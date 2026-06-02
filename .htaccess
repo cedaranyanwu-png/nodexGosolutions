@@ -1,0 +1,16 @@
+# Enable the Apache Rewrite Engine to allow for URL manipulation
+RewriteEngine On
+
+# Ensure the base for rewrite rules is the root directory
+RewriteBase /
+
+# Check if the requested filename is NOT an actual file on the server
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Check if the requested filename is NOT an actual directory on the server
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route all other requests to the single entry point: index.php
+# [L] means this is the Last rule to be processed if it matches
+# [QSA] means Query String Append, preserving existing URL parameters
+RewriteRule ^ index.php [L,QSA]
