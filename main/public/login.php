@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sign In | nodexGosolutions</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="../css/login.css" rel="stylesheet">
+
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+   <?php include "../modul/nav.html"?>
+    <div class="auth-wrapper">
+        <div class="auth-card" data-aos="zoom-in" data-aos-duration="900">
+
+            <div class="iss-telemetry d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-satellite me-1"></i> ISS ORBIT: 418 KM</span>
+                <span id="telemetry-speed">7.66 KM/S</span>
+            </div>
+
+            <div class="text-center mb-4">
+                <h4 class="fw-bold text-white mb-1">Dual Authentication</h4>
+                <p class="text-muted small mb-0" style="color: var(--text-muted-custom) !important;">Tenant & Admin Single-Sign On</p>
+            </div>
+
+            <div id="alertBox" class="alert d-none" role="alert"></div>
+
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Email / Tenant ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="admin@nodexplatform.com.ng" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label">Password</label>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="������������" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnLogin" class="btn btn-space w-100 mb-3">
+                    <i class="fa-solid fa-rocket me-2"></i>Authenticate Session
+                </button>
+            </form>
+
+            <div class="text-center pt-2 border-top border-secondary border-opacity-25 mt-3">
+                <p class="small mb-0" style="color: var(--text-muted-custom);">
+                    Don't have an account? <a href="register.html" class="text-info text-decoration-none fw-bold">Deploy Tenant</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+<?php include "../modul/footer.html"?>
+    <!-- JQUERY, BOOTSTRAP, AND LIBRARIES -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+     <script src="../js/login.js"></script>
+
+
+    <script>
+           </script>
+</body>
+</html>

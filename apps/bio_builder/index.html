@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bio Link Builder</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/bio_builder.css">
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- LEFT: Builder Form -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-primary me-2"></i> Bio Link Builder</h3>
+        <p class="text-muted small">Create your custom link-in-bio page in seconds.</p>
+        <hr>
+
+        <form id="bioForm">
+          <!-- Username / Handle -->
+          <div class="mb-3">
+            <label for="username" class="form-label fw-semibold">Page Handle / Username</label>
+            <div class="input-group">
+              <span class="input-group-text">bio.php?u=</span>
+              <input type="text" id="username" class="form-control" placeholder="john" required pattern="[a-zA-Z0-9_-]+">
+            </div>
+          </div>
+
+          <!-- Profile Info -->
+          <div class="mb-3">
+            <label for="displayName" class="form-label fw-semibold">Display Name</label>
+            <input type="text" id="displayName" class="form-control" placeholder="John Doe" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="bio" class="form-label fw-semibold">Bio / Short Description</label>
+            <textarea id="bio" class="form-control" rows="2" placeholder="Digital Creator | Tech Enthusiast"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="avatarUrl" class="form-label fw-semibold">Profile Picture URL</label>
+            <input type="url" id="avatarUrl" class="form-control" placeholder="https://via.placeholder.com/150">
+          </div>
+
+          <!-- Links Section -->
+          <hr class="my-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold m-0"><i class="fa-solid fa-link me-2 text-primary"></i> Your Links</h5>
+            <button type="button" id="addLinkBtn" class="btn btn-sm btn-outline-primary">
+              <i class="fa-solid fa-plus me-1"></i> Add Link
+            </button>
+          </div>
+
+          <div id="linksContainer">
+            <!-- Dynamic link rows inserted here via jQuery -->
+          </div>
+
+          <!-- Alert & Action Button -->
+          <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;"></div>
+
+          <button type="submit" id="saveBioBtn" class="btn btn-primary w-100 py-2 fs-5 mt-4 rounded-3">
+            <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publish Bio Page
+          </button>
+        </form>
+
+        <!-- Result Box -->
+        <div id="resultBox" class="mt-4 pt-4 border-top" style="display: none;">
+          <label class="form-label fw-semibold text-success"><i class="fa-solid fa-circle-check me-1"></i> Your Bio Page is Live!</label>
+          <div class="input-group mb-3">
+            <input type="text" id="publishedUrl" class="form-control" readonly>
+            <button class="btn btn-outline-secondary" type="button" id="copyBtn">
+              <i class="fa-solid fa-copy me-1"></i> Copy
+            </button>
+          </div>
+          <a href="#" id="visitBioBtn" target="_blank" class="btn btn-outline-primary w-100">
+            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Visit Your Page
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Mobile Live Preview -->
+    <div class="col-lg-5">
+      <div class="sticky-top pt-2">
+        <label class="form-label fw-semibold text-muted text-center w-100 mb-2">LIVE MOBILE PREVIEW</label>
+        <div class="phone-frame shadow-lg">
+          <div class="phone-screen">
+            <div class="text-center pt-4 px-3">
+              <img id="previewAvatar" src="https://via.placeholder.com/150" class="rounded-circle mb-3 preview-img" alt="Avatar">
+              <h5 id="previewName" class="fw-bold mb-1">Your Name</h5>
+              <p id="previewBio" class="text-muted small">Your bio description will appear here...</p>
+            </div>
+            <div id="previewLinks" class="px-3 pb-4">
+              <!-- Live link buttons rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- jQuery & Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="js/bio_builder.js"></script>
+
+</body>
+</html>

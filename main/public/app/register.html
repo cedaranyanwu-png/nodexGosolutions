@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Create Account | nodexGosolutions</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%25" cy="50%25" r="50%25"><stop offset="0%25" stop-color="%2306b6d4"/><stop offset="100%25" stop-color="%236366f1"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)"/><path d="M18 44V20l14 24V20M38 20h8v24M38 32h8" stroke="%23fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>' />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://nodexplatform.com.ng/main/css/register-mobile.css" />
+</head>
+<body>
+  <div id="nav-container"></div>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Join nodexGosolutions</p>
+      </div>
+
+      <form id="registerForm" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required placeholder="John Doe" autocomplete="name" inputmode="text" />
+          <span class="error-msg" id="fullNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email" inputmode="email" />
+          <span class="error-msg" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required placeholder="+234 800 000 0000" autocomplete="tel" inputmode="tel" />
+          <span class="error-msg" id="phoneError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" required placeholder="Min. 8 characters" autocomplete="new-password" />
+            <button type="button" class="toggle-password" data-target="password">👁️</button>
+          </div>
+          <span class="error-msg" id="passwordError"></span>
+          <div class="password-strength" id="passwordStrength"></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter password" autocomplete="new-password" />
+            <button type="button" class="toggle-password" data-target="confirmPassword">👁️</button>
+          </div>
+          <span class="error-msg" id="confirmPasswordError"></span>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="terms" name="terms" required />
+            <span>I agree to <a href="#" target="_blank">Terms</a> & <a href="#" target="_blank">Privacy</a></span>
+          </label>
+          <span class="error-msg" id="termsError"></span>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-loader" style="display:none;">Creating...</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Have an account? <a href="https://nodexplatform.com.ng/app/login.html">Sign In</a></p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="https://nodexplatform.com.ng/main/js/app-register.js"></script>
+</body>
+</html>

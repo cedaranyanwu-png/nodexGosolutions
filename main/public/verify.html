@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification - nodexGosolutions</title>
+    <!-- jQuery Library -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Fullscreen Viewport Setup */
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #03040a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Ambient Glow Effect */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        /* Container Card */
+        .card {
+            position: relative;
+            z-index: 1;
+            background: #0a0f1e;
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 440px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 22px;
+            color: #00d2ff;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #8a99ad;
+            line-height: 1.5;
+        }
+
+        /* CSS Spinner */
+        .loader {
+            border: 3px solid rgba(0, 210, 255, 0.1);
+            border-top: 3px solid #00d2ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.9s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Button Styling */
+        .btn-login {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #00d2ff, #0072ff);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="title">nodexGosolutions</div>
+    <div id="loader" class="loader"></div>
+    <div id="statusMsg" class="status-msg">Verifying your account details...</div>
+    <div id="actionArea"></div>
+</div>
+
+<script>
+$(document).ready(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+    const token = urlParams.get('token');
+
+    if (!email || !token) {
+        $('#loader').hide();
+        $('#statusMsg').css('color', '#ff4d4d').text('Invalid or missing verification details.');
+        $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+        return;
+    }
+
+    $.ajax({
+        url: 'https://nodexplatform.com.ng/main/php/verify.php',
+        type: 'POST',
+        data: {
+            email: email,
+            token: token
+        },
+        dataType: 'json',
+        success: function(response) {
+            $('#loader').hide();
+
+            if (response.success) {
+                $('#statusMsg').css('color', '#00ffaa').text(response.message || 'Verification successful! Redirecting to login...');
+
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else {
+                $('#statusMsg').css('color', '#ff4d4d').text(response.message || 'Verification failed.');
+                $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#loader').hide();
+
+            console.error("HTTP Status:", xhr.status);
+            console.error("Raw Response:", xhr.responseText);
+
+            let message = 'Network error or invalid server response.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+
+            $('#statusMsg').css('color', '#ff4d4d').text(message);
+            $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

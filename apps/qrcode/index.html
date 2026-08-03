@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business QR Code Generator</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/qrcode.css">
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- LEFT: Controls & Form -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="fw-bold mb-3">
+          <i class="fa-solid fa-qrcode text-primary me-2"></i> QR Code Generator
+        </h3>
+        <p class="text-muted small">Generate branded static or dynamic QR codes with live analytics.</p>
+        <hr>
+
+        <form id="qrForm">
+          <!-- QR Type Selection -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">QR Code Type</label>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="qr_type" id="typeStatic" value="static" checked>
+              <label class="btn btn-outline-primary" for="typeStatic">
+                <i class="fa-solid fa-bolt me-1"></i> Static QR
+              </label>
+
+              <input type="radio" class="btn-check" name="qr_type" id="typeDynamic" value="dynamic">
+              <label class="btn btn-outline-primary" for="typeDynamic">
+                <i class="fa-solid fa-chart-line me-1"></i> Dynamic QR (Trackable)
+              </label>
+            </div>
+            <div class="form-text mt-1" id="typeHelpText">
+              Static QR encodes data directly. Dynamic QR uses a short link you can track and edit anytime.
+            </div>
+          </div>
+
+          <!-- Target URL / Content -->
+          <div class="mb-3">
+            <label for="qrContent" class="form-label fw-semibold">Destination URL / Content</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
+              <input type="url" id="qrContent" class="form-control" placeholder="https://yourbusiness.com/promo" required>
+            </div>
+          </div>
+
+          <!-- Logo Upload (Embedded Center) -->
+          <div class="mb-3">
+            <label for="logoInput" class="form-label fw-semibold">Embed Business Logo (Optional)</label>
+            <input type="file" id="logoInput" class="form-control" accept="image/*">
+            <div class="form-text">PNG/JPG logo centered with High Error Correction (30% recovery).</div>
+          </div>
+
+          <!-- Alert Output -->
+          <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;"></div>
+
+          <button type="submit" id="generateBtn" class="btn btn-primary w-100 py-2 fs-5 mt-3 rounded-3">
+            <i class="fa-solid fa-gear me-2"></i> Generate QR Code
+          </button>
+        </form>
+      </div>
+
+      <!-- ANALYTICS PANEL (For Dynamic QRs) -->
+      <div class="card shadow-sm border-0 rounded-4 p-4 mt-4" id="analyticsCard">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-chart-pie text-success me-2"></i> Real-time Analytics</h5>
+          <button type="button" id="refreshAnalyticsBtn" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-rotate-right me-1"></i> Refresh Data
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle" id="analyticsTable">
+            <thead class="table-light">
+              <tr>
+                <th>Code</th>
+                <th>Target URL</th>
+                <th class="text-center">Total Scans</th>
+                <th class="text-end">Last Scan</th>
+              </tr>
+            </thead>
+            <tbody id="analyticsBody">
+              <tr><td colspan="4" class="text-center text-muted">No dynamic codes generated yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Canvas Preview & Download -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0 rounded-4 p-4 text-center sticky-top" style="top: 20px;">
+        <label class="form-label fw-semibold text-muted mb-3">QR CODE PREVIEW</label>
+
+        <div class="qr-preview-wrapper mb-3 p-3 bg-light border rounded-3 d-inline-block mx-auto">
+          <canvas id="qrCanvas" width="260" height="260"></canvas>
+        </div>
+
+        <div id="qrMetaInfo" class="small text-muted mb-3">
+          Type target URL and click Generate.
+        </div>
+
+        <button type="button" id="downloadBtn" class="btn btn-success w-100 py-2 rounded-3" disabled>
+          <i class="fa-solid fa-download me-2"></i> Download High-Res PNG
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Libraries: jQuery, Bootstrap, QRCode.js -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- Custom JS -->
+<script src="js/qrcode.js"></script>
+
+</body>
+</html>

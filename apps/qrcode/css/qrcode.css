@@ -1,0 +1,19 @@
+body {
+  background-color: #f4f6f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.qr-preview-wrapper {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+#qrCanvas {
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-group .btn-check:checked + .btn-outline-primary {
+  background-color: #0d6efd;
+  color: #ffffff;
+}

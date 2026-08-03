@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini URL Shortener</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/url_shortner.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="card shortener-card">
+    <div class="card-header text-center">
+      <h2><i class="fa-solid fa-link me-2"></i> Mini URL Shortener</h2>
+      <p class="mb-0 text-white-50">Paste a long URL to turn it into a short link instantly.</p>
+    </div>
+
+    <div class="card-body p-4">
+      <!-- AJAX Form -->
+      <form id="shortenerForm">
+        <div class="mb-3">
+          <label for="longUrl" class="form-label fw-semibold">Enter your long URL</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-globe"></i></span>
+            <input type="url" id="longUrl" class="form-control" placeholder="https://example.com/very-long-page-address" required>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-2 fs-5">
+          <i class="fa-solid fa-bolt me-2"></i> Shorten URL
+        </button>
+      </form>
+
+      <!-- Alert Box for Error Messages -->
+      <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;" role="alert"></div>
+
+      <!-- Output Result Box -->
+      <div id="resultBox" class="mt-4 pt-4 border-top" style="display: none;">
+        <label class="form-label fw-semibold">Your Shortened Link:</label>
+        <div class="input-group mb-3">
+          <input type="text" id="shortUrlInput" class="form-control" readonly>
+          <button class="btn btn-outline-secondary" type="button" id="copyBtn">
+            <i class="fa-solid fa-copy me-1"></i> Copy
+          </button>
+        </div>
+
+        <a href="#" id="visitLink" target="_blank" class="btn btn-outline-primary w-100">
+          <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Open Short Link
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery & Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="js/url_shortner.js"></script>
+
+</body>
+</html>

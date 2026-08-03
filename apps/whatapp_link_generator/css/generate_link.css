@@ -1,0 +1,39 @@
+body { background-color: #f4f6f9; }
+    .wa-card {
+      max-width: 650px;
+      margin: 40px auto;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    .wa-header {
+      background-color: #25D366;
+      color: white;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      padding: 2rem;
+    }
+    .btn-whatsapp {
+      background-color: #25D366;
+      color: white;
+      font-weight: 600;
+    }
+    .btn-whatsapp:hover {
+      background-color: #1da851;
+      color: white;
+    }
+    .preview-box {
+      background-color: #e5ddd5;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .chat-bubble {
+      background-color: #dcf8c6;
+      border-radius: 7.5px;
+      padding: 8px 12px;
+      display: inline-block;
+      max-width: 85%;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+      color: #303030;
+      word-break: break-word;
+    }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Image Compressor & Converter</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/img_com.css">
+</head>
+<body>
+
+<div class="container py-5">
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h1 class="fw-bold"><i class="fa-solid fa-file-image text-primary me-2"></i> Image Compressor</h1>
+    <p class="text-muted">Compress, resize, and convert images (JPG, PNG, WebP) in bulk for fast web loading.</p>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="row g-4">
+
+    <!-- LEFT: Settings & Dropzone -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-sliders text-primary me-2"></i> Compression Settings</h5>
+        <hr>
+
+        <form id="compressForm">
+          <!-- Quality Control -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <label for="qualityRange" class="form-label fw-semibold">Quality Level</label>
+              <span id="qualityVal" class="fw-bold text-primary">80%</span>
+            </div>
+            <input type="range" class="form-range" id="qualityRange" min="10" max="100" value="80">
+          </div>
+
+          <!-- Format Conversion -->
+          <div class="mb-3">
+            <label for="targetFormat" class="form-label fw-semibold">Target Output Format</label>
+            <select id="targetFormat" class="form-select">
+              <option value="original">Keep Original Format</option>
+              <option value="webp">Convert to WebP (Recommended)</option>
+              <option value="jpeg">Convert to JPG</option>
+              <option value="png">Convert to PNG</option>
+            </select>
+          </div>
+
+          <!-- Resize Options -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Resize Max Dimensions (px)</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="number" id="maxWidth" class="form-control" placeholder="Max Width (e.g. 1920)">
+              </div>
+              <div class="col-6">
+                <input type="number" id="maxHeight" class="form-control" placeholder="Max Height (e.g. 1080)">
+              </div>
+            </div>
+            <div class="form-text">Aspect ratio will be automatically preserved.</div>
+          </div>
+        </form>
+
+        <!-- Dropzone Area -->
+        <div class="dropzone-area mt-3 text-center p-4 rounded-3 border-2 border-dashed" id="dropzone">
+          <i class="fa-solid fa-cloud-arrow-up fa-3x text-primary mb-2"></i>
+          <p class="mb-1 fw-semibold">Drag & Drop images here</p>
+          <span class="text-muted small">or click to browse from device</span>
+          <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/webp" class="d-none">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Batch Processing Queue -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0"><i class="fa-solid fa-list-check text-success me-2"></i> Process Queue</h5>
+          <button id="downloadAllBtn" class="btn btn-success btn-sm rounded-3 d-none">
+            <i class="fa-solid fa-file-zipper me-1"></i> Download All (.ZIP)
+          </button>
+        </div>
+        <hr>
+
+        <div id="queueList" class="queue-container">
+          <div class="text-center py-5 text-muted" id="emptyQueueMsg">
+            <i class="fa-regular fa-images fa-3x mb-2 text-secondary"></i>
+            <p>No images selected yet. Drag & drop files on the left panel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Libraries: jQuery, Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script src="js/img_com.js"></script>
+
+</body>
+</html>

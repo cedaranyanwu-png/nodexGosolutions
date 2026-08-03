@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Login | nodexGosolutions</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%25" cy="50%25" r="50%25"><stop offset="0%25" stop-color="%2306b6d4"/><stop offset="100%25" stop-color="%236366f1"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)"/><path d="M18 44V20l14 24V20M38 20h8v24M38 32h8" stroke="%23fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>' />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://nodexplatform.com.ng/main/css/login-mobile.css" />
+</head>
+<body>
+  <div id="nav-container"></div>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to continue</p>
+      </div>
+
+      <form id="loginForm" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email" inputmode="email" />
+          <span class="error-msg" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" required placeholder="Enter password" autocomplete="current-password" />
+            <button type="button" class="toggle-password" data-target="password">👁️</button>
+          </div>
+          <span class="error-msg" id="passwordError"></span>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember" name="remember" />
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader" style="display:none;">Signing in...</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>No account? <a href="https://nodexplatform.com.ng/app/register">Sign Up</a></p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+
+  <script src="https://nodexplatform.com.ng/main/js/app-login.js"></script>
+</body>
+</html>
