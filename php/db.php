@@ -9,12 +9,12 @@
 // Enable strict typing for better reliability and fewer runtime bugs
 declare(strict_types=1);
 
-// Require our unified JSON Database engine class
-require_once __DIR__ . '/../../php/database.php';
+// Require our unified JSON Database engine class from the same directory
+require_once __DIR__ . '/database.php';
 
 // Initialize the Database instance targeting the 'system' JSON database directory
 // We store this instance in $conn to maintain compatibility across existing files
-$conn = new Database(__DIR__ . '/../../databases', 'system');
+$conn = new Database(__DIR__ . '/../databases', 'system');
 
 // Ensure tables exist under 'system' database folder
 $conn->createTable('users');

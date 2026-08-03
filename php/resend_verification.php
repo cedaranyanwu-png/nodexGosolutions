@@ -8,8 +8,8 @@
 // Enable strict typing for better reliability
 declare(strict_types=1);
 
-// Require central database configuration and security helpers
-require_once 'db.php';
+// Require central database configuration and security helpers from same folder
+require_once __DIR__ . '/db.php';
 
 // ============================================================
 // 1. VALIDATE REQUEST METHOD

@@ -23,8 +23,8 @@ $(document).ready(function() {
 
         // Execute asynchronous POST registration payload
         $.ajax({
-            // Target local relative path instead of hardcoded domain
-            url: '/main/php/register.php',
+            // Target local root PHP folder path instead of main/php/
+            url: '/php/register.php',
             type: 'POST',
             dataType: 'json',
             data: {

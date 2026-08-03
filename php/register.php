@@ -5,10 +5,10 @@
  * Implements user registration and handles secure insertion into our JSON Database.
  */
 
-// Require the connection and security configurations
-require_once 'db.php';
-// Require email dispatch service interface
-require_once 'send_email.php';
+// Require the connection and security configurations from same folder
+require_once __DIR__ . '/db.php';
+// Require email dispatch service interface from same folder
+require_once __DIR__ . '/send_email.php';
 
 // Initiate secure session tracking
 secureSession();

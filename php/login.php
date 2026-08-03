@@ -5,8 +5,8 @@
  * Implements secure login authentication utilizing the custom JSON Database.
  */
 
-// Require the connection and security helper configurations
-require_once 'db.php';
+// Require the connection and security helper configurations from same folder
+require_once __DIR__ . '/db.php';
 
 // Instantiate secure session management
 secureSession();
@@ -86,7 +86,7 @@ $_SESSION['role']     = $user['role'] ?? 'tenant';
 $_SESSION['fullname'] = $user['fullname'] ?? '';
 
 // Direct authenticated user to appropriate dashboard path based on role (admin or tenant)
-$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard.php' : 'user/dashboard.html';
+$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard.php' : 'user/dashboard.php';
 
 // Return authentication success response
 jsonResponse([

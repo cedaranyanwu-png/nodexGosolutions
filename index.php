@@ -27,6 +27,12 @@ if (str_contains($currentHost, ':')) {
 // Parse the raw requested URL path to extract the routing path (slug)
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
+// Physical Asset Router Bypass: If the requested resource exists on disk as a file, return false so the webserver can serve it directly
+if (file_exists(__DIR__ . $requestUri) && !is_dir(__DIR__ . $requestUri)) {
+    // Return false to allow webserver to handle raw resource files directly
+    return false;
+}
+
 // Define the root pages matching map pointing to main landing page scripts
 $routeMap = [
     '/login' => __DIR__ . '/main/public/login.php',
@@ -47,8 +53,8 @@ $routeMap = [
     '/portfolio.php' => __DIR__ . '/main/public/portfolio.php',
     '/cms/admin' => __DIR__ . '/cms/admin.php',
     '/cms/admin.php' => __DIR__ . '/cms/admin.php',
-    '/cms/save_page' => __DIR__ . '/cms/php/save_page.php',
-    '/cms/php/save_page.php' => __DIR__ . '/cms/php/save_page.php',
+    '/cms/save_page' => __DIR__ . '/php/save_page.php',
+    '/cms/php/save_page.php' => __DIR__ . '/php/save_page.php',
     '/admin/dashboard' => __DIR__ . '/main/public/admin/dashboard.php',
     '/admin/dashboard.php' => __DIR__ . '/main/public/admin/dashboard.php',
     '/user/dashboard' => __DIR__ . '/main/public/user/dashboard.php',

@@ -7,8 +7,8 @@
  * Restricted strictly to logged-in users with administrative privileges.
  */
 
-// Require the secure session and database initialization context from db.php
-require_once __DIR__ . '/../main/php/db.php';
+// Require the secure session and database initialization context from db.php in php/ folder
+require_once __DIR__ . '/../php/db.php';
 
 // Instantiate secure session properties configuration
 secureSession();
@@ -114,9 +114,9 @@ $(document).ready(function() {
         $btn.prop('disabled', true).text('Saving Code...');
         $status.hide().removeClass('success error');
 
-        // Send payload via AJAX pointing to cms/php/save_page.php
+        // Send payload via AJAX pointing to routed cms/save_page path
         $.ajax({
-            url: 'php/save_page.php',
+            url: '/cms/save_page',
             type: 'POST',
             data: $(this).serialize(),
             dataType: 'json',

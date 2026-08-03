@@ -9,8 +9,8 @@
 // Return response as JSON payload
 header('Content-Type: application/json');
 
-// Require the secure session and database initialization context from db.php
-require_once __DIR__ . '/../../main/php/db.php';
+// Require the secure session and database initialization context from db.php in the same folder
+require_once __DIR__ . '/db.php';
 
 // Instantiate secure session properties configuration
 secureSession();
@@ -29,11 +29,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Require the centralized JSON Database engine
-require_once __DIR__ . '/../../php/database.php';
+require_once __DIR__ . '/database.php';
 
 try {
     // Instantiate the database pointing to /app/databases/site_cms
-    $db = new Database(__DIR__ . '/../../databases', 'site_cms');
+    $db = new Database(__DIR__ . '/../databases', 'site_cms');
 
     // Extract form variables
     $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;

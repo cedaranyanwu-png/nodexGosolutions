@@ -1,3 +1,19 @@
+<?php
+/**
+ * login.php
+ *
+ * Renders the single sign-on authentication interface for tenants and administrators.
+ */
+
+// Enable strict typing for safety
+declare(strict_types=1);
+
+// Require dynamic database configuration
+require_once __DIR__ . '/../../php/db.php';
+
+// Instantiate secure session configurations
+secureSession();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,17 +24,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="../css/login.css" rel="stylesheet">
-
-    <style>
-
-    </style>
+    <!-- Load unified CSS from root directory -->
+    <link href="/css/login.css" rel="stylesheet">
 </head>
 <body>
 
     <div id="canvas-container"></div>
 
-   <?php include "../modul/nav.html"?>
+    <!-- Navigation Header component -->
+    <?php require_once __DIR__ . '/../modul/nav.html'; ?>
+
     <div class="auth-wrapper">
         <div class="auth-card" data-aos="zoom-in" data-aos-duration="900">
 
@@ -29,7 +44,7 @@
 
             <div class="text-center mb-4">
                 <h4 class="fw-bold text-white mb-1">Dual Authentication</h4>
-                <p class="text-muted small mb-0" style="color: var(--text-muted-custom) !important;">Tenant & Admin Single-Sign On</p>
+                <p class="text-muted small mb-0">Tenant & Admin Single-Sign On</p>
             </div>
 
             <div id="alertBox" class="alert d-none" role="alert"></div>
@@ -49,7 +64,7 @@
                     </div>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="������������" required>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
                     </div>
                 </div>
 
@@ -60,22 +75,22 @@
 
             <div class="text-center pt-2 border-top border-secondary border-opacity-25 mt-3">
                 <p class="small mb-0" style="color: var(--text-muted-custom);">
-                    Don't have an account? <a href="register.html" class="text-info text-decoration-none fw-bold">Deploy Tenant</a>
+                    Don't have an account? <a href="/register" class="text-info text-decoration-none fw-bold">Deploy Tenant</a>
                 </p>
             </div>
 
         </div>
     </div>
-<?php include "../modul/footer.html"?>
+
+    <!-- Footer component -->
+    <?php require_once __DIR__ . '/../modul/footer.html'; ?>
+
     <!-- JQUERY, BOOTSTRAP, AND LIBRARIES -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-     <script src="../js/login.js"></script>
-
-
-    <script>
-           </script>
+    <!-- Load unified JS from root directory -->
+    <script src="/js/login.js"></script>
 </body>
 </html>

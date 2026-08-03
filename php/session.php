@@ -5,8 +5,8 @@
  * Manages active user sessions, validations, and "Remember Me" cookie tracking using our custom JSON Database.
  */
 
-// Require database connection and security configurations
-require_once "db.php";
+// Require database connection and security configurations from same directory
+require_once __DIR__ . '/db.php';
 
 // Initialize session securely using db.php's function
 if (function_exists('secureSession')) {

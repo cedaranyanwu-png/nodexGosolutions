@@ -1,55 +1,76 @@
 <?php
+/**
+ * bio_builder.php
+ *
+ * Implements digital biography creation, persistence, and custom layout rendering using our JSON Database.
+ */
+
+// Enable strict typing for safety
 declare(strict_types=1);
 
-$dataFile = __DIR__ . '/bios.json';
+// Require the centralized JSON Database class from same directory
+require_once __DIR__ . '/database.php';
 
-function getBios(string $file): array {
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([], JSON_PRETTY_PRINT));
-        return [];
-    }
-    return json_decode(file_get_contents($file), true) ?? [];
-}
+// Instantiate the Database pointing to /app/databases/bio_builder
+$db = new Database(__DIR__ . '/../databases', 'bio_builder');
 
-function saveBios(string $file, array $data): void {
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
-}
+// Ensure table 'bios' is created
+$db->createTable('bios');
 
 // ==========================================
 // 1. POST ENDPOINT (AJAX Request from jQuery)
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save') {
+    // Send JSON header
     header('Content-Type: application/json');
 
+    // Extract and sanitize inputs
     $username    = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['username'] ?? '');
     $displayName = trim($_POST['display_name'] ?? '');
     $bio         = trim($_POST['bio'] ?? '');
     $avatarUrl   = filter_var(trim($_POST['avatar_url'] ?? ''), FILTER_VALIDATE_URL) ?: 'https://via.placeholder.com/150';
     $linksJson   = $_POST['links'] ?? '[]';
+    // Parse social links
     $links       = json_decode($linksJson, true) ?? [];
 
+    // Validate parameters presence
     if (empty($username) || empty($displayName)) {
+        // Return bad request error
         echo json_encode(['success' => false, 'error' => 'Username and display name are required.']);
+        // Terminate
         exit;
     }
 
-    $bios = getBios($dataFile);
-    $bios[$username] = [
+    // Prepare bio payload fields
+    $payload = [
+        'username'     => $username,
         'display_name' => htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'),
         'bio'          => htmlspecialchars($bio, ENT_QUOTES, 'UTF-8'),
         'avatar_url'   => htmlspecialchars($avatarUrl, ENT_QUOTES, 'UTF-8'),
-        'links'        => $links,
-        'updated_at'   => date('Y-m-d H:i:s')
+        'links'        => $links
     ];
 
-    saveBios($dataFile, $bios);
+    // Check if a bio page already exists for this username to decide update vs insert
+    $existing = $db->selectOne('bios', ['username' => $username]);
 
+    if ($existing !== null) {
+        // Perform update for existing bio
+        $db->update('bios', $payload, ['id' => $existing['id']]);
+    } else {
+        // Insert new bio record
+        $db->insert('bios', $payload);
+    }
+
+    // Determine current protocol
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-    $host = $_SERVER['HTTP_HOST'];
-    $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-    $pageUrl = "{$protocol}{$host}{$scriptDir}/bio_builder.php?u={$username}";
+    // Capture current host
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    // Format redirection URL
+    $pageUrl = "{$protocol}{$host}/php/bio_builder.php?u={$username}";
 
+    // Return success response
     echo json_encode(['success' => true, 'page_url' => $pageUrl]);
+    // Terminate
     exit;
 }
 
@@ -57,21 +78,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
 // 2. GET ENDPOINT (Public Profile View)
 // ==========================================
 $requestedUser = preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['u'] ?? '');
-$bios = getBios($dataFile);
 
-if (empty($requestedUser) || !isset($bios[$requestedUser])) {
-    http_response_code(404);
-    die("<h3>404 - Bio Page Not Found</h3><p><a href='index.html'>Create your own Bio Page</a></p>");
+// Try selecting bio page details from our database table
+$userBio = null;
+if (!empty($requestedUser)) {
+    // Select matched bio record
+    $userBio = $db->selectOne('bios', ['username' => $requestedUser]);
 }
 
-$userBio = $bios[$requestedUser];
+// If no matching profile was found, return a 404 response
+if ($userBio === null) {
+    // Send 404 header status
+    http_response_code(404);
+    // Display error message fallback markup
+    die("<h3>404 - Bio Page Not Found</h3><p><a href='../apps/bio_builder/index.html'>Create your own Bio Page</a></p>");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $userBio['display_name'] ?> - Links</title>
+  <title><?= htmlspecialchars($userBio['display_name']) ?> - Links</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -120,9 +148,9 @@ $userBio = $bios[$requestedUser];
 <body>
 
 <div class="bio-card">
-  <img src="<?= $userBio['avatar_url'] ?>" class="avatar-img mb-3" alt="Avatar">
-  <h2 class="fw-bold mb-1"><?= $userBio['display_name'] ?></h2>
-  <p class="text-white-50 mb-4"><?= nl2br($userBio['bio']) ?></p>
+  <img src="<?= htmlspecialchars($userBio['avatar_url']) ?>" class="avatar-img mb-3" alt="Avatar">
+  <h2 class="fw-bold mb-1"><?= htmlspecialchars($userBio['display_name']) ?></h2>
+  <p class="text-white-50 mb-4"><?= nl2br(htmlspecialchars($userBio['bio'])) ?></p>
 
   <div class="bio-links">
     <?php foreach ($userBio['links'] as $link): ?>

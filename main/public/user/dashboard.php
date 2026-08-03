@@ -23,7 +23,7 @@ $base_domain = "nodexplatform.com.ng";
     <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -318,6 +318,6 @@ $base_domain = "nodexplatform.com.ng";
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Custom jQuery Engine -->
-<script src="/../js/userdash/app.js"></script>
+<script src="/js/userdash/app.js"></script>
 </body>
 </html>

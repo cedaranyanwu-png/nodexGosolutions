@@ -40,7 +40,7 @@
         /* Container Card */
         .card {
             position: relative;
-            z-index: 1;
+ z-index: 1;
             background: #0a0f1e;
             border: 1px solid rgba(0, 210, 255, 0.25);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -114,53 +114,80 @@
 </div>
 
 <script>
+// Execute actions upon page readiness
 $(document).ready(function() {
+    // Parse URL query string parameters
     const urlParams = new URLSearchParams(window.location.search);
+    // Extract email address query value
     const email = urlParams.get('email');
+    // Extract verification token query value
     const token = urlParams.get('token');
 
+    // Make sure parameters are supplied
     if (!email || !token) {
+        // Hide spinner loading indicator
         $('#loader').hide();
+        // Show validation error styling
         $('#statusMsg').css('color', '#ff4d4d').text('Invalid or missing verification details.');
-        $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+        // Display fallback button back to portal login
+        $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
+        // Stop execution
         return;
     }
 
+    // Submit AJAX verification payload asynchronously
     $.ajax({
-        url: 'https://nodexplatform.com.ng/main/php/verify.php',
+        // Target unified local PHP verification script path
+        url: '/php/verify.php',
         type: 'POST',
         data: {
             email: email,
             token: token
         },
         dataType: 'json',
+        // On ajax request success
         success: function(response) {
+            // Hide the spinner loading indicator
             $('#loader').hide();
 
+            // Check if response flag validates verification success
             if (response.success) {
+                // Show success status styling
                 $('#statusMsg').css('color', '#00ffaa').text(response.message || 'Verification successful! Redirecting to login...');
 
+                // Redirect user to login screen
                 setTimeout(function() {
-                    window.location.href = 'login.html';
+                    // Navigate to single sign-on screen
+                    window.location.href = '/login';
                 }, 2000);
             } else {
+                // Show verification failure alerts
                 $('#statusMsg').css('color', '#ff4d4d').text(response.message || 'Verification failed.');
-                $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+                // Display fallback navigation button
+                $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
             }
         },
+        // On ajax error scenario
         error: function(xhr, status, error) {
+            // Hide the loading spinner
             $('#loader').hide();
 
+            // Console log debugging context
             console.error("HTTP Status:", xhr.status);
+            // Console log response text context
             console.error("Raw Response:", xhr.responseText);
 
+            // Establish standard error fallback message text
             let message = 'Network error or invalid server response.';
             if (xhr.responseJSON && xhr.responseJSON.message) {
+                // Grab descriptive message from response JSON payload
                 message = xhr.responseJSON.message;
             }
 
+            // Display error alerts
             $('#statusMsg').css('color', '#ff4d4d').text(message);
-            $('#actionArea').html('<a href="login.html" class="btn-login">Go to Login</a>');
+            // Output fallback button
+            $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
         }
     });
 });

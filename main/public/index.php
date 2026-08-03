@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS Scroll Animation CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-     <link href="../css/style.css" rel="stylesheet">
+     <link href="/css/style.css" rel="stylesheet">
 
 
     <style>
@@ -27,7 +27,7 @@
     <div id="canvas-container"></div>
 
     <!-- NAVBAR -->
-   <?php include "../modul/nav.html";?>
+   <?php include "main/modul/nav.html";?>
     <!-- SECTION 1: HERO -->
     <section id="hero" class="text-center">
         <div class="container" data-aos="zoom-in">
@@ -387,12 +387,12 @@
     </section>
 
     <!-- SECTION 12: CONTACT & FOOTER -->
-   <?php include "../modul/footer.html";?>
+   <?php include "main/modul/footer.html";?>
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-     <script src="../js/index.js"></script>
+     <script src="/js/index.js"></script>
 
 
     <script>

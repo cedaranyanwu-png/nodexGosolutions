@@ -5,8 +5,8 @@
  * Handles account validation processes using the custom JSON database driver.
  */
 
-// Include the unified database and helper functions file
-require_once 'db.php';
+// Include the unified database and helper functions file from same directory
+require_once __DIR__ . '/db.php';
 
 // Extract and sanitize input query criteria
 $email = cleanInput($_REQUEST['email'] ?? '');

@@ -9,8 +9,8 @@
 // Enable strict typing for safety
 declare(strict_types=1);
 
-// Require our system database connection layer
-require_once __DIR__ . '/../../php/db.php';
+// Require our system database connection layer going three levels up to the root php folder
+require_once __DIR__ . '/../../../php/db.php';
 
 // Instantiate secure session configurations
 secureSession();
