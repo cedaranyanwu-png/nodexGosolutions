@@ -28,9 +28,30 @@ if (str_contains($currentHost, ':')) {
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
 // Physical Asset Router Bypass: If the requested resource exists on disk as a file, return false so the webserver can serve it directly
-if (file_exists(__DIR__ . $requestUri) && !is_dir(__DIR__ . $requestUri)) {
-    // Return false to allow webserver to handle raw resource files directly
-    return false;
+$bypassPath = __DIR__ . $requestUri;
+$realBypassPath = realpath($bypassPath);
+$realRootPath = realpath(__DIR__);
+
+// Only allow bypass if the resolved path is strictly within the project directory root (or is not going outside)
+if ($realBypassPath !== false && $realRootPath !== false && str_starts_with($realBypassPath, $realRootPath) && is_file($realBypassPath)) {
+    // Forbid direct HTTP access to databases or sensitive assets
+    $relativeToRoot = substr($realBypassPath, strlen($realRootPath));
+    $relativeToRoot = ltrim(str_replace('\\', '/', $relativeToRoot), '/');
+
+    // List of directories that should never be directly downloaded via physical asset bypass
+    $protectedDirs = ['databases/', 'main/modul/'];
+    $isProtected = false;
+    foreach ($protectedDirs as $protected) {
+        if (str_starts_with($relativeToRoot, $protected)) {
+            $isProtected = true;
+            break;
+        }
+    }
+
+    if (!$isProtected) {
+        // Return false to allow webserver to handle raw resource files directly
+        return false;
+    }
 }
 
 // Define the root pages matching map pointing to main landing page scripts
@@ -81,7 +102,7 @@ if (str_ends_with($normalizedSlug, '.php')) {
 }
 
 // Define recognized landing page host names (apex, secondary, and development local hosts)
-$landingHosts = ['nodexgosolutions.com', 'localhost', '127.0.0.1'];
+$landingHosts = ['nodexplatform.com.ng', 'localhost', '127.0.0.1'];
 
 // Check if the requested host is one of our central marketing landing domain names
 if (in_array(strtolower($currentHost), $landingHosts, true)) {
@@ -131,6 +152,109 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
         <?php
         // Terminate execution
         exit;
+    }
+}
+
+// ============================================================
+// DYNAMIC TENANT PUBLIC DIRECTORY ROUTING
+// ============================================================
+
+// Check if the current host is NOT one of our landing hosts (meaning it is a subdomain or a specific tenant custom domain)
+if (!in_array(strtolower($currentHost), $landingHosts, true)) {
+    // Define candidate tenant folder names inside the root "public" directory
+    $possibleTenantFolders = [
+        // Candidate 1: The full request host name (e.g. "tenant1.nodexplatform.com.ng" or "mytenant.com")
+        $currentHost,
+    ];
+
+    // Split host by dots to isolate subdomains
+    $hostParts = explode('.', $currentHost);
+    // If we have subdomain parts, add the first subdomain segment as a candidate folder name (e.g., "tenant1")
+    if (count($hostParts) > 1) {
+        // Append first subdomain segment
+        $possibleTenantFolders[] = $hostParts[0];
+    }
+
+    // Initialize tenant public folder directory pointer
+    $tenantPublicDir = null;
+    // Iterate through candidates to locate an existing tenant subdirectory inside the root public/ folder
+    foreach ($possibleTenantFolders as $folder) {
+        // Construct the candidate directory path on disk
+        $candidatePath = __DIR__ . '/public/' . $folder;
+        // Verify if the candidate folder exists and is a valid directory
+        if (is_dir($candidatePath)) {
+            // Set the resolved tenant public directory pointer
+            $tenantPublicDir = $candidatePath;
+            // Break loop once matching folder is found
+            break;
+        }
+    }
+
+    // If a valid tenant public directory is found on disk, resolve and serve the requested resource
+    if ($tenantPublicDir !== null) {
+        // Canonicalize base tenant directory path
+        $realPublicDir = realpath($tenantPublicDir);
+
+        // Combine the tenant's public folder path with the requested URL path
+        $targetPath = $tenantPublicDir . $requestUri;
+
+        // If the targeted path points to a directory, append default index page files
+        if (is_dir($targetPath)) {
+            // Normalize path trailing slash
+            $targetPath = rtrim($targetPath, '/') . '/';
+            // Check for index.php as priority
+            if (file_exists($targetPath . 'index.php')) {
+                // Route to index.php
+                $targetPath .= 'index.php';
+            // Fallback to index.html
+            } elseif (file_exists($targetPath . 'index.html')) {
+                // Route to index.html
+                $targetPath .= 'index.html';
+            }
+        }
+
+        // Get the real absolute path of the targeted resource
+        $realTargetPath = realpath($targetPath);
+
+        // Security check: Ensure target path exists, is a file, and remains strictly within the tenant's public folder boundary to prevent LFI/directory traversal
+        if ($realPublicDir !== false && $realTargetPath !== false && is_file($realTargetPath) && str_starts_with($realTargetPath, $realPublicDir)) {
+            // Isolate file extension to determine execution or direct static asset serving
+            $extension = strtolower(pathinfo($realTargetPath, PATHINFO_EXTENSION));
+
+            // If the requested resource is a dynamic PHP script
+            if ($extension === 'php') {
+                // Execute and render the PHP file directly in tenant context
+                require_once $realTargetPath;
+                // Halt further routing processes
+                exit;
+            } else {
+                // Define common web content MIME-types list
+                $mimeTypes = [
+                    'html' => 'text/html',
+                    'htm'  => 'text/html',
+                    'css'  => 'text/css',
+                    'js'   => 'application/javascript',
+                    'png'  => 'image/png',
+                    'jpg'  => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'gif'  => 'image/gif',
+                    'svg'  => 'image/svg+xml',
+                    'ico'  => 'image/x-icon',
+                    'json' => 'application/json',
+                    'pdf'  => 'application/pdf',
+                    'zip'  => 'application/zip',
+                ];
+
+                // Retrieve MIME type header matching the extension, falling back to octet-stream
+                $contentType = $mimeTypes[$extension] ?? 'application/octet-stream';
+                // Emit correct browser response content header
+                header("Content-Type: " . $contentType);
+                // Stream raw file contents directly to client
+                readfile($realTargetPath);
+                // Exit routing script successfully
+                exit;
+            }
+        }
     }
 }
 

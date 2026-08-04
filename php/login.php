@@ -42,8 +42,8 @@ if (!$rateCheck['allowed']) {
 if ($email === 'admin@nodexplatform.com.ng' && $password === 'admin123') {
     // Reset rate limits on successful authentication
     resetRateLimit($rateKey);
-    // Assign admin session parameters
-    $_SESSION['user_id']   = 0;
+    // Assign admin session parameters aligned with persistent Admin record (ID 3) in users.json
+    $_SESSION['user_id']   = 3;
     $_SESSION['email']     = $email;
     $_SESSION['role']      = 'admin';
     $_SESSION['fullname']  = 'System Administrator';
@@ -66,7 +66,16 @@ if (!$user || !password_verify($password, $user['password'] ?? '')) {
     jsonResponse(['success' => false, 'message' => 'Invalid credentials provided.'], 401);
 }
 
-// 3. Email Verification Enforcer
+// 3. Suspended Status Check: Reject authentication if the user's account is suspended
+if (strtolower((string)($user['status'] ?? '')) === 'suspended') {
+    // Return forbidden/suspended response status
+    jsonResponse([
+        'success' => false,
+        'message' => 'Your account has been suspended by an administrator. Please contact support.'
+    ], 403);
+}
+
+// 4. Email Verification Enforcer
 if ((int)($user['is_verified'] ?? 0) !== 1) {
     // Return unverified response status
     jsonResponse([

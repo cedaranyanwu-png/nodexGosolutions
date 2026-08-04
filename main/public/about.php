@@ -27,7 +27,7 @@
     <div id="canvas-container"></div>
 
     <!-- NAVBAR Header -->
-<?php include "../modul/nav.html"?>
+<?php include __DIR__ . "/../modul/nav.html"?>
     <!-- SECTION 1: HERO OVERVIEW -->
     <section id="about-hero" class="text-center">
         <div class="container" data-aos="zoom-in">
@@ -238,7 +238,7 @@
     </section>
 
     <!-- SECTION 9: PARTNERSHIP INITIATION / CONTACT -->
-    <?php include "../modul/footer.html";?>
+    <?php include __DIR__ . "/../modul/footer.html";?>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

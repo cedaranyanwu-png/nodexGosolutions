@@ -28,7 +28,7 @@
     <canvas id="background-canvas"></canvas>
 
     <!-- Navigation -->
-   <?php include "../modul/nav.html"?>
+   <?php include __DIR__ . "/../modul/nav.html"?>
 
     <!-- SECTION 1: Hero - Introducing Cedar -->
     <section id="hero" class="d-flex align-items-center">
@@ -186,7 +186,7 @@
     </section>
 
     <!-- SECTION 12: Call to Action / Contact & Social Links -->
-    <?php include "../modul/footer.html"?>
+    <?php include __DIR__ . "/../modul/footer.html"?>
     <!-- Bootstrap 5 JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

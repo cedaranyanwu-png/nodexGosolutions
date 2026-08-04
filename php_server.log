@@ -25,3 +25,16 @@
 [Tue Aug  4 15:27:43 2026] [::1]:54498 Closing
 [Tue Aug  4 15:27:44 2026] [::1]:54500 Accepted
 [Tue Aug  4 15:27:44 2026] [::1]:54500 Closing
+[Tue Aug  4 16:47:30 2026] [::1]:55662 Accepted
+[Tue Aug  4 16:47:30 2026] [::1]:55662 Closing
+[Tue Aug  4 16:48:10 2026] [::1]:50546 Accepted
+[Tue Aug  4 16:48:10 2026] [::1]:50546 Closing
+[Tue Aug  4 16:48:12 2026] [::1]:50934 Accepted
+[Tue Aug  4 16:48:12 2026] [::1]:50934 Closing
+[Tue Aug  4 16:48:15 2026] [::1]:50936 Accepted
+[Tue Aug  4 16:48:15 2026] [::1]:50936 Closing
+[Tue Aug  4 17:00:59 2026] [::1]:52434 Accepted
+[Tue Aug  4 17:00:59 2026] [::1]:52434 [200]: GET /databases/system/users.json
+[Tue Aug  4 17:00:59 2026] [::1]:52434 Closing
+[Tue Aug  4 17:02:11 2026] [::1]:60164 Accepted
+[Tue Aug  4 17:02:11 2026] [::1]:60164 Closing

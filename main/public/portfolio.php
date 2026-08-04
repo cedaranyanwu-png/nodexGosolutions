@@ -27,7 +27,7 @@
     <div id="canvas-container"></div>
 
     <!-- NAVBAR Header -->
-    <?php include "../modul/nav.html"?>
+    <?php include __DIR__ . "/../modul/nav.html"?>
 
     <!-- MAIN PORTFOLIO & BIOGRAPHY CONTENT -->
     <main class="py-4">
@@ -275,7 +275,7 @@
     </main>
 
     <!-- FOOTER -->
-    <?php include "../modul/footer.html"?>
+    <?php include __DIR__ . "/../modul/footer.html"?>
 
     <!-- JS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
