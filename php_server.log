@@ -1,55 +1,14 @@
-[Mon Aug  3 21:59:21 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Mon Aug  3 22:00:02 2026] [::1]:42278 Accepted
-[Mon Aug  3 22:00:02 2026] [::1]:42278 Closing
-[Mon Aug  3 22:00:02 2026] [::1]:42290 Accepted
-[Mon Aug  3 22:00:02 2026] [::1]:42296 Accepted
-[Mon Aug  3 22:00:02 2026] [::1]:42290 Closing
-[Mon Aug  3 22:00:02 2026] [::1]:42296 Closing
-[Mon Aug  3 22:00:05 2026] [::1]:43636 Accepted
-[Mon Aug  3 22:00:05 2026] [::1]:43636 Closing
-[Mon Aug  3 22:00:05 2026] [::1]:43648 Accepted
-[Mon Aug  3 22:00:05 2026] [::1]:43648 Closing
-[Mon Aug  3 22:00:05 2026] [::1]:43664 Accepted
-[Mon Aug  3 22:00:05 2026] [::1]:43664 Closing
-[Mon Aug  3 22:04:39 2026] [::1]:45906 Accepted
-[Mon Aug  3 22:04:39 2026] [::1]:45906 Closing
-[Mon Aug  3 22:04:39 2026] [::1]:45920 Accepted
-[Mon Aug  3 22:04:39 2026] [::1]:45920 [200]: GET /css/login.css
-[Mon Aug  3 22:04:39 2026] [::1]:45920 Closing
-[Mon Aug  3 22:04:39 2026] [::1]:45926 Accepted
-[Mon Aug  3 22:04:39 2026] [::1]:45926 [200]: GET /js/login.js
-[Mon Aug  3 22:04:39 2026] [::1]:45926 Closing
-[Mon Aug  3 22:04:42 2026] [::1]:45938 Accepted
-[Mon Aug  3 22:04:42 2026] [::1]:45938 Closing
-[Mon Aug  3 22:09:34 2026] [::1]:52190 Accepted
-[Mon Aug  3 22:09:34 2026] [::1]:52190 Closing
-[Mon Aug  3 22:09:34 2026] [::1]:52200 Accepted
-[Mon Aug  3 22:09:34 2026] [::1]:52212 Accepted
-[Mon Aug  3 22:09:34 2026] [::1]:52200 [200]: GET /css/login.css
-[Mon Aug  3 22:09:34 2026] [::1]:52212 [200]: GET /js/login.js
-[Mon Aug  3 22:09:34 2026] [::1]:52200 Closing
-[Mon Aug  3 22:09:34 2026] [::1]:52212 Closing
-[Mon Aug  3 22:09:36 2026] [::1]:56928 Accepted
-[Mon Aug  3 22:09:36 2026] [::1]:56928 [200]: POST /php/login.php
-[Mon Aug  3 22:09:36 2026] [::1]:56928 Closing
-[Mon Aug  3 22:09:37 2026] [::1]:56932 Accepted
-[Mon Aug  3 22:09:37 2026] PHP Warning:  require_once(/app/main/public/admin/../../php/db.php): Failed to open stream: No such file or directory in /app/main/public/admin/dashboard.php on line 13
-[Mon Aug  3 22:09:37 2026] PHP Fatal error:  Uncaught Error: Failed opening required '/app/main/public/admin/../../php/db.php' (include_path='.:/usr/share/php') in /app/main/public/admin/dashboard.php:13
-Stack trace:
-#0 /app/index.php(68): require_once()
-#1 {main}
-  thrown in /app/main/public/admin/dashboard.php on line 13
-[Mon Aug  3 22:09:37 2026] [::1]:56932 Closing
-[Mon Aug  3 22:12:15 2026] [::1]:49900 Accepted
-[Mon Aug  3 22:12:15 2026] [::1]:49900 Closing
-[Mon Aug  3 22:12:15 2026] [::1]:49914 Accepted
-[Mon Aug  3 22:12:15 2026] [::1]:49928 Accepted
-[Mon Aug  3 22:12:15 2026] [::1]:49914 [200]: GET /css/login.css
-[Mon Aug  3 22:12:15 2026] [::1]:49914 Closing
-[Mon Aug  3 22:12:15 2026] [::1]:49928 [200]: GET /js/login.js
-[Mon Aug  3 22:12:15 2026] [::1]:49928 Closing
-[Mon Aug  3 22:12:18 2026] [::1]:49944 Accepted
-[Mon Aug  3 22:12:18 2026] [::1]:49944 [200]: POST /php/login.php
-[Mon Aug  3 22:12:18 2026] [::1]:49944 Closing
-[Mon Aug  3 22:12:19 2026] [::1]:49954 Accepted
-[Mon Aug  3 22:12:19 2026] [::1]:49954 Closing
+[Tue Aug  4 14:06:48 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug  4 14:07:47 2026] [::1]:45206 Accepted
+[Tue Aug  4 14:07:47 2026] [::1]:45206 Closing
+[Tue Aug  4 14:07:47 2026] [::1]:45212 Accepted
+[Tue Aug  4 14:07:47 2026] [::1]:45220 Accepted
+[Tue Aug  4 14:07:47 2026] [::1]:45212 [200]: GET /css/login.css
+[Tue Aug  4 14:07:47 2026] [::1]:45212 Closing
+[Tue Aug  4 14:07:47 2026] [::1]:45220 [200]: GET /js/login.js
+[Tue Aug  4 14:07:47 2026] [::1]:45220 Closing
+[Tue Aug  4 14:07:51 2026] [::1]:56274 Accepted
+[Tue Aug  4 14:07:51 2026] [::1]:56274 [200]: POST /php/login.php
+[Tue Aug  4 14:07:51 2026] [::1]:56274 Closing
+[Tue Aug  4 14:07:52 2026] [::1]:56288 Accepted
+[Tue Aug  4 14:07:52 2026] [::1]:56288 Closing

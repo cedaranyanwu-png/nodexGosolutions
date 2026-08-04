@@ -60,6 +60,8 @@ $routeMap = [
     '/user/dashboard' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.php' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.html' => __DIR__ . '/main/public/user/dashboard.php',
+    '/php/admin_action.php' => __DIR__ . '/php/admin_action.php',
+    '/php/admin_action' => __DIR__ . '/php/admin_action.php',
 ];
 
 // Check if the current requested URI is registered in our hardcoded static routing map
