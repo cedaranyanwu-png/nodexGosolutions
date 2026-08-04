@@ -86,7 +86,7 @@ $_SESSION['role']     = $user['role'] ?? 'tenant';
 $_SESSION['fullname'] = $user['fullname'] ?? '';
 
 // Direct authenticated user to appropriate dashboard path based on role (admin or tenant)
-$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard.php' : 'user/dashboard.php';
+$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard.php' : '/user/dashboard.php';
 
 // Return authentication success response
 jsonResponse([
