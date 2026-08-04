@@ -108,7 +108,7 @@ $(document).ready(function() {
   // Load Customers via AJAX
   function loadCustomerDatabase() {
     $.ajax({
-      url: 'api.php?action=get_customers',
+      url: '/php/invoice_gen.php?action=get_customers',
       type: 'GET',
       dataType: 'json',
       success: function(response) {
@@ -135,7 +135,7 @@ $(document).ready(function() {
     };
 
     $.ajax({
-      url: 'php/invoice_gen.php?action=save_invoice',
+      url: '/php/invoice_gen.php?action=save_invoice',
       type: 'POST',
       dataType: 'json',
       data: { invoice: JSON.stringify(invoiceData) },

@@ -1,14 +1,27 @@
-[Tue Aug  4 14:06:48 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Tue Aug  4 14:07:47 2026] [::1]:45206 Accepted
-[Tue Aug  4 14:07:47 2026] [::1]:45206 Closing
-[Tue Aug  4 14:07:47 2026] [::1]:45212 Accepted
-[Tue Aug  4 14:07:47 2026] [::1]:45220 Accepted
-[Tue Aug  4 14:07:47 2026] [::1]:45212 [200]: GET /css/login.css
-[Tue Aug  4 14:07:47 2026] [::1]:45212 Closing
-[Tue Aug  4 14:07:47 2026] [::1]:45220 [200]: GET /js/login.js
-[Tue Aug  4 14:07:47 2026] [::1]:45220 Closing
-[Tue Aug  4 14:07:51 2026] [::1]:56274 Accepted
-[Tue Aug  4 14:07:51 2026] [::1]:56274 [200]: POST /php/login.php
-[Tue Aug  4 14:07:51 2026] [::1]:56274 Closing
-[Tue Aug  4 14:07:52 2026] [::1]:56288 Accepted
-[Tue Aug  4 14:07:52 2026] [::1]:56288 Closing
+[Tue Aug  4 15:14:05 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug  4 15:15:45 2026] [::1]:52624 Accepted
+[Tue Aug  4 15:15:45 2026] [::1]:52624 Closing
+[Tue Aug  4 15:15:45 2026] [::1]:52640 Accepted
+[Tue Aug  4 15:15:45 2026] [::1]:52656 Accepted
+[Tue Aug  4 15:15:45 2026] [::1]:52640 [200]: GET /css/login.css
+[Tue Aug  4 15:15:45 2026] [::1]:52656 [200]: GET /js/login.js
+[Tue Aug  4 15:15:45 2026] [::1]:52640 Closing
+[Tue Aug  4 15:15:45 2026] [::1]:52656 Closing
+[Tue Aug  4 15:15:48 2026] [::1]:44302 Accepted
+[Tue Aug  4 15:15:48 2026] [::1]:44302 [200]: POST /php/login.php
+[Tue Aug  4 15:15:48 2026] [::1]:44302 Closing
+[Tue Aug  4 15:15:49 2026] [::1]:44312 Accepted
+[Tue Aug  4 15:15:49 2026] [::1]:44312 Closing
+[Tue Aug  4 15:27:40 2026] [::1]:54468 Accepted
+[Tue Aug  4 15:27:40 2026] [::1]:54468 Closing
+[Tue Aug  4 15:27:40 2026] [::1]:54472 Accepted
+[Tue Aug  4 15:27:40 2026] [::1]:54472 [200]: GET /css/login.css
+[Tue Aug  4 15:27:40 2026] [::1]:54472 Closing
+[Tue Aug  4 15:27:40 2026] [::1]:54484 Accepted
+[Tue Aug  4 15:27:40 2026] [::1]:54484 [200]: GET /js/login.js
+[Tue Aug  4 15:27:40 2026] [::1]:54484 Closing
+[Tue Aug  4 15:27:43 2026] [::1]:54498 Accepted
+[Tue Aug  4 15:27:43 2026] [::1]:54498 [200]: POST /php/login.php
+[Tue Aug  4 15:27:43 2026] [::1]:54498 Closing
+[Tue Aug  4 15:27:44 2026] [::1]:54500 Accepted
+[Tue Aug  4 15:27:44 2026] [::1]:54500 Closing

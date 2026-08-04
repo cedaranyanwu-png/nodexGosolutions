@@ -2,322 +2,357 @@
 /**
  * dashboard.php
  *
- * User and hosting tenant control dashboard. Enables hosting deployments and database creations.
+ * This is the enhanced Client-Side Tenant Control Panel.
+ * It serves as a centralized hub offering:
+ * - "Tools on Top" quick launch bar for all sub-apps (QR Codes, short URLs, invoice creator, image compressor, etc.)
+ * - Direct Web Deployment & CMS links
+ * - Live dynamic lists of their active deployments (Bios, short links, QR codes) queried directly from our custom JSON Database
+ * - Back-to-Main landing page navigation links
  */
 
 // Enable strict typing for safety
 declare(strict_types=1);
 
-// Set base system domain constant for tenant hosting
-$base_domain = "nodexplatform.com.ng";
+// Require central database configuration and security helpers
+require_once __DIR__ . '/../../../php/db.php';
+
+// Instantiate secure session configurations
+secureSession();
+
+// Access Control: Verify that the user is logged in
+if (!isset($_SESSION['email'])) {
+    // If not logged in, redirect to login screen
+    header('Location: /login');
+    // Terminate script execution
+    exit;
+}
+
+// Fetch list of links, qr codes, and biography records to display dynamically in the control panel
+$urlDb     = new Database(__DIR__ . '/../../../databases', 'url_shortner');
+$qrDb      = new Database(__DIR__ . '/../../../databases', 'qrcode');
+$bioDb     = new Database(__DIR__ . '/../../../databases', 'bio_builder');
+
+// Load records list
+$shortLinks = $urlDb->select('links');
+$qrCodes    = $qrDb->select('qrcodes');
+$biosList   = $bioDb->select('bios');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Hosting Admin - <?php // Render base domain string
-    echo $base_domain; ?></title>
+    <title>Tenant Control Panel | nodexGosolutions</title>
+
+    <!-- Load standard Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        :root {
+            --bg-dark: #0b0f1e;
+            --card-bg: #131a35;
+            --accent: #00d2ff;
+            --accent-hover: #00a2cc;
+            --text: #f8fafc;
+            --text-muted: #8a99ad;
+            --border-color: rgba(0, 210, 255, 0.15);
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            font-family: 'Source Sans 3', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #0072ff, #00d2ff);
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.25);
+            padding: 15px 30px;
+        }
+        .navbar-brand-custom {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: white !important;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+        }
+        .nav-link-custom {
+            color: white !important;
+            font-weight: 600;
+            margin-left: 20px;
+            transition: opacity 0.3s;
+        }
+        .nav-link-custom:hover {
+            opacity: 0.8;
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(0, 114, 255, 0.12), rgba(0, 210, 255, 0.12));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 45px;
+            margin-top: 40px;
+        }
+        .hero-banner h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        /* Tools On Top Row Grid */
+        .tool-box-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .tool-box-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 210, 255, 0.3);
+            color: var(--accent);
+        }
+        .tool-icon {
+            font-size: 26px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .tool-title {
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Section Cards */
+        .panel-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .panel-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 10px;
+        }
+        /* Table Styles */
+        .table-responsive-custom {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+        th {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.01);
+        }
+        .btn-preview-link {
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .btn-preview-link:hover {
+            background-color: var(--accent);
+            color: var(--bg-dark);
+        }
+    </style>
 </head>
 <body>
 
-<div class="d-flex" id="wrapper">
-
-    <!-- Sidebar Navigation -->
-    <div class="bg-dark border-end text-white" id="sidebar-wrapper">
-        <div class="sidebar-heading p-3 border-bottom border-secondary d-flex align-items-center">
-            <i class="fa-solid fa-server me-2 text-primary fa-lg"></i>
-            <span class="fw-bold">NodeX Hosting</span>
-        </div>
-
-        <!-- Admin Profile Summary Card -->
-        <div class="p-3 bg-secondary bg-opacity-10 border-bottom border-secondary">
+    <!-- Unified Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid d-flex justify-content-between">
+            <a class="navbar-brand-custom" href="/"><i class="fa-solid fa-server me-2"></i>nodexGo Portal</a>
             <div class="d-flex align-items-center">
-                <div class="avatar bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
-                    AD
-                </div>
-                <div>
-                    <h6 class="mb-0 fw-bold">Admin Workspace</h6>
-                    <small class="text-muted">admin@<?php // Output base domain
-                    echo $base_domain; ?></small>
-                </div>
+                <span class="text-white me-3 small"><i class="fa-solid fa-user me-1"></i> <?php echo htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['email']); ?></span>
+                <!-- Clean back-to-main page link -->
+                <a class="btn btn-outline-light btn-sm rounded-pill px-3 nav-link-custom" href="/"><i class="fa-solid fa-arrow-left me-1"></i> Return to Main Page</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container py-4">
+
+        <!-- Welcome Banner Section -->
+        <div class="hero-banner text-center">
+            <h2>Welcome to Your Tenant Workspace Control Panel!</h2>
+            <p class="text-muted mb-0">Unify deployment tools on demand. Launch apps, create shortened URLs, generate QR codes, and monitor active deployments below.</p>
+        </div>
+
+        <!-- TOOLS ON TOP: Quick Launch Bar -->
+        <h4 class="mb-3 text-uppercase small fw-bold text-muted tracking-wide" style="font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">
+            <i class="fa-solid fa-cubes me-2 text-primary"></i>Quick Deployment Tools (Tools on Top)
+        </h4>
+        <div class="row g-3 mb-5">
+            <!-- Web Deployment & CMS Builder -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/cms/admin.php" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-laptop-code"></i></span>
+                    <span class="tool-title">Web Builder & CMS</span>
+                </a>
+            </div>
+            <!-- Dynamic QR Code Generator -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/qrcode/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-qrcode"></i></span>
+                    <span class="tool-title">QR Code Gen</span>
+                </a>
+            </div>
+            <!-- Mini URL Shortener -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/url_shortner/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-link"></i></span>
+                    <span class="tool-title">URL Shortener</span>
+                </a>
+            </div>
+            <!-- Digital Bio Page Builder -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/bio_builder/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-id-card"></i></span>
+                    <span class="tool-title">Bio Page Builder</span>
+                </a>
+            </div>
+            <!-- Interactive CV/Resume Builder -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/cv_builder/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-file-invoice"></i></span>
+                    <span class="tool-title">Resume Builder</span>
+                </a>
+            </div>
+            <!-- Dynamic Invoice Estimator -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/invoice/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                    <span class="tool-title">Invoice Gen</span>
+                </a>
+            </div>
+            <!-- WhatsApp Link Generator -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/whatapp_link_generator/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-brands fa-whatsapp"></i></span>
+                    <span class="tool-title">WhatsApp Gen</span>
+                </a>
+            </div>
+            <!-- Batch Image Compressor -->
+            <div class="col-md-3 col-sm-6">
+                <a href="/apps/img_comprossor/index.html" class="tool-box-card">
+                    <span class="tool-icon"><i class="fa-solid fa-file-image"></i></span>
+                    <span class="tool-title">Img Compressor</span>
+                </a>
             </div>
         </div>
 
-        <!-- Sidebar Menu Links -->
-        <div class="list-group list-group-flush pt-2">
-            <a class="list-group-item list-group-item-action list-group-item-dark active nav-link-item" href="#view-overview" id="nav-overview">
-                <i class="fa-solid fa-chart-pie me-2"></i>Dashboard Overview
-            </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark nav-link-item" href="#view-projects" id="nav-projects">
-                <i class="fa-solid fa-globe me-2"></i>Hosted Projects
-            </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark nav-link-item" href="#view-database" id="nav-database">
-                <i class="fa-solid fa-database me-2"></i>Database Manager
-            </a>
-            <a class="list-group-item list-group-item-action list-group-item-dark nav-link-item" href="#view-user-admin" id="nav-user-admin">
-                <i class="fa-solid fa-user-shield me-2"></i>User Admin Settings
-            </a>
-        </div>
-    </div>
-
-    <!-- Main Content Area -->
-    <div id="page-content-wrapper" class="w-100 bg-light">
-
-        <!-- Top Header -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3 shadow-sm">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <h5 class="mb-0 fw-bold text-dark" id="page-title">Dashboard Overview</h5>
-                <div>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 me-2">
-                        <i class="fa-solid fa-circle me-1 small"></i> System Active
-                    </span>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-                        <i class="fa-solid fa-cloud-arrow-up me-1"></i> New Project
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <div class="container-fluid p-4">
-
-            <!-- SECTION 1: OVERVIEW DASHBOARD -->
-            <div class="view-section" id="section-overview">
-                <!-- Analytics Cards -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-body p-3 d-flex align-items-center">
-                                <div class="icon-shape bg-primary text-white rounded-3 me-3 p-3">
-                                    <i class="fa-solid fa-globe fa-xl"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted small fw-semibold">Active Subdomains</span>
-                                    <h4 class="fw-bold mb-0" id="stat-count">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-body p-3 d-flex align-items-center">
-                                <div class="icon-shape bg-success text-white rounded-3 me-3 p-3">
-                                    <i class="fa-solid fa-hard-drive fa-xl"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted small fw-semibold">Public Storage</span>
-                                    <h4 class="fw-bold mb-0" id="stat-storage">0 KB</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-body p-3 d-flex align-items-center">
-                                <div class="icon-shape bg-info text-white rounded-3 me-3 p-3">
-                                    <i class="fa-solid fa-database fa-xl"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted small fw-semibold">Active Databases</span>
-                                    <h4 class="fw-bold mb-0" id="stat-db-count">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-body p-3 d-flex align-items-center">
-                                <div class="icon-shape bg-warning text-white rounded-3 me-3 p-3">
-                                    <i class="fa-solid fa-folder-tree fa-xl"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted small fw-semibold">Target Root</span>
-                                    <h4 class="fw-bold mb-0 text-dark">/public/</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 2: HOSTED PROJECTS -->
-            <div class="view-section d-none" id="section-projects">
-                <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="fw-bold mb-0">Hosted Subdomains</h5>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+        <!-- DYNAMIC CONTROL PANEL TABLES -->
+        <div class="row">
+            <!-- Active Short Links & QR Code Deployments -->
+            <div class="col-md-6">
+                <div class="panel-card h-100">
+                    <h3><i class="fa-solid fa-rocket me-2 text-info"></i>Active Short Links</h3>
+                    <div class="table-responsive-custom">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <th>Subdomain URL</th>
-                                    <th>Status</th>
-                                    <th>Server Directory</th>
-                                    <th>Size</th>
-                                    <th>Created Date</th>
-                                    <th class="text-end">Actions</th>
+                                    <th>Short Code</th>
+                                    <th>Original Destination URL</th>
+                                    <th class="text-end">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="projects-table-body">
-                                <!-- Dynamic content -->
+                            <tbody>
+                                <?php // Iterate through active shortened link deployments
+                                if (!empty($shortLinks)):
+                                    foreach (array_slice($shortLinks, -5) as $link): ?>
+                                        <tr>
+                                            <td><code><?php echo htmlspecialchars($link['code'] ?? ''); ?></code></td>
+                                            <td class="text-truncate" style="max-width: 150px;"><?php echo htmlspecialchars($link['long_url'] ?? ''); ?></td>
+                                            <td class="text-end">
+                                                <a href="/php/url_shortner.php?c=<?php echo htmlspecialchars($link['code'] ?? ''); ?>" target="_blank" class="btn-preview-link">Visit</a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach;
+                                else: ?>
+                                    <tr><td colspan="3" class="text-center text-muted small">No short URLs deployed yet.</td></tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 3: DATABASE MANAGER -->
-            <div class="view-section d-none" id="section-database">
-                <div class="row g-4">
-                    <!-- Create DB Panel -->
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-header bg-white py-3">
-                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-plus me-2 text-primary"></i>Create New Database</h6>
-                            </div>
-                            <div class="card-body">
-                                <form id="form-create-db">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Database Name</label>
-                                        <input type="text" class="form-control" name="db_name" placeholder="my_project_db" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Database Engine</label>
-                                        <select class="form-select" name="db_type">
-                                            <option value="json">JSON Flat File Store (.json)</option>
-                                            <option value="sqlite">SQLite Database (.sqlite)</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-database me-1"></i> Create Storage</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DB List & Inspector -->
-                    <div class="col-md-8">
-                        <div class="card border-0 shadow-sm rounded-3">
-                            <div class="card-header bg-white py-3">
-                                <h6 class="fw-bold mb-0"><i class="fa-solid fa-table me-2 text-primary"></i>Database Repositories</h6>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
+            <!-- Active Biography Pages -->
+            <div class="col-md-6">
+                <div class="panel-card h-100">
+                    <h3><i class="fa-solid fa-address-book me-2 text-success"></i>Active Bio Profiles</h3>
+                    <div class="table-responsive-custom">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Display Name</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php // Iterate through active biography deployments
+                                if (!empty($biosList)):
+                                    foreach (array_slice($biosList, -5) as $bio): ?>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Engine</th>
-                                            <th>Path</th>
-                                            <th>Size</th>
-                                            <th class="text-end">Actions</th>
+                                            <td><code>@<?php echo htmlspecialchars($bio['username'] ?? ''); ?></code></td>
+                                            <td><?php echo htmlspecialchars($bio['display_name'] ?? ''); ?></td>
+                                            <td class="text-end">
+                                                <a href="/php/bio_builder.php?u=<?php echo htmlspecialchars($bio['username'] ?? ''); ?>" target="_blank" class="btn-preview-link">Visit Profile</a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody id="db-table-body">
-                                        <!-- Dynamic content -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    <?php endforeach;
+                                else: ?>
+                                    <tr><td colspan="3" class="text-center text-muted small">No bio profile pages deployed yet.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
-            <!-- SECTION 4: USER ADMIN PROPERTIES -->
-            <div class="view-section d-none" id="section-user-admin">
-                <div class="card border-0 shadow-sm rounded-3 max-width-700">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-gear me-2 text-primary"></i>User Admin Properties</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Primary Administrator Email</label>
-                            <input type="email" class="form-control" value="admin@<?php // Output base domain
-                            echo $base_domain; ?>" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Root Hosting Path</label>
-                            <input type="text" class="form-control font-monospace" value="/public/" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Default Subdomain Domain</label>
-                            <input type="text" class="form-control" value="<?php // Output base domain
-                            echo $base_domain; ?>" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Max Upload Limit</label>
-                            <input type="text" class="form-control" value="50 MB (ZIP / HTML)" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
     </div>
-</div>
 
-<!-- Modal: New Project Deployment -->
-<div class="modal fade" id="createProjectModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Deploy Subdomain Project</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="form-create-project" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Subdomain Name</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="subdomain" id="input-subdomain" placeholder="myproject" required>
-                            <span class="input-group-text">.<?php // Output base domain
-                            echo $base_domain; ?></span>
-                        </div>
-                    </div>
-
-                    <ul class="nav nav-tabs nav-fill mb-3">
-                        <li class="nav-item">
-                            <button class="nav-link active fw-bold" id="upload-tab" data-bs-toggle="tab" data-bs-target="#tab-upload" type="button">
-                                <i class="fa-solid fa-file-zipper me-2"></i>Upload ZIP or File
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link fw-bold" id="editor-tab" data-bs-toggle="tab" data-bs-target="#tab-editor" type="button">
-                                <i class="fa-solid fa-code me-2"></i>Raw HTML Editor
-                            </button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active p-2" id="tab-upload">
-                            <input type="file" class="form-control mb-2" name="project_file" accept=".zip,.html,.htm">
-                            <small class="text-muted">ZIP files auto-extract into <code>/public/[subdomain]/</code>.</small>
-                        </div>
-                        <div class="tab-pane fade p-2" id="tab-editor">
-                            <textarea class="form-control font-monospace" name="html_content" rows="6" placeholder="<h1>Hello World</h1>"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="btn-deploy">Deploy Project</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- jQuery & Bootstrap 5 Bundle JS -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Custom jQuery Engine -->
-<script src="/js/userdash/app.js"></script>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

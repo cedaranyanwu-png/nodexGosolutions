@@ -86,7 +86,7 @@ $(document).ready(function() {
     saveBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> Saving Bio...');
 
     $.ajax({
-      url: 'php/bio_builder.php',
+      url: '/php/bio_builder.php',
       type: 'POST',
       dataType: 'json',
       data: {
