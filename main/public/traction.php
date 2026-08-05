@@ -24,8 +24,7 @@ if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS Scroll Animation CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
- <!-- Central modularized stylesheet -->
-    <link href="<?= assetUrl('/css/style.css') ?>" rel="stylesheet">
+ <link href="<?= assetUrl('/css/traction.css') ?>" rel="stylesheet">
 
     <style>
 
@@ -211,8 +210,7 @@ if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
- <!-- Central modularized script orchestrator -->
-    <script src="<?= assetUrl('/js/app.js') ?>"></script>
+ <script src="<?= assetUrl('/js/traction.js') ?>"></script>
     <!-- Safe Script Initialization Engine -->
     <script>
         // Scroll Progress Indicator

@@ -26,8 +26,7 @@ if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
 
     <!-- AOS (Animate on Scroll) CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Central modularized stylesheet -->
-    <link href="<?= assetUrl('/css/style.css') ?>" rel="stylesheet">
+    <link href="<?= assetUrl('/css/cedar.css') ?>" rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -209,8 +208,7 @@ if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
 
     <!-- Three.js (for the 3D Background animation) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Central modularized script orchestrator -->
-    <script src="<?= assetUrl('/js/app.js') ?>"></script>
+    <script src="<?= assetUrl('/js/cedar.js') ?>"></script>
 
 
     <!-- Custom JS for Animations -->
