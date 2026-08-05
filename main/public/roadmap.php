@@ -1,3 +1,16 @@
+<?php
+/**
+ * Dynamic CMS Page Integration Override
+ * Queries the site_cms database to determine if there is a custom code override for slug 'roadmap'.
+ */
+require_once __DIR__ . "/../../php/db.php";
+$cmsDb = new Database(__DIR__ . "/../../databases", "site_cms");
+$cmsPage = $cmsDb->selectOne("pages", ["slug" => "roadmap"]);
+if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
+    eval("?>" . $cmsPage["body_code"]);
+    die();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS Scroll Animation CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="../css/roadmap.css" rel="stylesheet">
+    <!-- Central modularized stylesheet -->
+    <link href="<?= assetUrl('/css/style.css') ?>" rel="stylesheet">
 
     <style>
 
@@ -125,7 +139,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="../js/roadmap.js"></script>
+    <!-- Central modularized script orchestrator -->
+    <script src="<?= assetUrl('/js/app.js') ?>"></script>
 
 
     <!-- Roadmap Dynamic Fetch Script -->

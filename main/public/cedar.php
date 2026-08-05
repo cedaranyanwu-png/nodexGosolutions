@@ -1,3 +1,16 @@
+<?php
+/**
+ * Dynamic CMS Page Integration Override
+ * Queries the site_cms database to determine if there is a custom code override for slug 'cedar'.
+ */
+require_once __DIR__ . "/../../php/db.php";
+$cmsDb = new Database(__DIR__ . "/../../databases", "site_cms");
+$cmsPage = $cmsDb->selectOne("pages", ["slug" => "cedar"]);
+if ($cmsPage !== null && !empty($cmsPage["body_code"])) {
+    eval("?>" . $cmsPage["body_code"]);
+    die();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +26,8 @@
 
     <!-- AOS (Animate on Scroll) CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="../css/cedar.css" rel="stylesheet">
+    <!-- Central modularized stylesheet -->
+    <link href="<?= assetUrl('/css/style.css') ?>" rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -195,7 +209,8 @@
 
     <!-- Three.js (for the 3D Background animation) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="../js/cedar.js"></script>
+    <!-- Central modularized script orchestrator -->
+    <script src="<?= assetUrl('/js/app.js') ?>"></script>
 
 
     <!-- Custom JS for Animations -->

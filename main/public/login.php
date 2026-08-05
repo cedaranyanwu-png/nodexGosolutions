@@ -25,7 +25,8 @@ secureSession();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Load unified CSS from root directory -->
-    <link href="/css/login.css" rel="stylesheet">
+    <!-- Central modularized stylesheet -->
+    <link href="<?= assetUrl('/css/style.css') ?>" rel="stylesheet">
 </head>
 <body>
 
@@ -91,6 +92,7 @@ secureSession();
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Load unified JS from root directory -->
-    <script src="/js/login.js"></script>
+    <!-- Central modularized script orchestrator -->
+    <script src="<?= assetUrl('/js/app.js') ?>"></script>
 </body>
 </html>

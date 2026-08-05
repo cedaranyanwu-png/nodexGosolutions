@@ -176,4 +176,24 @@ function jsonResponse(mixed $data, int $statusCode = 200): void {
     // Exit current execution context
     exit;
 }
+
+/**
+ * Appends a dynamic auto-increment parameter to asset URLs based on file modification time.
+ * Prevents browser caching issues when CSS or JS files are updated.
+ *
+ * @param string $path Clean relative asset path (e.g. '/css/style.css').
+ * @return string Cache-busted asset URL string.
+ */
+function assetUrl(string $path): string {
+    // Resolve absolute path to check file on disk
+    $absPath = __DIR__ . '/..' . $path;
+    // Fallback to static timestamp
+    $version = '1.0.0';
+    if (file_exists($absPath)) {
+        // Retrieve file modification time to automatically increment versioning
+        $version = (string)filemtime($absPath);
+    }
+    // Append query parameter with auto-increment version number
+    return $path . '?v=' . $version;
+}
 ?>

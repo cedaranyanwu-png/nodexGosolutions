@@ -14,6 +14,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/TenantManager.php';
 // Include the custom JSON Database engine class
 require_once __DIR__ . '/php/database.php';
+// Include the common database helpers and cache busting helper function
+require_once __DIR__ . '/php/db.php';
 
 // Capture the incoming HTTP request host from server headers
 $currentHost = $_SERVER['HTTP_HOST'] ?? '';
