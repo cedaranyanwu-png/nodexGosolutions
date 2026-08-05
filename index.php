@@ -124,8 +124,8 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
     // Attempt to locate a custom page matching the slug from pages.json
     $cmsPage = $cmsDb->selectOne('pages', ['slug' => $normalizedSlug]);
 
-    // If a custom CMS page was found, render its custom code payload
-    if ($cmsPage !== null) {
+    // If a custom CMS page was found and has active custom code, render its custom code payload
+    if ($cmsPage !== null && !empty($cmsPage['body_code'])) {
         /**
          * Helper to evaluate raw user PHP/HTML code within isolated variables context.
          *
