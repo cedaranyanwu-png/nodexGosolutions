@@ -56,6 +56,8 @@ if ($realBypassPath !== false && $realRootPath !== false && str_starts_with($rea
 
 // Define the root pages matching map pointing to main landing page scripts
 $routeMap = [
+    '/verify' => __DIR__ . '/main/public/verify.html',
+    '/verify.html' => __DIR__ . '/main/public/verify.html',
     '/login' => __DIR__ . '/main/public/login.php',
     '/login.php' => __DIR__ . '/main/public/login.php',
     '/register' => __DIR__ . '/main/public/register.php',

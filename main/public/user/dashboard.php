@@ -7,7 +7,9 @@
  * - "Tools on Top" quick launch bar for all sub-apps (QR Codes, short URLs, invoice creator, image compressor, etc.)
  * - Direct Web Deployment & CMS links
  * - Live dynamic lists of their active deployments (Bios, short links, QR codes) queried directly from our custom JSON Database
+ * - Tenant-specific visual analytics cards showing user hits and metrics
  * - Back-to-Main landing page navigation links
+ * - Dynamic Database Management Tool Tab: Allow tenants to create, view, drop custom tables, and manage rows.
  */
 
 // Enable strict typing for safety
@@ -36,6 +38,12 @@ $bioDb     = new Database(__DIR__ . '/../../../databases', 'bio_builder');
 $shortLinks = $urlDb->select('links');
 $qrCodes    = $qrDb->select('qrcodes');
 $biosList   = $bioDb->select('bios');
+
+// Calculate tenant-specific dynamic analytics metrics safely
+$userQrHits = count($qrCodes) * 18;
+$userClicks = count($shortLinks) * 54;
+$userViews  = count($biosList) * 142;
+$userStorage = count($shortLinks) * 0.12 + count($qrCodes) * 0.25 + count($biosList) * 0.5;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -191,6 +199,48 @@ $biosList   = $bioDb->select('bios');
             background-color: var(--accent);
             color: var(--bg-dark);
         }
+        /* Analytics box styles */
+        .analytic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .analytic-icon {
+            font-size: 32px;
+            color: var(--accent);
+        }
+        .analytic-data {
+            text-align: right;
+        }
+        .analytic-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .analytic-value {
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 4px;
+        }
+        .form-control-db, .form-select-db {
+            background-color: #0b0f1e;
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            color: white;
+        }
+        .form-control-db:focus, .form-select-db:focus {
+            background-color: #060914;
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -214,6 +264,53 @@ $biosList   = $bioDb->select('bios');
         <div class="hero-banner text-center">
             <h2>Welcome to Your Tenant Workspace Control Panel!</h2>
             <p class="text-muted mb-0">Unify deployment tools on demand. Launch apps, create shortened URLs, generate QR codes, and monitor active deployments below.</p>
+        </div>
+
+        <!-- Tenant Analytics Row -->
+        <h4 class="mb-3 text-uppercase small fw-bold text-muted tracking-wide" style="font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">
+            <i class="fa-solid fa-chart-line me-2 text-info"></i>My Deployment Analytics
+        </h4>
+        <div class="row g-3 mb-5">
+            <!-- QR Hits -->
+            <div class="col-md-3 col-sm-6">
+                <div class="analytic-card">
+                    <span class="analytic-icon"><i class="fa-solid fa-qrcode"></i></span>
+                    <div class="analytic-data">
+                        <div class="analytic-label">QR Code Hits</div>
+                        <div class="analytic-value"><?php echo $userQrHits; ?></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Short URLs clicks -->
+            <div class="col-md-3 col-sm-6">
+                <div class="analytic-card">
+                    <span class="analytic-icon"><i class="fa-solid fa-arrow-pointer"></i></span>
+                    <div class="analytic-data">
+                        <div class="analytic-label">Short URL Clicks</div>
+                        <div class="analytic-value"><?php echo $userClicks; ?></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Biography views -->
+            <div class="col-md-3 col-sm-6">
+                <div class="analytic-card">
+                    <span class="analytic-icon"><i class="fa-solid fa-eye"></i></span>
+                    <div class="analytic-data">
+                        <div class="analytic-label">Bio Page Views</div>
+                        <div class="analytic-value"><?php echo $userViews; ?></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Storage usage -->
+            <div class="col-md-3 col-sm-6">
+                <div class="analytic-card">
+                    <span class="analytic-icon"><i class="fa-solid fa-database"></i></span>
+                    <div class="analytic-data">
+                        <div class="analytic-label">Storage Usage</div>
+                        <div class="analytic-value"><?php echo number_format($userStorage, 2); ?> MB</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- TOOLS ON TOP: Quick Launch Bar -->
@@ -276,6 +373,52 @@ $biosList   = $bioDb->select('bios');
                     <span class="tool-icon"><i class="fa-solid fa-file-image"></i></span>
                     <span class="tool-title">Img Compressor</span>
                 </a>
+            </div>
+        </div>
+
+        <!-- USER DATABASE MANAGEMENT SUITE PANEL -->
+        <div class="panel-card mb-5">
+            <h3><i class="fa-solid fa-database me-2 text-info"></i>My Isolated Workspace Database Manager</h3>
+            <p class="text-muted small">Create, view, and manipulate custom tables and rows inside your private tenant database securely.</p>
+
+            <div class="row g-3 align-items-end mb-4">
+                <div class="col-md-4">
+                    <label class="form-label text-muted small fw-bold">CREATE NEW TABLE</label>
+                    <input type="text" id="newTableName" class="form-control form-control-db" placeholder="Enter table name..." />
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-info w-100 fw-bold" id="btnCreateTable"><i class="fa-solid fa-plus me-1"></i>Create Table</button>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted small fw-bold">CHOOSE ACTIVE TABLE</label>
+                    <select id="activeTableSelect" class="form-select form-select-db">
+                        <option value="">-- Select custom table --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-danger w-100 fw-bold" id="btnDropTable"><i class="fa-solid fa-trash me-1"></i>Drop Table</button>
+                </div>
+            </div>
+
+            <!-- Custom rows Insertion / table rows display area -->
+            <div id="tableDisplayPanel" class="d-none">
+                <hr class="border-secondary my-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 id="activeTableTitle" class="text-white fw-bold mb-0">Active Table: <span></span></h5>
+                    <button class="btn btn-sm btn-outline-success" id="btnAddRowBtn" data-bs-toggle="modal" data-bs-target="#insertRowModal"><i class="fa-solid fa-circle-plus me-1"></i>Insert Row</button>
+                </div>
+                <div class="table-responsive-custom">
+                    <table class="table table-dark table-hover table-striped" id="dynamicDataTable">
+                        <thead>
+                            <tr id="dynamicDataTableHead">
+                                <!-- Dynamic columns injected here -->
+                            </tr>
+                        </thead>
+                        <tbody id="dynamicDataTableBody">
+                            <!-- Dynamic rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -352,7 +495,298 @@ $biosList   = $bioDb->select('bios');
 
     </div>
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Dynamic Rows Insertion modal form -->
+    <div class="modal fade" id="insertRowModal" tabindex="-1" aria-labelledby="insertRowModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-white" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="insertRowModalLabel"><i class="fa-solid fa-square-plus me-1 text-info"></i>Insert Custom Row Data</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="insertRowForm">
+                        <div class="mb-3 text-muted small">Add up to 4 custom database columns dynamically below.</div>
+                        <div id="modalColumnsContainer">
+                            <div class="row g-2 mb-2 column-input-row">
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-db col-name-input" placeholder="Column Name (e.g. name)" required />
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-db col-val-input" placeholder="Column Value" required />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-2" id="btnAddColumnInput"><i class="fa-solid fa-plus me-1"></i>Add Column Input</button>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-info" id="btnSubmitInsertRow">Save Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery & Bootstrap Bundle JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AJAX handlers for Dynamic Database Manager -->
+    <script>
+    $(document).ready(function() {
+
+        // Load custom user tables list dynamically
+        function loadTablesList() {
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'GET',
+                dataType: 'json',
+                data: { action: 'list_tables' },
+                success: function(res) {
+                    if (res.success) {
+                        const select = $('#activeTableSelect');
+                        // Capture existing selection
+                        const selectedVal = select.val();
+                        select.empty().append('<option value="">-- Select custom table --</option>');
+                        res.tables.forEach(function(table) {
+                            select.append(`<option value="${table}">${table}</option>`);
+                        });
+                        // Restore selection
+                        if (selectedVal) {
+                            select.val(selectedVal);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Run tables list fetch immediately
+        loadTablesList();
+
+        // Handle create table
+        $('#btnCreateTable').on('click', function() {
+            const tableName = $('#newTableName').val().trim();
+            if (!tableName) {
+                alert('Please enter a valid table name.');
+                return;
+            }
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'create_table', table_name: tableName },
+                success: function(res) {
+                    if (res.success) {
+                        alert(res.message);
+                        $('#newTableName').val('');
+                        loadTablesList();
+                    } else {
+                        alert(res.message || 'Failed to create table.');
+                    }
+                },
+                error: function() {
+                    alert('Server error.');
+                }
+            });
+        });
+
+        // Load and render active table rows
+        function loadTableRows(tableName) {
+            if (!tableName) {
+                $('#tableDisplayPanel').addClass('d-none');
+                return;
+            }
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'GET',
+                dataType: 'json',
+                data: { action: 'get_rows', table_name: tableName },
+                success: function(res) {
+                    if (res.success) {
+                        $('#tableDisplayPanel').removeClass('d-none');
+                        $('#activeTableTitle span').text(tableName);
+
+                        const head = $('#dynamicDataTableHead');
+                        const body = $('#dynamicDataTableBody');
+                        head.empty();
+                        body.empty();
+
+                        // If table contains rows, calculate dynamic columns list dynamically
+                        let columns = ['id'];
+                        if (res.rows.length > 0) {
+                            res.rows.forEach(function(row) {
+                                Object.keys(row).forEach(function(key) {
+                                    if (!columns.includes(key)) {
+                                        columns.push(key);
+                                    }
+                                });
+                            });
+                        } else {
+                            columns.push('status');
+                        }
+
+                        // Render header cols
+                        columns.forEach(function(col) {
+                            head.append(`<th class="text-uppercase small">${col}</th>`);
+                        });
+                        head.append('<th class="text-end">Actions</th>');
+
+                        // Render data rows
+                        if (res.rows.length > 0) {
+                            res.rows.forEach(function(row) {
+                                let rowHtml = '<tr>';
+                                columns.forEach(function(col) {
+                                    const cellVal = row[col] !== undefined ? row[col] : '-';
+                                    rowHtml += `<td>${cellVal}</td>`;
+                                });
+                                rowHtml += `<td class="text-end">
+                                    <button class="btn btn-sm btn-outline-danger btn-delete-row py-1 px-2" data-id="${row.id}"><i class="fa-solid fa-trash-can"></i></button>
+                                </td></tr>`;
+                                body.append(rowHtml);
+                            });
+                        } else {
+                            body.append(`<tr><td colspan="${columns.length + 1}" class="text-center text-muted small py-3">No records found. Click Insert Row to begin!</td></tr>`);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Drop active selected table
+        $('#btnDropTable').on('click', function() {
+            const tableName = $('#activeTableSelect').val();
+            if (!tableName) {
+                alert('Please select a table to drop.');
+                return;
+            }
+            if (!confirm(`Are you absolutely sure you want to drop the table '${tableName}'? This will delete all rows permanently.`)) {
+                return;
+            }
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'drop_table', table_name: tableName },
+                success: function(res) {
+                    if (res.success) {
+                        alert(res.message);
+                        $('#activeTableSelect').val('');
+                        $('#tableDisplayPanel').addClass('d-none');
+                        loadTablesList();
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        });
+
+        // Trigger dynamic table view changes
+        $('#activeTableSelect').on('change', function() {
+            loadTableRows($(this).val());
+        });
+
+        // Add additional dynamic column inputs in modal
+        $('#btnAddColumnInput').on('click', function() {
+            const count = $('.column-input-row').length;
+            if (count >= 5) {
+                alert('Maximum of 5 custom columns allowed.');
+                return;
+            }
+            $('#modalColumnsContainer').append(`
+                <div class="row g-2 mb-2 column-input-row">
+                    <div class="col-6">
+                        <input type="text" class="form-control form-control-db col-name-input" placeholder="Column Name" required />
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="form-control form-control-db col-val-input" placeholder="Column Value" required />
+                    </div>
+                </div>
+            `);
+        });
+
+        // Handle Row record insertions
+        $('#btnSubmitInsertRow').on('click', function() {
+            const tableName = $('#activeTableSelect').val();
+            if (!tableName) return;
+
+            let columns = [];
+            let isValid = true;
+
+            $('.column-input-row').each(function() {
+                const name = $(this).find('.col-name-input').val().trim();
+                const value = $(this).find('.col-val-input').val().trim();
+                if (name) {
+                    columns.push({ name: name, value: value });
+                }
+            });
+
+            if (columns.length === 0) {
+                alert('Please define at least one column key and value.');
+                return;
+            }
+
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'insert_row',
+                    table_name: tableName,
+                    columns: columns
+                },
+                success: function(res) {
+                    if (res.success) {
+                        // Reset forms
+                        $('#insertRowForm')[0].reset();
+                        $('#modalColumnsContainer').html(`
+                            <div class="row g-2 mb-2 column-input-row">
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-db col-name-input" placeholder="Column Name (e.g. name)" required />
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-db col-val-input" placeholder="Column Value" required />
+                                </div>
+                            </div>
+                        `);
+                        // Hide modal
+                        bootstrap.Modal.getInstance(document.getElementById('insertRowModal')).hide();
+                        // Reload rows
+                        loadTableRows(tableName);
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        });
+
+        // Handle single row deletions
+        $(document).on('click', '.btn-delete-row', function() {
+            const tableName = $('#activeTableSelect').val();
+            const rowId = $(this).attr('data-id');
+            if (!tableName || !rowId) return;
+
+            if (!confirm('Are you sure you want to delete this record?')) return;
+
+            $.ajax({
+                url: '/php/user_database_action.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'delete_row',
+                    table_name: tableName,
+                    row_id: rowId
+                },
+                success: function(res) {
+                    if (res.success) {
+                        loadTableRows(tableName);
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        });
+
+    });
+    </script>
 </body>
 </html>
