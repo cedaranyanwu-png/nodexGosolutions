@@ -47,3 +47,15 @@
 [Thu Aug  6 18:07:00 2026] [::1]:54204 Accepted
 [Thu Aug  6 18:07:00 2026] [::1]:54204 [200]: GET /admin/dashboard
 [Thu Aug  6 18:07:00 2026] [::1]:54204 Closing
+[Thu Aug  6 19:28:01 2026] [::1]:33944 Accepted
+[Thu Aug  6 19:28:01 2026] [::1]:33944 [200]: GET /login
+[Thu Aug  6 19:28:01 2026] [::1]:33944 Closing
+[Thu Aug  6 19:28:01 2026] [::1]:33952 Accepted
+[Thu Aug  6 19:28:01 2026] [::1]:33952 [200]: GET /css/style.css?v=1786020194
+[Thu Aug  6 19:28:01 2026] [::1]:33952 Closing
+[Thu Aug  6 19:28:04 2026] [::1]:33958 Accepted
+[Thu Aug  6 19:28:04 2026] [::1]:33958 [200]: POST /php/login.php
+[Thu Aug  6 19:28:04 2026] [::1]:33958 Closing
+[Thu Aug  6 19:28:05 2026] [::1]:33964 Accepted
+[Thu Aug  6 19:28:05 2026] [::1]:33964 [200]: GET /admin/dashboard
+[Thu Aug  6 19:28:05 2026] [::1]:33964 Closing
