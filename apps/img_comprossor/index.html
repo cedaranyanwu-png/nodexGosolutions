@@ -3,112 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compressor | nodexGosolutions</title>
+    <title>Interactive Image Compressor | nodexGosolutions</title>
 
-    <!-- Load Orbitron and standard fonts -->
+    <!-- Load standard Google fonts and fontawesome -->
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #0072ff;
-            --accent: #00d2ff;
-            --light-bg: #f8fafc;
-            --dark: #0f172a;
-            --border-color: rgba(0, 114, 255, 0.1);
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandBlue: '#3b82f6',
+              brandLightBlue: '#eff6ff',
+            }
+          }
         }
-        body {
-            background-color: var(--light-bg);
-            color: #1e293b;
-            font-family: 'Source Sans 3', sans-serif;
-            min-height: 100vh;
-        }
-        .header-nav {
-            background-color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 30px;
-        }
-        .compressor-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 114, 255, 0.03);
-            max-width: 600px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        .dropzone {
-            border: 2px dashed #0072ff;
-            background-color: #f0f4ff;
-            border-radius: 12px;
-            padding: 40px 20px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .dropzone:hover {
-            background-color: #e5edff;
-        }
-    </style>
+      }
+    </script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
 
-    <!-- Header Navigation -->
-    <nav class="header-nav d-flex justify-content-between align-items-center">
-        <a href="/user/dashboard" class="text-decoration-none fw-bold text-primary" style="font-family: 'Orbitron', sans-serif; font-size: 1.3rem;">
-            <i class="fa-solid fa-server me-2"></i>nodex<span class="text-dark">Go</span>
+    <!-- Header Navigation Bar -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <a href="/user/dashboard" class="flex items-center text-xl font-bold text-blue-600 tracking-wide hover:opacity-90 transition duration-150">
+            <i class="fa-solid fa-server mr-2"></i>nodex<span class="text-slate-800 font-semibold">Go</span>
         </a>
-        <a href="/user/dashboard" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i> Dashboard</a>
-    </nav>
+        <a href="/user/dashboard" class="text-xs font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-100 transition duration-150">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Return Dashboard
+        </a>
+    </header>
 
-    <!-- Compressor Container -->
-    <div class="container">
-        <div class="compressor-card">
-            <h3 class="fw-bold text-primary mb-2" style="font-family: 'Orbitron', sans-serif;"><i class="fa-solid fa-file-image me-2"></i>Batch Image Compressor</h3>
-            <p class="text-muted small mb-4">Compress JPEG, PNG, or WebP images instantly in your browser with no file size limit.</p>
+    <!-- Main Workspace Container -->
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-8 max-w-xl w-full text-center">
 
-            <div id="dropzone" class="dropzone mb-4">
-                <i class="fa-solid fa-cloud-arrow-up fs-1 text-primary mb-3"></i>
-                <h5 class="fw-bold text-dark">Drag & Drop Image Here</h5>
-                <p class="text-muted small mb-0">or click to browse local files</p>
-                <input type="file" id="fileInput" accept="image/*" class="d-none" />
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-4">
+                <i class="fa-solid fa-file-image text-2xl animate-pulse"></i>
             </div>
 
-            <!-- Configuration Slider -->
-            <div id="configArea" class="d-none mb-4 text-start">
-                <label class="form-label text-dark fw-bold small">COMPRESSION QUALITY: <span id="qualityVal" class="text-primary">80%</span></label>
-                <input type="range" class="form-range" id="qualityRange" min="10" max="100" value="80" />
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">Interactive JS Image Compressor</h1>
+            <p class="text-xs text-gray-500 mb-6">Compress PNG, JPG, or WebP graphic files in-browser via secure HTML5 canvas routines.</p>
+
+            <!-- File Drag & Drop Sandbox -->
+            <div id="dropzone" class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50/80 rounded-xl p-8 cursor-pointer transition duration-150 mb-6 flex flex-col items-center">
+                <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-3 animate-bounce"></i>
+                <h3 class="text-sm font-bold text-gray-700 mb-1">Drag & Drop Image Here</h3>
+                <p class="text-2xs text-gray-400">or click to browse local files</p>
+                <input type="file" id="fileInput" accept="image/*" class="hidden" />
             </div>
 
-            <!-- Savings Metrics Area -->
-            <div id="savingsPanel" class="d-none row g-3 text-start mb-4">
-                <div class="col-6">
-                    <div class="p-3 border rounded" style="background-color: #f8fafc;">
-                        <span class="text-muted small d-block">Original Size</span>
-                        <strong class="text-dark fs-5" id="origSize">0 KB</strong>
-                    </div>
+            <!-- Quality Configuration Slider -->
+            <div id="configArea" class="hidden mb-6 text-left">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-gray-600 uppercase">Compression Factor Ratio:</label>
+                    <span id="qualityVal" class="text-sm font-extrabold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">80%</span>
                 </div>
-                <div class="col-6">
-                    <div class="p-3 border rounded" style="background-color: #f0fdf4; border-color: #bbf7d0 !important;">
-                        <span class="text-success small d-block">Compressed Size</span>
-                        <strong class="text-success fs-5" id="compSize">0 KB</strong>
-                    </div>
+                <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" id="qualityRange" min="10" max="100" value="80" />
+            </div>
+
+            <!-- Instant Savings Visual Statistics Cards -->
+            <div id="savingsPanel" class="hidden grid grid-cols-2 gap-3 mb-6 text-left animate-fade-in">
+                <div class="p-4 bg-slate-50 border border-gray-100 rounded-xl">
+                    <span class="text-2xs font-bold uppercase text-gray-400 block mb-1">Original Size</span>
+                    <strong class="text-gray-700 text-base font-bold" id="origSize">0 KB</strong>
                 </div>
-                <div class="col-12 text-center text-success fw-bold small" id="ratioSavings">
+                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                    <span class="text-2xs font-bold uppercase text-emerald-600 block mb-1">Optimized Size</span>
+                    <strong class="text-emerald-700 text-base font-bold" id="compSize">0 KB</strong>
+                </div>
+                <div class="col-span-2 text-center py-2 bg-emerald-100/50 rounded-lg text-emerald-800 font-bold text-xs" id="ratioSavings">
                     Size Saved: 0%
                 </div>
             </div>
 
-            <!-- Action buttons -->
-            <button class="btn btn-primary rounded-pill px-5 fw-bold py-2 d-none w-100 mb-2" id="btnCompress"><i class="fa-solid fa-compress me-1"></i>Compress Image</button>
-            <a class="btn btn-success rounded-pill px-5 fw-bold py-2 d-none w-100" id="btnDownload" download="compressed_image.jpg"><i class="fa-solid fa-download me-1"></i>Download Compressed Image</a>
-        </div>
-    </div>
+            <!-- Action Executions -->
+            <div class="space-y-2">
+                <button class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg hover:shadow-blue-200 transition duration-150 flex items-center justify-center gap-2" id="btnCompress">
+                    <i class="fa-solid fa-compress-arrows-alt"></i> Compress Image Asset
+                </button>
+                <a class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg hover:shadow-emerald-200 transition duration-150 flex items-center justify-center gap-2" id="btnDownload" download="optimized_graphic.jpg">
+                    <i class="fa-solid fa-circle-down"></i> Download Compressed Asset
+                </a>
+            </div>
 
-    <!-- JS image compression script -->
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-3 text-center text-2xs text-gray-400">
+        &copy; 2026 nodexGosolutions. Browser Canvas Compression Standard.
+    </footer>
+
+    <!-- Browser Compression Canvas Logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const dropzone = document.getElementById('dropzone');
@@ -126,45 +114,41 @@
         let loadedImage = null;
         let originalFile = null;
 
-        // Trigger file input dialog on dropzone click
+        // Click to browse triggers
         dropzone.addEventListener('click', () => fileInput.click());
 
-        // File dragover
+        // File Drag & Drop Handlers
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropzone.style.backgroundColor = '#e5edff';
+            dropzone.classList.add('bg-blue-100/80');
         });
 
-        // File dragleave
         dropzone.addEventListener('dragleave', () => {
-            dropzone.style.backgroundColor = '#f0f4ff';
+            dropzone.classList.remove('bg-blue-100/80');
         });
 
-        // File drop
         dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropzone.style.backgroundColor = '#f0f4ff';
+            dropzone.classList.remove('bg-blue-100/80');
             if (e.dataTransfer.files.length > 0) {
                 handleFile(e.dataTransfer.files[0]);
             }
         });
 
-        // File input selection
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
             }
         });
 
-        // Slider value dynamic update
         qualityRange.addEventListener('input', (e) => {
             qualityVal.textContent = e.target.value + '%';
         });
 
-        // Handle uploaded image file
+        // Initialize file load details
         function handleFile(file) {
             if (!file.type.startsWith('image/')) {
-                alert('Please select a valid image file.');
+                alert('Please supply an active graphic file.');
                 return;
             }
             originalFile = file;
@@ -174,17 +158,17 @@
             reader.onload = function(event) {
                 loadedImage = new Image();
                 loadedImage.onload = function() {
-                    configArea.classList.remove('d-none');
-                    btnCompress.classList.remove('d-none');
-                    btnDownload.classList.add('d-none');
-                    savingsPanel.classList.add('d-none');
+                    configArea.classList.remove('hidden');
+                    btnCompress.classList.remove('hidden');
+                    btnDownload.classList.add('hidden');
+                    savingsPanel.classList.add('hidden');
                 };
                 loadedImage.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        // Execute browser canvas compression routine
+        // Draw on canvas and compress
         btnCompress.addEventListener('click', () => {
             if (!loadedImage) return;
 
@@ -197,25 +181,23 @@
 
             const quality = parseFloat(qualityRange.value) / 100;
 
-            // Output compressed image source blob
+            // Standard Jpeg compression routine
             canvas.toBlob((blob) => {
                 if (!blob) return;
 
                 compSize.textContent = formatBytes(blob.size);
                 const percentSaved = Math.round(((originalFile.size - blob.size) / originalFile.size) * 100);
-                ratioSavings.textContent = `Size Saved: ${percentSaved > 0 ? percentSaved : 0}%`;
+                ratioSavings.textContent = `Physical Storage Savings: ${percentSaved > 0 ? percentSaved : 0}% Space Saved`;
 
-                // Update download link
                 const compressedUrl = URL.createObjectURL(blob);
                 btnDownload.href = compressedUrl;
-                btnDownload.download = `compressed_${originalFile.name}`;
+                btnDownload.download = `optimized_${originalFile.name}`;
 
-                savingsPanel.classList.remove('d-none');
-                btnDownload.classList.remove('d-none');
+                savingsPanel.classList.remove('hidden');
+                btnDownload.classList.remove('hidden');
             }, 'image/jpeg', quality);
         });
 
-        // Helper to format file sizes
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;

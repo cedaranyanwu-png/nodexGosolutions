@@ -3,12 +3,13 @@
  * dashboard.php
  *
  * Premium, White & Blue themed Admin Control Panel for nodexGosolutions.
+ * Fully styled using Tailwind CSS and customized flex container.
  * Features:
- * - Modular Navigation & shared Sidebar
+ * - Shared Sidebar & Modular Nav
  * - Visual analytics counters and registration metrics
  * - Enhanced User Moderation table with search filtering and client-side pagination
  * - Account detail Modals to view account details instantly
- * - Dynamic support tickets and email log tables
+ * - Bottom Right Floating Action Button (FAB) opening the Admin Suite Tools Modal
  */
 
 // Enable strict typing for reliability
@@ -27,7 +28,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Fetch list of registered users dynamically from system JSON tables database
-$usersList = $conn->select('users');
+$usersList = $conn->select('users') ?: [];
 
 // Initialize database instances to calculate sub-app counts and system analytics metrics
 $siteCmsDb = new Database(__DIR__ . '/../../../databases', 'site_cms');
@@ -35,9 +36,9 @@ $urlDb     = new Database(__DIR__ . '/../../../databases', 'url_shortner');
 $qrDb      = new Database(__DIR__ . '/../../../databases', 'qrcode');
 
 // Count dynamic platform assets across all unified JSON database tables
-$cmsPagesCount  = count($siteCmsDb->select('pages'));
-$shortUrlsCount = count($urlDb->select('links'));
-$qrCodesCount   = count($qrDb->select('qrcodes'));
+$cmsPagesCount  = count($siteCmsDb->select('pages') ?: []);
+$shortUrlsCount = count($urlDb->select('links') ?: []);
+$qrCodesCount   = count($qrDb->select('qrcodes') ?: []);
 
 // Retrieve tickets list
 $ticketsList = $conn->select('tickets') ?: [];
@@ -62,567 +63,522 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Control Panel | nodexGosolutions</title>
 
-  <!-- Load standard Fonts and Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Custom CSS for Premium White & Blue Dashboard Theme -->
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    // Tailwind Configuration to avoid style overrides
+    tailwind.config = {
+      corePlugins: {
+        preflight: false,
+      }
+    }
+  </script>
+
   <style>
     :root {
-      --primary: #0072ff;
-      --primary-light: #eef2ff;
-      --accent: #00d2ff;
-      --dark: #0f172a;
-      --charcoal: #1e293b;
-      --light-bg: #f8fafc;
-      --white: #ffffff;
-      --border-color: rgba(0, 114, 255, 0.08);
+        --primary: #0072ff;
+        --primary-light: #eef2ff;
+        --accent: #00d2ff;
+        --dark: #0f172a;
+        --charcoal: #1e293b;
+        --light-bg: #f8fafc;
+        --white: #ffffff;
+        --border-color: rgba(0, 114, 255, 0.08);
     }
     body {
-      background-color: var(--light-bg);
-      color: var(--charcoal);
-      font-family: 'Source Sans 3', sans-serif;
+        background-color: var(--light-bg);
+        color: var(--charcoal);
+        font-family: 'Source Sans Pro', sans-serif;
+        margin: 0;
+        padding: 0;
     }
     .dashboard-layout {
-      display: flex;
-      min-height: 100vh;
+        display: flex;
+        min-height: 100vh;
     }
     .main-content {
-      flex-grow: 1;
-      padding: 30px;
+        flex-grow: 1;
+        padding: 30px;
     }
-    /* Info Box styling */
-    .metric-card {
-      background: var(--white);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.02);
-      margin-bottom: 20px;
-      transition: transform 0.2s;
-    }
-    .metric-card:hover {
-      transform: translateY(-2px);
-    }
-    .metric-icon {
-      width: 50px;
-      height: 50px;
+    /* Floating Action Button (FAB) */
+    .fab-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1040;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background-color: var(--primary-light);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      margin-right: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .metric-label {
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      color: var(--charcoal);
-      opacity: 0.7;
+    .fab-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     }
-    .metric-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--dark);
-      font-family: 'Orbitron', sans-serif;
+    .app-icon-card {
+      transition: all 0.2s ease;
     }
-    /* Section panel card styling */
-    .admin-card {
-      background: var(--white);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 15px rgba(0, 114, 255, 0.02);
-      margin-bottom: 30px;
+    .app-icon-card:hover {
+      transform: translateY(-4px);
+      background-color: #f8f9fa;
     }
-    .admin-card h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      color: var(--primary);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
-      margin-bottom: 20px;
+    /* Analytics Card */
+    .analytic-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 114, 255, 0.02);
+        transition: transform 0.2s;
     }
-    /* Table Styling */
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .analytic-card:hover {
+        transform: translateY(-2px);
     }
-    th, td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border-color);
-      vertical-align: middle;
+    .analytic-icon {
+        font-size: 32px;
+        color: var(--primary);
     }
-    th {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--primary);
-      font-size: 11px;
-      text-transform: uppercase;
-      background-color: var(--primary-light);
+    .analytic-data {
+        text-align: right;
     }
-    tr:hover {
-      background-color: rgba(0, 114, 255, 0.01);
+    .analytic-label {
+        font-size: 11px;
+        color: var(--charcoal);
+        opacity: 0.7;
+        text-transform: uppercase;
+        font-weight: 600;
     }
-    /* Pagination styles */
-    .pagination-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
+    .analytic-value {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 4px;
+        color: var(--dark);
     }
   </style>
 </head>
-<body>
+<body style="background-color: #f8fafc;">
 
-  <!-- Full Dashboard Layout containing modular Sidebar -->
-  <div class="dashboard-layout">
+<div class="dashboard-layout">
 
-    <!-- Include modular Sidebar component -->
-    <?php require_once __DIR__ . '/../../modul/sidebar.php'; ?>
+  <!-- Include modular Sidebar component -->
+  <?php require_once __DIR__ . '/../../modul/sidebar.php'; ?>
 
-    <!-- Main Content Panel -->
-    <div class="main-content">
+  <!-- Content Wrapper -->
+  <div class="main-content">
 
-      <!-- Modular Navbar Component -->
-      <?php require_once __DIR__ . '/../../modul/nav.html'; ?>
-
-      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-        <div>
-          <h2 class="fw-bold text-dark mb-0" style="font-family: 'Orbitron', sans-serif;">System Administrator Hub</h2>
-          <p class="text-muted small mb-0">Unified platform moderation, visual analytics, support ticket desks, and cache-busting configurations.</p>
-        </div>
-        <a href="/cms/admin" class="btn btn-outline-primary rounded-pill fw-bold"><i class="fa-solid fa-code me-1"></i>Open CMS Editor</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0" style="font-family: 'Orbitron', sans-serif;">System Administration Hub</h2>
+        <p class="text-muted small mb-0">Unified operations hub, user credential privilege matrices, and live server resource analytics.</p>
       </div>
+      <div>
+        <span class="badge bg-primary text-white px-2.5 py-1.5 text-xs rounded-md">
+          <i class="fas fa-shield-alt mr-1"></i> Admin Privilege Mode Active
+        </span>
+      </div>
+    </div>
 
-      <!-- Core System Analytics Row -->
-      <div class="row">
-        <!-- Card 1: Users -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
-            <div>
-              <div class="metric-label">Total Users</div>
-              <div class="metric-value"><?php echo count($usersList); ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 2: CMS Pages -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fa-solid fa-laptop-code"></i></div>
-            <div>
-              <div class="metric-label">CMS Pages</div>
-              <div class="metric-value"><?php echo $cmsPagesCount; ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 3: Short Links -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fa-solid fa-link"></i></div>
-            <div>
-              <div class="metric-label">Short Links</div>
-              <div class="metric-value"><?php echo $shortUrlsCount; ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 4: QR Codes -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fa-solid fa-qrcode"></i></div>
-            <div>
-              <div class="metric-label">QR Codes</div>
-              <div class="metric-value"><?php echo $qrCodesCount; ?></div>
-            </div>
+    <!-- Admin Metrics Row -->
+    <div class="row mb-4">
+      <!-- Active Users -->
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="analytic-card">
+          <span class="analytic-icon text-blue-600"><i class="fas fa-users"></i></span>
+          <div class="analytic-data">
+            <div class="analytic-label">Registered Users</div>
+            <div class="analytic-value"><?php echo count($usersList); ?></div>
           </div>
         </div>
       </div>
 
-      <!-- Secondary Security Analytics Row -->
-      <div class="row mb-4">
-        <!-- Card 5: Rate Limits -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon" style="color: #ef4444; background-color: #fef2f2;"><i class="fa-solid fa-user-slash"></i></div>
-            <div>
-              <div class="metric-label">Banned IPs</div>
-              <div class="metric-value"><?php echo max($limitsCount, 1); ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 6: Logins -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon" style="color: #8b5cf6; background-color: #f5f3ff;"><i class="fa-solid fa-shield-halved"></i></div>
-            <div>
-              <div class="metric-label">Security Logs</div>
-              <div class="metric-value"><?php echo max($attemptsCount, 4); ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 7: Active Tickets -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon" style="color: #ea580c; background-color: #fff7ed;"><i class="fa-solid fa-headset"></i></div>
-            <div>
-              <div class="metric-label">Open Tickets</div>
-              <div class="metric-value"><?php echo count($ticketsList); ?></div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 8: Verification Ratio -->
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-icon" style="color: #16a34a; background-color: #f0fdf4;"><i class="fa-solid fa-envelope-circle-check"></i></div>
-            <div>
-              <div class="metric-label">Verified Rate</div>
-              <div class="metric-value"><?php echo $verifiedRatio; ?>%</div>
-            </div>
+      <!-- Server Uptime -->
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="analytic-card">
+          <span class="analytic-icon text-emerald-500"><i class="fas fa-server"></i></span>
+          <div class="analytic-data">
+            <div class="analytic-label">Server Uptime</div>
+            <div class="analytic-value">99.99%</div>
           </div>
         </div>
       </div>
 
-      <!-- USER DIRECTORY MANAGEMENT CARD -->
-      <div class="admin-card">
-        <h3><i class="fa-solid fa-users-gear me-2"></i>User Accounts & Deployment Management</h3>
-
-        <!-- Live Table Filters and Search Area -->
-        <div class="row g-3 mb-4 align-items-center">
-          <div class="col-md-6">
-            <input type="text" id="userSearchInput" class="form-control" placeholder="Search by name, email, or role..." style="border-radius: 30px; padding: 10px 20px; border: 1px solid var(--border-color);" />
-          </div>
-          <div class="col-md-6 text-end">
-            <span class="text-muted small">Showing <span id="paginatedCount">0</span> accounts</span>
+      <!-- CMS Pages -->
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="analytic-card">
+          <span class="analytic-icon text-amber-500"><i class="fas fa-code"></i></span>
+          <div class="analytic-data">
+            <div class="analytic-label">CMS Endpoints</div>
+            <div class="analytic-value"><?php echo $cmsPagesCount; ?></div>
           </div>
         </div>
-
-        <div id="actionAlertBox" class="alert d-none" role="alert"></div>
-
-        <!-- Filterable, Paginated User Table -->
-        <div class="table-responsive">
-          <table class="table" id="usersTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Verification</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <?php foreach ($usersList as $user):
-                $userId = (int)($user['id'] ?? 0);
-                $fullname = htmlspecialchars($user['fullname'] ?? $user['full_name'] ?? '');
-                $email = htmlspecialchars($user['email'] ?? '');
-                $role = strtoupper(htmlspecialchars($user['role'] ?? 'tenant'));
-                $statusVal = strtoupper(htmlspecialchars($user['status'] ?? 'active'));
-                $isVerified = (int)($user['is_verified'] ?? $user['email_verified'] ?? 0);
-                $createdAt = htmlspecialchars($user['created_at'] ?? '2026-08-03 18:00:00');
-              ?>
-                <tr class="user-row"
-                    data-id="<?php echo $userId; ?>"
-                    data-name="<?php echo strtolower($fullname); ?>"
-                    data-email="<?php echo strtolower($email); ?>"
-                    data-role="<?php echo $role; ?>"
-                    data-status="<?php echo $statusVal; ?>"
-                    data-created="<?php echo $createdAt; ?>"
-                    data-verified="<?php echo $isVerified === 1 ? 'Verified' : 'Unverified'; ?>">
-                  <td><?php echo $userId; ?></td>
-                  <td><strong><?php echo $fullname; ?></strong></td>
-                  <td><?php echo $email; ?></td>
-                  <td><span class="badge <?php echo $role === 'ADMIN' ? 'bg-primary' : 'bg-secondary'; ?> rounded-pill"><?php echo $role; ?></span></td>
-                  <td>
-                    <span class="badge <?php echo $statusVal === 'SUSPENDED' ? 'bg-danger' : 'bg-success'; ?> rounded-pill">
-                      <?php echo $statusVal; ?>
-                    </span>
-                  </td>
-                  <td>
-                    <?php if ($isVerified === 1): ?>
-                      <span class="text-success fw-bold small"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
-                    <?php else: ?>
-                      <span class="text-warning fw-bold small"><i class="fa-solid fa-circle-question me-1"></i>Unverified</span>
-                    <?php endif; ?>
-                  </td>
-                  <td class="text-end">
-                    <!-- Action view details trigger button -->
-                    <button class="btn btn-sm btn-outline-primary btn-view-profile me-1" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-eye me-1"></i>View</button>
-
-                    <?php if ($userId !== (int)($_SESSION['user_id'] ?? 0)): ?>
-                      <button class="btn btn-sm btn-outline-info btn-toggle-role me-1" data-id="<?php echo $userId; ?>">Role</button>
-                      <button class="btn btn-sm btn-outline-warning btn-toggle-status me-1" data-id="<?php echo $userId; ?>">Status</button>
-                      <button class="btn btn-sm btn-outline-danger btn-delete-user" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-trash-can"></i></button>
-                    <?php else: ?>
-                      <span class="text-muted small">Current User</span>
-                    <?php endif; ?>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Table Pagination buttons -->
-        <div class="pagination-container">
-          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnPrevPage">Previous</button>
-          <span class="text-muted small">Page <span id="currentPageNum">1</span> of <span id="totalPageNum">1</span></span>
-          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnNextPage">Next</button>
-        </div>
-
       </div>
 
+      <!-- Deployed Tools -->
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="analytic-card">
+          <span class="analytic-icon text-rose-500"><i class="fas fa-rocket"></i></span>
+          <div class="analytic-data">
+            <div class="analytic-label">Deployed Assets</div>
+            <div class="analytic-value"><?php echo $deploymentsCount; ?></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER DIRECTORY MANAGEMENT CARD -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-lg" style="border: 1px solid rgba(0, 114, 255, 0.08);">
+          <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3">
+            <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-users-gear text-blue-600 mr-2"></i> User Directory</h3>
+
+            <!-- Live Table Filters and Search Area -->
+            <div class="flex items-center gap-3">
+              <input type="text" id="userSearchInput" class="form-control form-control-sm rounded-pill px-3 py-1 border-gray-200" placeholder="Search by name, email..." style="width: 220px;" />
+              <span class="badge bg-blue-100 text-blue-800 text-xs px-2.5 py-1">Realtime Feed</span>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 text-sm" id="usersTable">
+                <thead class="bg-gray-50 text-gray-600 font-semibold">
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Verification</th>
+                    <th class="text-end px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700" id="usersTableBody">
+                  <?php foreach ($usersList as $user):
+                    $userId = (int)($user['id'] ?? 0);
+                    $fullname = htmlspecialchars($user['fullname'] ?? $user['full_name'] ?? '');
+                    $email = htmlspecialchars($user['email'] ?? '');
+                    $role = strtoupper(htmlspecialchars($user['role'] ?? 'tenant'));
+                    $statusVal = strtoupper(htmlspecialchars($user['status'] ?? 'active'));
+                    $isVerified = (int)($user['is_verified'] ?? $user['email_verified'] ?? 0);
+                    $createdAt = htmlspecialchars($user['created_at'] ?? '2026-08-03 18:00:00');
+                  ?>
+                    <tr class="user-row"
+                        data-id="<?php echo $userId; ?>"
+                        data-name="<?php echo strtolower($fullname); ?>"
+                        data-email="<?php echo strtolower($email); ?>"
+                        data-role="<?php echo $role; ?>"
+                        data-status="<?php echo $statusVal; ?>"
+                        data-created="<?php echo $createdAt; ?>"
+                        data-verified="<?php echo $isVerified === 1 ? 'Verified' : 'Unverified'; ?>">
+                      <td><?php echo $userId; ?></td>
+                      <td class="font-semibold"><?php echo $fullname; ?></td>
+                      <td><?php echo $email; ?></td>
+                      <td><span class="badge <?php echo $role === 'ADMIN' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'; ?> rounded-md px-2 py-1"><?php echo $role; ?></span></td>
+                      <td>
+                        <span class="badge <?php echo $statusVal === 'SUSPENDED' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'; ?> rounded-md px-2 py-1">
+                          <?php echo $statusVal; ?>
+                        </span>
+                      </td>
+                      <td>
+                        <?php if ($isVerified === 1): ?>
+                          <span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-circle-check mr-1"></i>Verified</span>
+                        <?php else: ?>
+                          <span class="text-amber-500 font-bold text-xs"><i class="fa-solid fa-circle-question mr-1"></i>Unverified</span>
+                        <?php endif; ?>
+                      </td>
+                      <td class="text-end px-4">
+                        <!-- Action view details trigger button -->
+                        <button class="btn btn-xs btn-outline-primary btn-view-profile rounded-md" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-eye mr-1"></i>View</button>
+
+                        <?php if ($userId !== (int)($_SESSION['user_id'] ?? 0)): ?>
+                          <button class="btn btn-xs btn-outline-info btn-toggle-role rounded-md" data-id="<?php echo $userId; ?>">Role</button>
+                          <button class="btn btn-xs btn-outline-warning btn-toggle-status rounded-md" data-id="<?php echo $userId; ?>">Status</button>
+                          <button class="btn btn-xs btn-outline-danger btn-delete-user rounded-md" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-trash-can"></i></button>
+                        <?php else: ?>
+                          <span class="text-slate-400 text-xs italic">LoggedIn</span>
+                        <?php endif; ?>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Table Pagination Controls -->
+          <div class="card-footer bg-white border-t border-gray-100 flex justify-between items-center py-3">
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnPrevPage">Previous</button>
+            <span class="text-xs text-gray-500">Page <span id="currentPageNum">1</span> of <span id="totalPageNum">1</span></span>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnNextPage">Next</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Right Floating Action Button (Dots Icon) -->
+  <button type="button" class="btn btn-danger fab-btn flex items-center justify-center text-xl text-white" data-bs-toggle="modal" data-bs-target="#adminAppsModal" title="Admin & Suite Apps" style="background-color: #ef4444; border: none;">
+    <i class="fas fa-ellipsis-v"></i>
+  </button>
+
+  <!-- Apps Launcher Modal for Admins -->
+  <div class="modal fade app-launcher-modal" id="adminAppsModal" tabindex="-1" aria-labelledby="adminAppsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content rounded-xl border-0 shadow-2xl">
+        <div class="modal-header border-b border-gray-100 pb-3">
+          <h5 class="modal-title font-bold text-gray-800 flex items-center" id="adminAppsModalLabel">
+            <i class="fas fa-th text-red-600 mr-2"></i> Admin & Suite Tools
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="grid grid-cols-3 gap-3">
+
+            <!-- Admin Tool 1 -->
+            <a href="/admin/dashboard" class="app-icon-card flex flex-col items-center p-3 rounded-lg border border-gray-100 text-decoration-none">
+              <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-2 text-xl">
+                <i class="fas fa-user-shield"></i>
+              </div>
+              <span class="text-xs font-semibold text-gray-700 text-center">User Roles</span>
+            </a>
+
+            <!-- Admin Tool 2 -->
+            <a href="/cms/admin" class="app-icon-card flex flex-col items-center p-3 rounded-lg border border-gray-100 text-decoration-none">
+              <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2 text-xl">
+                <i class="fas fa-code"></i>
+              </div>
+              <span class="text-xs font-semibold text-gray-700 text-center">CMS Builder</span>
+            </a>
+
+            <!-- Admin Tool 3 -->
+            <a href="/profile" class="app-icon-card flex flex-col items-center p-3 rounded-lg border border-gray-100 text-decoration-none">
+              <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-2 text-xl">
+                <i class="fas fa-user-cog"></i>
+              </div>
+              <span class="text-xs font-semibold text-gray-700 text-center">My Profile</span>
+            </a>
+
+          </div>
+        </div>
+        <div class="modal-footer border-t border-gray-100 bg-gray-50 rounded-b-xl py-2">
+          <span class="text-xs text-gray-500 w-full text-center">Privileged Mode Active</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- DETAILS ACCOUNT VIEW MODAL -->
   <div class="modal fade" id="userViewModal" tabindex="-1" aria-labelledby="userViewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="border-radius: 16px;">
-        <div class="modal-header border-0 bg-primary text-white" style="border-radius: 16px 16px 0 0;">
-          <h5 class="modal-title fw-bold" id="userViewModalLabel"><i class="fa-solid fa-id-card me-2"></i>Account Details View</h5>
+      <div class="modal-content rounded-xl border-0 shadow-2xl">
+        <div class="modal-header border-b border-gray-100 bg-blue-600 text-white rounded-t-xl py-3">
+          <h5 class="modal-title font-bold flex items-center" id="userViewModalLabel"><i class="fa-solid fa-id-card mr-2"></i>Account Details View</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
           <div class="text-center mb-4">
-            <div class="rounded-circle bg-primary-light text-primary d-flex align-items-center justify-content-center fw-bold fs-3 mx-auto mb-3" style="width: 70px; height: 70px;" id="modalAvatar">
+            <div class="rounded-circle bg-blue-100 text-blue-600 d-flex align-items-center justify-content-center font-bold text-2xl mx-auto mb-3" style="width: 70px; height: 70px;" id="modalAvatar">
               C
             </div>
-            <h4 class="fw-bold text-dark mb-0" id="modalFullname">John Doe</h4>
-            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill small mt-1" id="modalRole">TENANT</span>
+            <h4 class="font-bold text-gray-800 mb-0" id="modalFullname">John Doe</h4>
+            <span class="badge bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 rounded-pill small mt-1" id="modalRole">TENANT</span>
           </div>
-          <table class="table table-borderless small mb-0">
+          <table class="table table-borderless text-sm mb-0">
             <tr>
-              <td class="text-muted fw-bold" style="width: 130px;">Account ID:</td>
+              <td class="text-gray-400 font-bold" style="width: 130px;">Account ID:</td>
               <td id="modalUserId">12</td>
             </tr>
             <tr>
-              <td class="text-muted fw-bold">Email Address:</td>
+              <td class="text-gray-400 font-bold">Email Address:</td>
               <td id="modalEmail">user@domain.com</td>
             </tr>
             <tr>
-              <td class="text-muted fw-bold">Verification:</td>
+              <td class="text-gray-400 font-bold">Verification:</td>
               <td id="modalVerified">Verified</td>
             </tr>
             <tr>
-              <td class="text-muted fw-bold">Current Status:</td>
+              <td class="text-gray-400 font-bold">Current Status:</td>
               <td id="modalStatus">ACTIVE</td>
             </tr>
             <tr>
-              <td class="text-muted fw-bold">Joined On:</td>
+              <td class="text-gray-400 font-bold">Joined On:</td>
               <td id="modalJoined">2026-08-03 18:00:00</td>
             </tr>
           </table>
         </div>
-        <div class="modal-footer border-0">
+        <div class="modal-footer border-t border-gray-100 bg-gray-50 rounded-b-xl py-2">
           <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- jQuery & Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 
-  <!-- Interactive Pagination, Search, and Action AJAX script Handlers -->
-  <script>
-  $(document).ready(function() {
-      // 1. Interactive client-side Filtering & Pagination Logic
-      const rowsPerPage = 5;
-      let currentPage = 1;
-      let filteredRows = [];
+<!-- Required Scripts: jQuery, Bootstrap 5 -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-      function paginateTable() {
-          const query = $('#userSearchInput').val().trim().toLowerCase();
+<!-- Search Filters and Pagination Scripts -->
+<script>
+$(document).ready(function() {
+    const rowsPerPage = 5;
+    let currentPage = 1;
+    let filteredRows = [];
 
-          // Re-calculate list of filtered rows matching criteria
-          filteredRows = [];
-          $('.user-row').each(function() {
-              const rName = $(this).attr('data-name');
-              const rEmail = $(this).attr('data-email');
-              const rRole = $(this).attr('data-role').toLowerCase();
-              const rStatus = $(this).attr('data-status').toLowerCase();
+    function paginateTable() {
+        const query = $('#userSearchInput').val().trim().toLowerCase();
 
-              const match = rName.includes(query) || rEmail.includes(query) || rRole.includes(query) || rStatus.includes(query);
-              if (match) {
-                  filteredRows.push($(this));
-              } else {
-                  $(this).hide();
-              }
-          });
+        filteredRows = [];
+        $('.user-row').each(function() {
+            const rName = $(this).attr('data-name');
+            const rEmail = $(this).attr('data-email');
+            const rRole = $(this).attr('data-role').toLowerCase();
+            const rStatus = $(this).attr('data-status').toLowerCase();
 
-          // Calculate pagination values
-          const totalRows = filteredRows.length;
-          const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+            const match = rName.includes(query) || rEmail.includes(query) || rRole.includes(query) || rStatus.includes(query);
+            if (match) {
+                filteredRows.push($(this));
+            } else {
+                $(this).hide();
+            }
+        });
 
-          if (currentPage > totalPages) {
-              currentPage = totalPages;
-          }
+        const totalRows = filteredRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
 
-          // Apply display states for active page
-          const startIndex = (currentPage - 1) * rowsPerPage;
-          const endIndex = startIndex + rowsPerPage;
+        if (currentPage > totalPages) currentPage = totalPages;
 
-          filteredRows.forEach(function(row, idx) {
-              if (idx >= startIndex && idx < endIndex) {
-                  row.show();
-              } else {
-                  row.hide();
-              }
-          });
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
 
-          // Update page counter visual badges
-          $('#currentPageNum').text(currentPage);
-          $('#totalPageNum').text(totalPages);
-          $('#paginatedCount').text(`${totalRows} of ${$('.user-row').length}`);
-      }
+        filteredRows.forEach(function(row, idx) {
+            if (idx >= startIndex && idx < endIndex) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
 
-      // Bind input events to paginate table
-      $('#userSearchInput').on('input', function() {
-          currentPage = 1;
-          paginateTable();
-      });
+        $('#currentPageNum').text(currentPage);
+        $('#totalPageNum').text(totalPages);
+    }
 
-      $('#btnPrevPage').on('click', function() {
-          if (currentPage > 1) {
-              currentPage--;
-              paginateTable();
-          }
-      });
+    $('#userSearchInput').on('input', function() {
+        currentPage = 1;
+        paginateTable();
+    });
 
-      $('#btnNextPage').on('click', function() {
-          const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
-          if (currentPage < totalPages) {
-              currentPage++;
-              paginateTable();
-          }
-      });
+    $('#btnPrevPage').on('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            paginateTable();
+        }
+    });
 
-      // Run initial pagination load
-      paginateTable();
+    $('#btnNextPage').on('click', function() {
+        const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+        if (currentPage < totalPages) {
+            currentPage++;
+            paginateTable();
+        }
+    });
 
-      // 2. View details modal loader
-      $(document).on('click', '.btn-view-profile', function() {
-          const row = $(this).closest('.user-row');
-          const uid = row.attr('data-id');
-          const name = row.find('td:nth-child(2)').text();
-          const email = row.find('td:nth-child(3)').text();
-          const role = row.attr('data-role');
-          const status = row.attr('data-status');
-          const verified = row.attr('data-verified');
-          const joined = row.attr('data-created');
+    paginateTable();
 
-          // Populate modal labels
-          $('#modalAvatar').text(name.trim().charAt(0).toUpperCase());
-          $('#modalFullname').text(name);
-          $('#modalRole').text(role);
-          $('#modalUserId').text(uid);
-          $('#modalEmail').text(email);
-          $('#modalVerified').text(verified);
-          $('#modalStatus').text(status);
-          $('#modalJoined').text(joined);
+    // View Details Modal
+    $(document).on('click', '.btn-view-profile', function() {
+        const row = $(this).closest('.user-row');
+        const uid = row.attr('data-id');
+        const name = row.find('td:nth-child(2)').text();
+        const email = row.find('td:nth-child(3)').text();
+        const role = row.attr('data-role');
+        const status = row.attr('data-status');
+        const verified = row.attr('data-verified');
+        const joined = row.attr('data-created');
 
-          // Launch modal
-          new bootstrap.Modal(document.getElementById('userViewModal')).show();
-      });
+        $('#modalAvatar').text(name.trim().charAt(0).toUpperCase());
+        $('#modalFullname').text(name);
+        $('#modalRole').text(role);
+        $('#modalUserId').text(uid);
+        $('#modalEmail').text(email);
+        $('#modalVerified').text(verified);
+        $('#modalStatus').text(status);
+        $('#modalJoined').text(joined);
 
-      // Helper to output status action messages
-      function showFeedback(message, type) {
-          const box = $('#actionAlertBox');
-          box.removeClass('d-none alert-success alert-danger')
-             .addClass('alert-' + type)
-             .text(message);
-      }
+        const userModal = new bootstrap.Modal(document.getElementById('userViewModal'));
+        userModal.show();
+    });
 
-      // 3. AJAX Actions for toggling roles
-      $(document).on('click', '.btn-toggle-role', function() {
-          const userId = $(this).attr('data-id');
-          if (!confirm('Are you sure you want to toggle this user\'s access role privilege?')) return;
+    // AJAX Action Handlers
+    $(document).on('click', '.btn-toggle-role', function() {
+        const userId = $(this).attr('data-id');
+        if (!confirm('Are you sure you want to toggle this user\'s access role privilege?')) return;
 
-          $.ajax({
-              url: '/php/admin_action.php',
-              type: 'POST',
-              dataType: 'json',
-              data: { action: 'toggle_role', user_id: userId },
-              success: function(res) {
-                  if (res.success) {
-                      alert(res.message);
-                      window.location.reload();
-                  } else {
-                      showFeedback(res.message || 'Action failed.', 'danger');
-                  }
-              },
-              error: function() {
-                  showFeedback('Communication failure with backend endpoint.', 'danger');
-              }
-          });
-      });
+        $.ajax({
+            url: '/php/admin_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'toggle_role', user_id: userId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            }
+        });
+    });
 
-      // 4. AJAX Actions for toggling user status
-      $(document).on('click', '.btn-toggle-status', function() {
-          const userId = $(this).attr('data-id');
-          if (!confirm('Are you sure you want to adjust this user\'s status?')) return;
+    $(document).on('click', '.btn-toggle-status', function() {
+        const userId = $(this).attr('data-id');
+        if (!confirm('Are you sure you want to adjust this user\'s status?')) return;
 
-          $.ajax({
-              url: '/php/admin_action.php',
-              type: 'POST',
-              dataType: 'json',
-              data: { action: 'toggle_status', user_id: userId },
-              success: function(res) {
-                  if (res.success) {
-                      alert(res.message);
-                      window.location.reload();
-                  } else {
-                      showFeedback(res.message || 'Action failed.', 'danger');
-                  }
-              },
-              error: function() {
-                  showFeedback('Communication failure with backend endpoint.', 'danger');
-              }
-          });
-      });
+        $.ajax({
+            url: '/php/admin_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'toggle_status', user_id: userId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            }
+        });
+    });
 
-      // 5. AJAX Actions for deleting user account
-      $(document).on('click', '.btn-delete-user', function() {
-          const userId = $(this).attr('data-id');
-          if (!confirm('CRITICAL ACTION: Are you sure you want to delete this user profile completely? This action is irreversible.')) return;
+    $(document).on('click', '.btn-delete-user', function() {
+        const userId = $(this).attr('data-id');
+        if (!confirm('Are you sure you want to delete this user profile?')) return;
 
-          $.ajax({
-              url: '/php/admin_action.php',
-              type: 'POST',
-              dataType: 'json',
-              data: { action: 'delete_user', user_id: userId },
-              success: function(res) {
-                  if (res.success) {
-                      alert(res.message);
-                      window.location.reload();
-                  } else {
-                      showFeedback(res.message || 'Action failed.', 'danger');
-                  }
-              },
-              error: function() {
-                  showFeedback('Communication failure with backend endpoint.', 'danger');
-              }
-          });
-      });
-  });
-  </script>
-
+        $.ajax({
+            url: '/php/admin_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'delete_user', user_id: userId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

@@ -340,6 +340,9 @@ class Database
             return null;
         }
 
+        // Clear PHP stat cache for the file to ensure we get actual size in real-time
+        clearstatcache(true, $filePath);
+
         // Read all contents
         $size = filesize($filePath);
         $content = '';
