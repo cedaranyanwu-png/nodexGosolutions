@@ -9,8 +9,8 @@
 require_once __DIR__ . '/db.php';
 
 // Extract and sanitize input query criteria
-$email = cleanInput($_REQUEST['email'] ?? '');
-$token = cleanInput($_REQUEST['token'] ?? '');
+$email = cleanInput($_POST['email'] ?? $_GET['email'] ?? '');
+$token = cleanInput($_POST['token'] ?? $_GET['token'] ?? '');
 
 // Make sure both email and token are supplied
 if (empty($email) || empty($token)) {

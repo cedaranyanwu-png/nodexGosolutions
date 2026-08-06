@@ -4,6 +4,7 @@
  *
  * This file replaces the MySQLi connection layer with our custom JSON-based
  * Database Engine, providing robust authentication and security helpers.
+ * It also automatically seeds the database with the main administrator account.
  */
 
 // Enable strict typing for better reliability and fewer runtime bugs
@@ -20,6 +21,26 @@ $conn = new Database(__DIR__ . '/../databases', 'system');
 $conn->createTable('users');
 $conn->createTable('rate_limits');
 $conn->createTable('login_attempts');
+$conn->createTable('tickets'); // Support tickets database table
+
+// Dynamic Auto-Seeder: Seed the main administrator account if users table is empty
+$usersCount = count($conn->select('users'));
+if ($usersCount === 0) {
+    // Hash password admin123 securely
+    $hashedPassword = password_hash('admin123', PASSWORD_DEFAULT);
+    // Seed admin profile
+    $conn->insert('users', [
+        'fullname' => 'Cedar Anyanwu',
+        'email' => 'admin@nodexplatform.com.ng',
+        'password' => $hashedPassword,
+        'role' => 'admin',
+        'status' => 'active',
+        'is_verified' => 1,
+        'email_verified' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+}
 
 /**
  * Configure secure and isolated session properties.

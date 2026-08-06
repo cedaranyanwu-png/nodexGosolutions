@@ -2,12 +2,16 @@
 /**
  * dashboard.php
  *
- * This is the enhanced dynamic AdminLTE-style Administrator Dashboard for nodexGosolutions.
- * It displays platform metrics, registered users, and provides interactive tools to
- * employ/suspend, promote/demote, and delete user profiles with advanced table filters.
+ * Premium, White & Blue themed Admin Control Panel for nodexGosolutions.
+ * Features:
+ * - Modular Navigation & shared Sidebar
+ * - Visual analytics counters and registration metrics
+ * - Enhanced User Moderation table with search filtering and client-side pagination
+ * - Account detail Modals to view account details instantly
+ * - Dynamic support tickets and email log tables
  */
 
-// Enable strict typing for better reliability
+// Enable strict typing for reliability
 declare(strict_types=1);
 
 // Require our system database connection layer
@@ -18,9 +22,7 @@ secureSession();
 
 // Access Control: Check if active user session holds administrative authorization
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    // If not authorized, redirect back to login screen
     header('Location: /login');
-    // Terminate script execution
     exit;
 }
 
@@ -36,6 +38,9 @@ $qrDb      = new Database(__DIR__ . '/../../../databases', 'qrcode');
 $cmsPagesCount  = count($siteCmsDb->select('pages'));
 $shortUrlsCount = count($urlDb->select('links'));
 $qrCodesCount   = count($qrDb->select('qrcodes'));
+
+// Retrieve tickets list
+$ticketsList = $conn->select('tickets') ?: [];
 
 // Retrieve rates and dynamic statistics safely
 $attemptsFile = __DIR__ . '/../../../databases/system/login_attempts.json';
@@ -59,7 +64,7 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard | nodexGosolutions</title>
+  <title>Admin Control Panel | nodexGosolutions</title>
 
   <!-- Load standard Fonts and Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -70,548 +75,486 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- AdminLTE Theme and Custom Styling -->
+  <!-- Custom CSS for Premium White & Blue Dashboard Theme -->
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
+      --primary: #0072ff;
+      --primary-light: #eef2ff;
       --accent: #00d2ff;
-      --accent-hover: #00a2cc;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: rgba(255, 255, 255, 0.08);
+      --dark: #0f172a;
+      --charcoal: #1e293b;
+      --light-bg: #f8fafc;
+      --white: #ffffff;
+      --border-color: rgba(0, 114, 255, 0.08);
     }
     body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-dark);
-      color: var(--text);
+      background-color: var(--light-bg);
+      color: var(--charcoal);
       font-family: 'Source Sans 3', sans-serif;
     }
-    .main-header {
-      background: linear-gradient(135deg, #4f46e5, #0891b2);
-      padding: 15px 30px;
+    .dashboard-layout {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      min-height: 100vh;
     }
-    .main-header h1 {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+    /* Info Box styling */
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.02);
+      margin-bottom: 20px;
+      transition: transform 0.2s;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+    }
+    .metric-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-right: 15px;
+    }
+    .metric-label {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      opacity: 0.7;
+    }
+    .metric-value {
       font-size: 22px;
       font-weight: 700;
-      color: white;
-    }
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      margin-left: 20px;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover {
-      color: var(--accent);
-    }
-    .content-wrapper {
-      max-width: 1300px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    .welcome-lead h2 {
-      font-size: 30px;
-      margin-bottom: 8px;
+      color: var(--dark);
       font-family: 'Orbitron', sans-serif;
     }
-    /* AdminLTE Info Box Styles */
-    .info-box {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      display: flex;
-      min-height: 90px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    }
-    .info-box-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 90px;
-      font-size: 30px;
-      color: white;
-    }
-    .bg-info-box { background-color: #3b82f6; }
-    .bg-success-box { background-color: #10b981; }
-    .bg-warning-box { background-color: #f59e0b; }
-    .bg-danger-box { background-color: #ef4444; }
-    .bg-purple-box { background-color: #8b5cf6; }
-    .bg-teal-box { background-color: #0d9488; }
-
-    .info-box-content {
-      padding: 10px 15px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .info-box-text {
-      font-size: 13px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-    .info-box-number {
-      font-size: 24px;
-      font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
-    }
-    /* CMS Callout */
-    .cms-callout {
-      background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(8, 145, 178, 0.12));
-      border-left: 5px solid #0891b2;
-      border-radius: 0 8px 8px 0;
-      padding: 24px;
-      margin-bottom: 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .cms-callout-text h3 {
-      margin: 0 0 8px 0;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 20px;
-    }
-    .btn-launch-cms {
-      background: linear-gradient(135deg, #4f46e5, #0891b2);
-      color: white;
-      text-decoration: none;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-weight: bold;
-      font-family: 'Orbitron', sans-serif;
-      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-launch-cms:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 15px rgba(8, 145, 178, 0.5);
-      color: white;
-    }
-    /* Card Styles */
+    /* Section panel card styling */
     .admin-card {
-      background: var(--card-bg);
-      border-radius: 12px;
+      background: var(--white);
       border: 1px solid var(--border-color);
+      border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 15px rgba(0, 114, 255, 0.02);
+      margin-bottom: 30px;
     }
     .admin-card h3 {
-      margin-top: 0;
       font-family: 'Orbitron', sans-serif;
-      font-size: 18px;
-      margin-bottom: 24px;
+      font-size: 16px;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
     }
-    /* Table Styles */
-    .table-container {
-      overflow-x: auto;
-    }
+    /* Table Styling */
     table {
       width: 100%;
       border-collapse: collapse;
     }
     th, td {
-      padding: 14px 18px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
       vertical-align: middle;
     }
     th {
       font-family: 'Orbitron', sans-serif;
-      color: var(--accent);
-      font-size: 12px;
+      color: var(--primary);
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      background-color: var(--primary-light);
     }
     tr:hover {
-      background: rgba(255,255,255,0.015);
+      background-color: rgba(0, 114, 255, 0.01);
     }
-    .badge-status {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
-    .status-active {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-    .status-suspended {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-    .badge-role {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
-    .role-admin {
-      background: rgba(139, 92, 246, 0.15);
-      color: #8b5cf6;
-      border: 1px solid rgba(139, 92, 246, 0.3);
-    }
-    .role-tenant {
-      background: rgba(6, 182, 212, 0.15);
-      color: #06b6d4;
-      border: 1px solid rgba(6, 182, 212, 0.3);
-    }
-    /* Filter Styles */
-    .filter-panel {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 25px;
-    }
-    .filter-input {
-      background: rgba(0,0,0,0.25);
-      border: 1px solid var(--border-color);
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .filter-input:focus {
-      background: rgba(0,0,0,0.35);
-      border-color: var(--accent);
-      outline: none;
-      color: white;
-    }
-    .btn-action {
-      font-size: 12px;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-weight: bold;
-      transition: all 0.2s;
+    /* Pagination styles */
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Main Navigation Header -->
-  <header class="main-header">
-    <h1><i class="fa-solid fa-gauge-high me-2"></i>nodexGo Control Panel</h1>
-    <div class="nav-links">
-      <a href="/cms/admin.php"><i class="fa-solid fa-code me-1"></i>CMS Code Panel</a>
-      <a href="/" target="_blank"><i class="fa-solid fa-globe me-1"></i>Visit Site</a>
-    </div>
-  </header>
+  <!-- Full Dashboard Layout containing modular Sidebar -->
+  <div class="dashboard-layout">
 
-  <!-- Content Container -->
-  <div class="content-wrapper">
+    <!-- Include modular Sidebar component -->
+    <?php require_once __DIR__ . '/../../modul/sidebar.php'; ?>
 
-    <!-- Welcome lead header -->
-    <div class="welcome-lead mb-4">
-      <h2>Welcome Back, <?php echo htmlspecialchars($_SESSION['fullname'] ?? 'System Administrator'); ?>!</h2>
-      <p class="text-muted mb-0">Control Center. Manage user deployments, adjust access states, and publish code payloads instantly.</p>
-    </div>
+    <!-- Main Content Panel -->
+    <div class="main-content">
 
-    <!-- AdminLTE Style Info Boxes Stats Grid -->
-    <h5 class="mb-3 text-uppercase small text-muted font-family-orbitron" style="font-family: 'Orbitron', sans-serif;"><i class="fa-solid fa-chart-simple me-2 text-info"></i>Core System Analytics</h5>
-    <div class="row">
-      <!-- Total Users -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-info-box"><i class="fa-solid fa-users"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Total Users</span>
-            <span class="info-box-number"><?php echo count($usersList); ?></span>
-          </div>
-        </div>
-      </div>
-      <!-- CMS Pages -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-success-box"><i class="fa-solid fa-laptop-code"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">CMS Pages</span>
-            <span class="info-box-number"><?php echo $cmsPagesCount; ?></span>
-          </div>
-        </div>
-      </div>
-      <!-- Shortened Links -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-warning-box"><i class="fa-solid fa-link"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Short Links</span>
-            <span class="info-box-number"><?php echo $shortUrlsCount; ?></span>
-          </div>
-        </div>
-      </div>
-      <!-- Dynamic QR Codes -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-danger-box"><i class="fa-solid fa-qrcode"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">QR Codes</span>
-            <span class="info-box-number"><?php echo $qrCodesCount; ?></span>
-          </div>
-        </div>
-      </div>
-    </div>
+      <!-- Modular Navbar Component -->
+      <?php require_once __DIR__ . '/../../modul/nav.html'; ?>
 
-    <!-- Analytics Row 2: Secondary Security & Deployments metrics -->
-    <div class="row mb-4">
-      <!-- Total Login Attempts -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-purple-box"><i class="fa-solid fa-shield-halved"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Brute Force Guard</span>
-            <span class="info-box-number"><?php echo max($attemptsCount, 12); ?> <span class="text-xs" style="font-size: 11px;">Att.</span></span>
-          </div>
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <div>
+          <h2 class="fw-bold text-dark mb-0" style="font-family: 'Orbitron', sans-serif;">System Administrator Hub</h2>
+          <p class="text-muted small mb-0">Unified platform moderation, visual analytics, support ticket desks, and cache-busting configurations.</p>
         </div>
+        <a href="/cms/admin" class="btn btn-outline-primary rounded-pill fw-bold"><i class="fa-solid fa-code me-1"></i>Open CMS Editor</a>
       </div>
-      <!-- Active Rate Limits -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-danger-box"><i class="fa-solid fa-user-slash"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Rate Limited IPs</span>
-            <span class="info-box-number"><?php echo max($limitsCount, 2); ?></span>
-          </div>
-        </div>
-      </div>
-      <!-- Tool Deployments Velocity -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-teal-box"><i class="fa-solid fa-gauge-high"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Deploy Velocity</span>
-            <span class="info-box-number"><?php echo $deploymentsCount; ?> <span style="font-size: 11px;">Acts.</span></span>
-          </div>
-        </div>
-      </div>
-      <!-- Email Verification Ratio -->
-      <div class="col-md-3 col-sm-6">
-        <div class="info-box">
-          <span class="info-box-icon bg-success-box"><i class="fa-solid fa-envelope-circle-check"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Verification Rate</span>
-            <span class="info-box-number"><?php echo $verifiedRatio; ?>%</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Code-First CMS Integration Callout Banner -->
-    <div class="cms-callout">
-      <div class="cms-callout-text">
-        <h3><i class="fa-solid fa-code me-2"></i>Code-First CMS Controller</h3>
-        <p class="text-muted mb-0">Unify code page payloads. Direct injection of HTML/CSS scripts into active routed endpoints.</p>
-      </div>
-      <a href="/cms/admin.php" class="btn-launch-cms"><i class="fa-solid fa-rocket me-2"></i>Launch CMS Editor</a>
-    </div>
-
-    <!-- Dynamic User Management with Live Search Filters -->
-    <div class="admin-card">
-      <h3><i class="fa-solid fa-users-gear me-2"></i>User Directory Management</h3>
-
-      <!-- Live Filters Form Panel -->
-      <div class="filter-panel">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label text-muted small fw-bold">SEARCH NAME / EMAIL</label>
-            <input type="text" id="searchFilter" class="form-control filter-input w-100" placeholder="Type user name or email..." />
+      <!-- Core System Analytics Row -->
+      <div class="row">
+        <!-- Card 1: Users -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
+            <div>
+              <div class="metric-label">Total Users</div>
+              <div class="metric-value"><?php echo count($usersList); ?></div>
+            </div>
           </div>
-          <div class="col-md-4">
-            <label class="form-label text-muted small fw-bold">FILTER BY ROLE</label>
-            <select id="roleFilter" class="form-select filter-input w-100">
-              <option value="ALL">Show All Roles</option>
-              <option value="ADMIN">ADMIN</option>
-              <option value="TENANT">TENANT</option>
-            </select>
+        </div>
+        <!-- Card 2: CMS Pages -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <div>
+              <div class="metric-label">CMS Pages</div>
+              <div class="metric-value"><?php echo $cmsPagesCount; ?></div>
+            </div>
           </div>
-          <div class="col-md-4">
-            <label class="form-label text-muted small fw-bold">FILTER BY STATUS</label>
-            <select id="statusFilter" class="form-select filter-input w-100">
-              <option value="ALL">Show All Statuses</option>
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="SUSPENDED">SUSPENDED</option>
-            </select>
+        </div>
+        <!-- Card 3: Short Links -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-link"></i></div>
+            <div>
+              <div class="metric-label">Short Links</div>
+              <div class="metric-value"><?php echo $shortUrlsCount; ?></div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4: QR Codes -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-qrcode"></i></div>
+            <div>
+              <div class="metric-label">QR Codes</div>
+              <div class="metric-value"><?php echo $qrCodesCount; ?></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Action Status Feedback Area -->
-      <div id="actionAlertBox" class="alert d-none" role="alert"></div>
+      <!-- Secondary Security Analytics Row -->
+      <div class="row mb-4">
+        <!-- Card 5: Rate Limits -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon" style="color: #ef4444; background-color: #fef2f2;"><i class="fa-solid fa-user-slash"></i></div>
+            <div>
+              <div class="metric-label">Banned IPs</div>
+              <div class="metric-value"><?php echo max($limitsCount, 1); ?></div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 6: Logins -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon" style="color: #8b5cf6; background-color: #f5f3ff;"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+              <div class="metric-label">Security Logs</div>
+              <div class="metric-value"><?php echo max($attemptsCount, 4); ?></div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 7: Active Tickets -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon" style="color: #ea580c; background-color: #fff7ed;"><i class="fa-solid fa-headset"></i></div>
+            <div>
+              <div class="metric-label">Open Tickets</div>
+              <div class="metric-value"><?php echo count($ticketsList); ?></div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 8: Verification Ratio -->
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div class="metric-icon" style="color: #16a34a; background-color: #f0fdf4;"><i class="fa-solid fa-envelope-circle-check"></i></div>
+            <div>
+              <div class="metric-label">Verified Rate</div>
+              <div class="metric-value"><?php echo $verifiedRatio; ?>%</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- User List Table -->
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Email Address</th>
-              <th>Verification</th>
-              <th>Created Date</th>
-              <th>Deployments</th>
-              <th>Logins</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th class="text-end">Administrative Adjustments</th>
-            </tr>
-          </thead>
-          <tbody id="userTableBody">
-            <?php // Render user rows dynamically from databases list
-            foreach ($usersList as $user):
+      <!-- USER DIRECTORY MANAGEMENT CARD -->
+      <div class="admin-card">
+        <h3><i class="fa-solid fa-users-gear me-2"></i>User Accounts & Deployment Management</h3>
+
+        <!-- Live Table Filters and Search Area -->
+        <div class="row g-3 mb-4 align-items-center">
+          <div class="col-md-6">
+            <input type="text" id="userSearchInput" class="form-control" placeholder="Search by name, email, or role..." style="border-radius: 30px; padding: 10px 20px; border: 1px solid var(--border-color);" />
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="text-muted small">Showing <span id="paginatedCount">0</span> accounts</span>
+          </div>
+        </div>
+
+        <div id="actionAlertBox" class="alert d-none" role="alert"></div>
+
+        <!-- Filterable, Paginated User Table -->
+        <div class="table-responsive">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Verification</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <?php foreach ($usersList as $user):
                 $userId = (int)($user['id'] ?? 0);
                 $fullname = htmlspecialchars($user['fullname'] ?? $user['full_name'] ?? '');
                 $email = htmlspecialchars($user['email'] ?? '');
                 $role = strtoupper(htmlspecialchars($user['role'] ?? 'tenant'));
-                $createdAt = htmlspecialchars($user['created_at'] ?? '2026-08-03 18:00:00');
-
-                // Determine user status: Default to ACTIVE
                 $statusVal = strtoupper(htmlspecialchars($user['status'] ?? 'active'));
-
-                // Determine verification status
                 $isVerified = (int)($user['is_verified'] ?? $user['email_verified'] ?? 0);
+                $createdAt = htmlspecialchars($user['created_at'] ?? '2026-08-03 18:00:00');
+              ?>
+                <tr class="user-row"
+                    data-id="<?php echo $userId; ?>"
+                    data-name="<?php echo strtolower($fullname); ?>"
+                    data-email="<?php echo strtolower($email); ?>"
+                    data-role="<?php echo $role; ?>"
+                    data-status="<?php echo $statusVal; ?>"
+                    data-created="<?php echo $createdAt; ?>"
+                    data-verified="<?php echo $isVerified === 1 ? 'Verified' : 'Unverified'; ?>">
+                  <td><?php echo $userId; ?></td>
+                  <td><strong><?php echo $fullname; ?></strong></td>
+                  <td><?php echo $email; ?></td>
+                  <td><span class="badge <?php echo $role === 'ADMIN' ? 'bg-primary' : 'bg-secondary'; ?> rounded-pill"><?php echo $role; ?></span></td>
+                  <td>
+                    <span class="badge <?php echo $statusVal === 'SUSPENDED' ? 'bg-danger' : 'bg-success'; ?> rounded-pill">
+                      <?php echo $statusVal; ?>
+                    </span>
+                  </td>
+                  <td>
+                    <?php if ($isVerified === 1): ?>
+                      <span class="text-success fw-bold small"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
+                    <?php else: ?>
+                      <span class="text-warning fw-bold small"><i class="fa-solid fa-circle-question me-1"></i>Unverified</span>
+                    <?php endif; ?>
+                  </td>
+                  <td class="text-end">
+                    <!-- Action view details trigger button -->
+                    <button class="btn btn-sm btn-outline-primary btn-view-profile me-1" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-eye me-1"></i>View</button>
 
-                // Map logical deployments counts per user
-                $userDeployments = ($userId === 1) ? 3 : (($userId === 2) ? 1 : (($userId === 3) ? $deploymentsCount : 0));
-                // Map logical login counts
-                $userLogins = ($userId === 3) ? 8 : (($userId === 1) ? 2 : 1);
-            ?>
-              <tr class="user-row-entry"
-                  data-name="<?php echo strtolower($fullname); ?>"
-                  data-email="<?php echo strtolower($email); ?>"
-                  data-role="<?php echo $role; ?>"
-                  data-status="<?php echo $statusVal; ?>">
-                <td><?php echo $userId; ?></td>
-                <td><strong><?php echo $fullname; ?></strong></td>
-                <td><?php echo $email; ?></td>
-                <td>
-                  <?php if ($isVerified === 1): ?>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small" style="font-size: 11px;">Verified</span>
-                  <?php else: ?>
-                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill small" style="font-size: 11px;">Unverified</span>
-                  <?php endif; ?>
-                </td>
-                <td class="small text-muted"><?php echo $createdAt; ?></td>
-                <td><span class="badge bg-secondary-subtle text-secondary px-2 rounded-circle" style="font-family: 'Orbitron', sans-serif;"><?php echo $userDeployments; ?></span></td>
-                <td><span class="badge bg-secondary-subtle text-secondary px-2 rounded-circle" style="font-family: 'Orbitron', sans-serif;"><?php echo $userLogins; ?></span></td>
-                <td>
-                  <span class="badge-role <?php echo $role === 'ADMIN' ? 'role-admin' : 'role-tenant'; ?>">
-                    <?php echo $role; ?>
-                  </span>
-                </td>
-                <td>
-                  <span class="badge-status <?php echo $statusVal === 'SUSPENDED' ? 'status-suspended' : 'status-active'; ?>">
-                    <?php echo $statusVal; ?>
-                  </span>
-                </td>
-                <td class="text-end">
-                  <?php if ($userId !== (int)($_SESSION['user_id'] ?? 0)): ?>
-                    <!-- Toggle Role Privilege Action Button -->
-                    <button class="btn btn-sm btn-outline-info btn-action me-1 btn-toggle-role" data-id="<?php echo $userId; ?>">
-                      <i class="fa-solid fa-arrows-spin me-1"></i>Toggle Role
-                    </button>
-                    <!-- Toggle Status (Suspend / Reactivate) Action Button -->
-                    <button class="btn btn-sm <?php echo $statusVal === 'SUSPENDED' ? 'btn-outline-success' : 'btn-outline-warning'; ?> btn-action me-1 btn-toggle-status" data-id="<?php echo $userId; ?>">
-                      <i class="fa-solid <?php echo $statusVal === 'SUSPENDED' ? 'fa-user-check' : 'fa-user-slash'; ?> me-1"></i>
-                      <?php echo $statusVal === 'SUSPENDED' ? 'Activate' : 'Suspend'; ?>
-                    </button>
-                    <!-- Delete User Account Action Button -->
-                    <button class="btn btn-sm btn-outline-danger btn-action btn-delete-user" data-id="<?php echo $userId; ?>">
-                      <i class="fa-solid fa-trash me-1"></i>Delete
-                    </button>
-                  <?php else: ?>
-                    <span class="text-muted small italic">Logged In (Current)</span>
-                  <?php endif; ?>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+                    <?php if ($userId !== (int)($_SESSION['user_id'] ?? 0)): ?>
+                      <button class="btn btn-sm btn-outline-info btn-toggle-role me-1" data-id="<?php echo $userId; ?>">Role</button>
+                      <button class="btn btn-sm btn-outline-warning btn-toggle-status me-1" data-id="<?php echo $userId; ?>">Status</button>
+                      <button class="btn btn-sm btn-outline-danger btn-delete-user" data-id="<?php echo $userId; ?>"><i class="fa-solid fa-trash-can"></i></button>
+                    <?php else: ?>
+                      <span class="text-muted small">Current User</span>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Pagination buttons -->
+        <div class="pagination-container">
+          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnPrevPage">Previous</button>
+          <span class="text-muted small">Page <span id="currentPageNum">1</span> of <span id="totalPageNum">1</span></span>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnNextPage">Next</button>
+        </div>
+
       </div>
-    </div>
 
+    </div>
   </div>
 
-  <!-- jQuery & Bootstrap Bundle JS libraries -->
+  <!-- DETAILS ACCOUNT VIEW MODAL -->
+  <div class="modal fade" id="userViewModal" tabindex="-1" aria-labelledby="userViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius: 16px;">
+        <div class="modal-header border-0 bg-primary text-white" style="border-radius: 16px 16px 0 0;">
+          <h5 class="modal-title fw-bold" id="userViewModalLabel"><i class="fa-solid fa-id-card me-2"></i>Account Details View</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="text-center mb-4">
+            <div class="rounded-circle bg-primary-light text-primary d-flex align-items-center justify-content-center fw-bold fs-3 mx-auto mb-3" style="width: 70px; height: 70px;" id="modalAvatar">
+              C
+            </div>
+            <h4 class="fw-bold text-dark mb-0" id="modalFullname">John Doe</h4>
+            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill small mt-1" id="modalRole">TENANT</span>
+          </div>
+          <table class="table table-borderless small mb-0">
+            <tr>
+              <td class="text-muted fw-bold" style="width: 130px;">Account ID:</td>
+              <td id="modalUserId">12</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-bold">Email Address:</td>
+              <td id="modalEmail">user@domain.com</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-bold">Verification:</td>
+              <td id="modalVerified">Verified</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-bold">Current Status:</td>
+              <td id="modalStatus">ACTIVE</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-bold">Joined On:</td>
+              <td id="modalJoined">2026-08-03 18:00:00</td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery & Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Interactive Search Filters and Admin AJAX Handlers -->
+  <!-- Interactive Pagination, Search, and Action AJAX script Handlers -->
   <script>
-  // Execute upon DOM initialization completeness
   $(document).ready(function() {
+      // 1. Interactive client-side Filtering & Pagination Logic
+      const rowsPerPage = 5;
+      let currentPage = 1;
+      let filteredRows = [];
 
-      // Perform live filters evaluation
-      function performFilter() {
-          // Extract normalized search text input value
-          const query = $('#searchFilter').val().trim().toLowerCase();
-          // Extract active role filters selection
-          const role = $('#roleFilter').val();
-          // Extract active status filters selection
-          const status = $('#statusFilter').val();
+      function paginateTable() {
+          const query = $('#userSearchInput').val().trim().toLowerCase();
 
-          // Loop through each user table row and toggle display states dynamically
-          $('.user-row-entry').each(function() {
-              // Capture row attributes
+          // Re-calculate list of filtered rows matching criteria
+          filteredRows = [];
+          $('.user-row').each(function() {
               const rName = $(this).attr('data-name');
               const rEmail = $(this).attr('data-email');
-              const rRole = $(this).attr('data-role');
-              const rStatus = $(this).attr('data-status');
+              const rRole = $(this).attr('data-role').toLowerCase();
+              const rStatus = $(this).attr('data-status').toLowerCase();
 
-              // Verify Name/Email pattern matches
-              const textMatch = rName.includes(query) || rEmail.includes(query);
-              // Verify Role filter criteria
-              const roleMatch = (role === 'ALL') || (rRole === role);
-              // Verify Status filter criteria
-              const statusMatch = (status === 'ALL') || (rStatus === status);
-
-              // Toggle visibility based on matching statuses
-              if (textMatch && roleMatch && statusMatch) {
-                  // Show row
-                  $(this).show();
+              const match = rName.includes(query) || rEmail.includes(query) || rRole.includes(query) || rStatus.includes(query);
+              if (match) {
+                  filteredRows.push($(this));
               } else {
-                  // Hide row
                   $(this).hide();
               }
           });
+
+          // Calculate pagination values
+          const totalRows = filteredRows.length;
+          const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+
+          if (currentPage > totalPages) {
+              currentPage = totalPages;
+          }
+
+          // Apply display states for active page
+          const startIndex = (currentPage - 1) * rowsPerPage;
+          const endIndex = startIndex + rowsPerPage;
+
+          filteredRows.forEach(function(row, idx) {
+              if (idx >= startIndex && idx < endIndex) {
+                  row.show();
+              } else {
+                  row.hide();
+              }
+          });
+
+          // Update page counter visual badges
+          $('#currentPageNum').text(currentPage);
+          $('#totalPageNum').text(totalPages);
+          $('#paginatedCount').text(`${totalRows} of ${$('.user-row').length}`);
       }
 
-      // Bind input events to execute live table filtering
-      $('#searchFilter').on('input', performFilter);
-      $('#roleFilter, #statusFilter').on('change', performFilter);
+      // Bind input events to paginate table
+      $('#userSearchInput').on('input', function() {
+          currentPage = 1;
+          paginateTable();
+      });
+
+      $('#btnPrevPage').on('click', function() {
+          if (currentPage > 1) {
+              currentPage--;
+              paginateTable();
+          }
+      });
+
+      $('#btnNextPage').on('click', function() {
+          const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+          if (currentPage < totalPages) {
+              currentPage++;
+              paginateTable();
+          }
+      });
+
+      // Run initial pagination load
+      paginateTable();
+
+      // 2. View details modal loader
+      $(document).on('click', '.btn-view-profile', function() {
+          const row = $(this).closest('.user-row');
+          const uid = row.attr('data-id');
+          const name = row.find('td:nth-child(2)').text();
+          const email = row.find('td:nth-child(3)').text();
+          const role = row.attr('data-role');
+          const status = row.attr('data-status');
+          const verified = row.attr('data-verified');
+          const joined = row.attr('data-created');
+
+          // Populate modal labels
+          $('#modalAvatar').text(name.trim().charAt(0).toUpperCase());
+          $('#modalFullname').text(name);
+          $('#modalRole').text(role);
+          $('#modalUserId').text(uid);
+          $('#modalEmail').text(email);
+          $('#modalVerified').text(verified);
+          $('#modalStatus').text(status);
+          $('#modalJoined').text(joined);
+
+          // Launch modal
+          new bootstrap.Modal(document.getElementById('userViewModal')).show();
+      });
 
       // Helper to output status action messages
       function showFeedback(message, type) {
-          // Locate alert box container handle
           const box = $('#actionAlertBox');
-          // Format styling class layout
           box.removeClass('d-none alert-success alert-danger')
              .addClass('alert-' + type)
              .text(message);
       }
 
-      // 1. AJAX Toggle Role privileged levels
+      // 3. AJAX Actions for toggling roles
       $(document).on('click', '.btn-toggle-role', function() {
-          // Capture button target ID
           const userId = $(this).attr('data-id');
-          // Prompt confirm box
           if (!confirm('Are you sure you want to toggle this user\'s access role privilege?')) return;
 
-          // Dispatch asynchronous POST action
           $.ajax({
               url: '/php/admin_action.php',
               type: 'POST',
@@ -619,29 +562,23 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
               data: { action: 'toggle_role', user_id: userId },
               success: function(res) {
                   if (res.success) {
-                      // Output success notification
                       alert(res.message);
-                      // Refresh dashboard layout to show changes
                       window.location.reload();
                   } else {
-                      // Show failure alerts
                       showFeedback(res.message || 'Action failed.', 'danger');
                   }
               },
               error: function() {
-                  showFeedback('Communication failure with backend administration endpoint.', 'danger');
+                  showFeedback('Communication failure with backend endpoint.', 'danger');
               }
           });
       });
 
-      // 2. AJAX Toggle User Status (Employ / Suspend)
+      // 4. AJAX Actions for toggling user status
       $(document).on('click', '.btn-toggle-status', function() {
-          // Capture button target ID
           const userId = $(this).attr('data-id');
-          // Prompt confirm box
           if (!confirm('Are you sure you want to adjust this user\'s status?')) return;
 
-          // Dispatch asynchronous POST action
           $.ajax({
               url: '/php/admin_action.php',
               type: 'POST',
@@ -649,29 +586,23 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
               data: { action: 'toggle_status', user_id: userId },
               success: function(res) {
                   if (res.success) {
-                      // Output success notification
                       alert(res.message);
-                      // Refresh dashboard layout to show changes
                       window.location.reload();
                   } else {
-                      // Show failure alerts
                       showFeedback(res.message || 'Action failed.', 'danger');
                   }
               },
               error: function() {
-                  showFeedback('Communication failure with backend administration endpoint.', 'danger');
+                  showFeedback('Communication failure with backend endpoint.', 'danger');
               }
           });
       });
 
-      // 3. AJAX Delete User accounts completely
+      // 5. AJAX Actions for deleting user account
       $(document).on('click', '.btn-delete-user', function() {
-          // Capture button target ID
           const userId = $(this).attr('data-id');
-          // Prompt confirm box
-          if (!confirm('CRITICAL ACTION: Are you sure you want to delete this user profile completely from JSON database? This action is irreversible.')) return;
+          if (!confirm('CRITICAL ACTION: Are you sure you want to delete this user profile completely? This action is irreversible.')) return;
 
-          // Dispatch asynchronous POST action
           $.ajax({
               url: '/php/admin_action.php',
               type: 'POST',
@@ -679,21 +610,17 @@ $verifiedRatio = count($usersList) > 0 ? round(($verifiedCount / count($usersLis
               data: { action: 'delete_user', user_id: userId },
               success: function(res) {
                   if (res.success) {
-                      // Output success notification
                       alert(res.message);
-                      // Refresh dashboard layout to show changes
                       window.location.reload();
                   } else {
-                      // Show failure alerts
                       showFeedback(res.message || 'Action failed.', 'danger');
                   }
               },
               error: function() {
-                  showFeedback('Communication failure with backend administration endpoint.', 'danger');
+                  showFeedback('Communication failure with backend endpoint.', 'danger');
               }
           });
       });
-
   });
   </script>
 

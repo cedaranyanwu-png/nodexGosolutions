@@ -2,397 +2,380 @@
 /**
  * database.php
  *
- * This file implements a clean, robust, and secured JSON-based Database Engine.
- * It manages folder-based databases where each table is represented by a JSON file.
- * To ensure high reliability, security, and read-write isolation, it supports:
- * - Proper parameter validation
- * - Dynamic database creation and table creation
- * - Robust select, insert, update, delete, and search capabilities
- * - Row-level IDs and basic lock emulation
+ * This file contains a secure, custom, file-locked JSON-based Database Engine.
+ * It serves as a unified replacement for legacy MySQLi queries.
  */
 
-// Enable strict typing mode to enforce type safety
+// Enable strict typing for architectural safety
 declare(strict_types=1);
 
 /**
  * Class Database
  *
- * Simulates relational database operations using physical directory structures and JSON files.
+ * Simulates relational database tables using local JSON files with write locking (LOCK_EX).
  */
 class Database
 {
-    // Holds the root storage path where databases are saved
-    private string $baseDir;
-
-    // Stores the directory path of the currently selected active database
-    private ?string $currentDb = null;
+    // Directory path on disk where database tables are stored
+    private string $storagePath;
+    // Current active database schema folder name
+    private string $activeDb;
 
     /**
-     * Database constructor.
+     * Database Constructor
      *
-     * @param string $storagePath Base path where all databases are located.
-     * @param string|null $defaultDb Optional initial database name to switch to.
+     * @param string $storagePath Directory path to store dynamic json tables.
+     * @param string|null $defaultDb Default database folder name.
      */
     public function __construct(string $storagePath = __DIR__ . '/../databases', ?string $defaultDb = null)
     {
-        // Trim any trailing slashes from the storage directory path
-        $this->baseDir = rtrim($storagePath, '/\\');
-
-        // Check if the base directory exists; if not, create it recursively with standard permissions
-        if (!is_dir($this->baseDir)) {
-            // Create directory recursively with 0755 permissions
-            mkdir($this->baseDir, 0755, true);
-        }
-
-        // If a default database name is provided, switch to it automatically
+        // Normalize trailing slashes
+        $this->storagePath = rtrim($storagePath, '/\\');
         if ($defaultDb !== null) {
-            // Set the active database
+            // Bind default schema
             $this->useDatabase($defaultDb);
         }
     }
 
     /**
-     * Switch or select the active database. Creates the directory if it does not exist.
+     * Set active database schema folder.
      *
-     * @param string $dbName The name of the database.
-     * @return self Returns the Database instance for method chaining.
+     * @param string $dbName Schema folder name.
+     * @return self
      */
     public function useDatabase(string $dbName): self
     {
-        // Construct the full path of the database directory under the base path
-        $this->currentDb = $this->baseDir . '/' . trim($dbName, '/\\');
-
-        // Check if the selected database folder exists; if not, create it recursively
-        if (!is_dir($this->currentDb)) {
-            // Create directory recursively with 0755 permissions
-            mkdir($this->currentDb, 0755, true);
+        $this->activeDb = $dbName;
+        // Construct the full database schema folder path on disk
+        $fullPath = $this->storagePath . '/' . $dbName;
+        // Automatically create database directory if it does not exist
+        if (!is_dir($fullPath)) {
+            mkdir($fullPath, 0755, true);
         }
-
-        // Return the current object context to allow method chaining
         return $this;
     }
 
     /**
-     * Creates a new JSON table file if it doesn't already exist.
+     * Create a new database table schema file.
      *
-     * @param string $tableName The table name.
-     * @return bool True on success, false if the table already exists.
+     * @param string $tableName Table name.
+     * @return bool True if created or exists, false on failure.
      */
     public function createTable(string $tableName): bool
     {
-        // Resolve the physical file path of the table
-        $filePath = $this->getFilePath($tableName);
-
-        // If the table file already exists, abort the creation process
+        $filePath = $this->getTableFilePath($tableName);
         if (file_exists($filePath)) {
-            // Return false as creation did not occur
-            return false;
+            // Already exists, return true
+            return true;
         }
-
-        // Write an empty array encoded in JSON format to initialize the table
-        return file_put_contents($filePath, json_encode([], JSON_PRETTY_PRINT)) !== false;
+        // Write an empty JSON array to initialize table records
+        return file_put_contents($filePath, json_encode([]), LOCK_EX) !== false;
     }
 
     /**
-     * Deletes a JSON table file from the active database.
+     * Drop a database table file from disk.
      *
-     * @param string $tableName The table name.
-     * @return bool True if deleted, false if file does not exist.
+     * @param string $tableName Table name to delete.
+     * @return bool True on success, false on failure.
      */
     public function dropTable(string $tableName): bool
     {
-        // Resolve the physical file path of the table
-        $filePath = $this->getFilePath($tableName);
-
-        // If the table file physically exists, attempt to unlink/delete it
+        $filePath = $this->getTableFilePath($tableName);
         if (file_exists($filePath)) {
-            // Delete the file and return the boolean result of the deletion
             return unlink($filePath);
         }
-
-        // Return false as there was no file to delete
         return false;
     }
 
     /**
-     * Inserts a record into the specified JSON table.
+     * Insert a new row (record) into a table.
      *
-     * @param string $tableName The table name.
-     * @param array $data The column-value associative array to insert.
-     * @return array|false The inserted record including auto-assigned ID and timestamps, or false on failure.
+     * @param string $tableName Target table name.
+     * @param array $data Row column values array.
+     * @return array|false Succeeded row data with unique ID, or false on failure.
      */
     public function insert(string $tableName, array $data): array|false
     {
-        // Read the existing records from the specified table
-        $records = $this->readTable($tableName);
-
-        // If the ID is not manually provided, calculate a unique auto-incrementing ID
-        if (!isset($data['id'])) {
-            // Retrieve all IDs from the existing list of records
-            $ids = array_column($records, 'id');
-            // Assign next ID: max of existing numeric IDs + 1, or default to 1 if empty
-            $data['id'] = !empty($ids) ? max(array_filter($ids, 'is_numeric')) + 1 : 1;
+        $filePath = $this->getTableFilePath($tableName);
+        if (!file_exists($filePath)) {
+            $this->createTable($tableName);
         }
 
-        // Set the creation timestamp for the record
+        // Lock file and read existing records
+        $records = $this->readRecordsWithLock($filePath, $lockHandle);
+        if ($records === null) {
+            return false;
+        }
+
+        // Calculate next auto-incrementing ID integer
+        $nextId = 1;
+        foreach ($records as $rec) {
+            if (isset($rec['id']) && (int)$rec['id'] >= $nextId) {
+                $nextId = (int)$rec['id'] + 1;
+            }
+        }
+
+        // Append unique ID and timestamps to record
+        $data['id'] = $nextId;
         $data['created_at'] = date('Y-m-d H:i:s');
-        // Set the update timestamp for the record
         $data['updated_at'] = date('Y-m-d H:i:s');
 
-        // Append the new record data array to the loaded records array
+        // Append to the list and write back
         $records[] = $data;
+        $written = $this->writeRecordsWithLock($lockHandle, $records);
 
-        // Save the updated list of records back to the table file with proper locking
-        if ($this->writeTable($tableName, $records)) {
-            // Return the full inserted record data
-            return $data;
-        }
-
-        // Return false indicating failure to persist the data
-        return false;
+        return $written ? $data : false;
     }
 
     /**
-     * Selects records matching specified conditions.
+     * Select rows from table matching criteria.
      *
-     * @param string $tableName The table name.
-     * @param array $where Filter conditions (e.g., ['email' => 'foo@bar.com']).
-     * @return array Matches found.
+     * @param string $tableName Table name.
+     * @param array $where Filter criteria columns.
+     * @return array Matching row arrays list.
      */
     public function select(string $tableName, array $where = []): array
     {
-        // Read the array of records from the table
-        $records = $this->readTable($tableName);
+        $filePath = $this->getTableFilePath($tableName);
+        if (!file_exists($filePath)) {
+            return [];
+        }
 
-        // If there are no where filter parameters, return all records
+        // Lock file and read existing records
+        $records = $this->readRecordsWithLock($filePath, $lockHandle);
+        if ($records === null) {
+            return [];
+        }
+        $this->releaseLock($lockHandle);
+
+        // If no filter is provided, return all records
         if (empty($where)) {
-            // Return the full set of records
             return $records;
         }
 
-        // Filter records by checking each row against all key-value pairs in the where conditions
-        return array_values(array_filter($records, function ($row) use ($where) {
-            // Loop through each key-value check in our where filter
-            foreach ($where as $key => $value) {
-                // If a key does not exist or value does not match, exclude the row
-                if (!isset($row[$key]) || $row[$key] !== $value) {
-                    // Filter match failure
-                    return false;
-                }
-            }
-            // All filters match successfully for this row
-            return true;
-        }));
-    }
-
-    /**
-     * Helper to retrieve a single record matching specific criteria.
-     *
-     * @param string $tableName The table name.
-     * @param array $where Filter conditions.
-     * @return array|null The record array if found, otherwise null.
-     */
-    public function selectOne(string $tableName, array $where): ?array
-    {
-        // Run select filter to load matching records
-        $results = $this->select($tableName, $where);
-        // Return the first match if it exists, otherwise return null
-        return $results[0] ?? null;
-    }
-
-    /**
-     * Updates rows matching specified conditions with new data.
-     *
-     * @param string $tableName The table name.
-     * @param array $data Fields and values to update.
-     * @param array $where Filtering conditions identifying which rows to update.
-     * @return int Number of updated rows.
-     */
-    public function update(string $tableName, array $data, array $where): int
-    {
-        // Load the existing records from the table
-        $records = $this->readTable($tableName);
-        // Count the number of records actually modified
-        $updatedCount = 0;
-
-        // Loop through all records by reference to allow modifying values directly
-        foreach ($records as &$row) {
-            // Tracks if all match conditions are fulfilled for this row
+        $results = [];
+        foreach ($records as $rec) {
             $match = true;
-            // Iterate over all filtering requirements
-            foreach ($where as $key => $value) {
-                // Check if key is absent or value is non-matching
-                if (!isset($row[$key]) || $row[$key] !== $value) {
-                    // Match failed
+            foreach ($where as $key => $val) {
+                if (!isset($rec[$key]) || $rec[$key] != $val) {
                     $match = false;
-                    // Break out of inner loop
                     break;
                 }
             }
-
-            // If a complete match is confirmed, update the row fields
             if ($match) {
-                // Merge new key-value data fields into the row
-                foreach ($data as $k => $v) {
-                    // Update key values
-                    $row[$k] = $v;
+                $results[] = $rec;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Select a single row matching criteria.
+     *
+     * @param string $tableName Table name.
+     * @param array $where Filter columns.
+     * @return array|null Returns first matched row or null.
+     */
+    public function selectOne(string $tableName, array $where): ?array
+    {
+        $rows = $this->select($tableName, $where);
+        return count($rows) > 0 ? $rows[0] : null;
+    }
+
+    /**
+     * Update existing rows inside table matching criteria.
+     *
+     * @param string $tableName Table name.
+     * @param array $data Columns to update.
+     * @param array $where Filter criteria.
+     * @return int Total updated rows count.
+     */
+    public function update(string $tableName, array $data, array $where): int
+    {
+        $filePath = $this->getTableFilePath($tableName);
+        if (!file_exists($filePath)) {
+            return 0;
+        }
+
+        // Lock file and read existing records
+        $records = $this->readRecordsWithLock($filePath, $lockHandle);
+        if ($records === null) {
+            return 0;
+        }
+
+        $updatedCount = 0;
+        foreach ($records as &$rec) {
+            $match = true;
+            foreach ($where as $key => $val) {
+                if (!isset($rec[$key]) || $rec[$key] != $val) {
+                    $match = false;
+                    break;
                 }
-                // Update the modification timestamp field
-                $row['updated_at'] = date('Y-m-d H:i:s');
-                // Increment our count of updated rows
+            }
+            if ($match) {
+                // Apply update fields
+                foreach ($data as $k => $v) {
+                    $rec[$k] = $v;
+                }
+                $rec['updated_at'] = date('Y-m-d H:i:s');
                 $updatedCount++;
             }
         }
-        // Unset reference variable to prevent variable collision side-effects
-        unset($row);
 
-        // If at least one row was successfully modified, persist the updated array
         if ($updatedCount > 0) {
-            // Write records back to table
-            $this->writeTable($tableName, $records);
+            $this->writeRecordsWithLock($lockHandle, $records);
+        } else {
+            $this->releaseLock($lockHandle);
         }
 
-        // Return total modified records count
         return $updatedCount;
     }
 
     /**
-     * Deletes records matching the conditions from the JSON table.
+     * Delete rows from table matching criteria.
      *
-     * @param string $tableName The table name.
-     * @param array $where Filter conditions.
-     * @return int Count of deleted rows.
+     * @param string $tableName Table name.
+     * @param array $where Filter criteria.
+     * @return int Total deleted rows count.
      */
     public function delete(string $tableName, array $where): int
     {
-        // Load all records currently in the table
-        $records = $this->readTable($tableName);
-        // Track original record count before filtering
-        $initialCount = count($records);
-
-        // Filter the records, keeping only those that do NOT match the deletion criteria
-        $filteredRecords = array_values(array_filter($records, function ($row) use ($where) {
-            // Check each deletion condition key-value pair
-            foreach ($where as $key => $value) {
-                // If a key matches the value, it's a target for deletion, so return false (exclude)
-                if (isset($row[$key]) && $row[$key] === $value) {
-                    // Target match for deletion - exclude
-                    return false;
-                }
-            }
-            // Keep the row
-            return true;
-        }));
-
-        // Calculate the difference to determine how many records were successfully deleted
-        $deletedCount = $initialCount - count($filteredRecords);
-
-        // If any rows were deleted, write the clean list back to disk
-        if ($deletedCount > 0) {
-            // Persist the filtered records list
-            $this->writeTable($tableName, $filteredRecords);
+        $filePath = $this->getTableFilePath($tableName);
+        if (!file_exists($filePath)) {
+            return 0;
         }
 
-        // Return total deleted records count
+        // Lock file and read existing records
+        $records = $this->readRecordsWithLock($filePath, $lockHandle);
+        if ($records === null) {
+            return 0;
+        }
+
+        $remainingRecords = [];
+        $deletedCount = 0;
+
+        foreach ($records as $rec) {
+            $match = true;
+            foreach ($where as $key => $val) {
+                if (!isset($rec[$key]) || $rec[$key] != $val) {
+                    $match = false;
+                    break;
+                }
+            }
+            if ($match) {
+                $deletedCount++;
+            } else {
+                $remainingRecords[] = $rec;
+            }
+        }
+
+        if ($deletedCount > 0) {
+            $this->writeRecordsWithLock($lockHandle, $remainingRecords);
+        } else {
+            $this->releaseLock($lockHandle);
+        }
+
         return $deletedCount;
     }
 
     /**
-     * Performs a text-based search across records in a table.
+     * Search table records matching query pattern across specific columns.
      *
-     * @param string $tableName The table name.
-     * @param string $query Text query to search.
-     * @param array $columns Optional list of columns to restrict the search to.
-     * @return array Matches found.
+     * @param string $tableName Table name.
+     * @param string $query Text query to search for.
+     * @param array $columns Target columns to inspect.
+     * @return array Matched row arrays.
      */
     public function search(string $tableName, string $query, array $columns = []): array
     {
-        // Read current table records
-        $records = $this->readTable($tableName);
-        // Normalize the search text to lowercase and strip whitespaces
-        $query = strtolower(trim($query));
-
-        // If query is empty, return all loaded records directly
-        if ($query === '') {
-            // Return unmodified list of records
-            return $records;
+        $rows = $this->select($tableName);
+        if (empty($query)) {
+            return $rows;
         }
 
-        // Return matched records by searching field values
-        return array_values(array_filter($records, function ($row) use ($query, $columns) {
-            // Filter record array to check only requested search columns, or use the entire row
-            $searchableData = empty($columns) ? $row : array_intersect_key($row, array_flip($columns));
+        $query = strtolower(trim($query));
+        $results = [];
 
-            // Loop through each field value in searchable data set
-            foreach ($searchableData as $val) {
-                // Only inspect string or numeric value types
-                if (is_string($val) || is_numeric($val)) {
-                    // Check if value contains the lowercase query text substring
-                    if (str_contains(strtolower((string)$val), $query)) {
-                        // Match found - keep this row
-                        return true;
-                    }
+        foreach ($rows as $row) {
+            $match = false;
+            // Define inspection columns list
+            $targetCols = empty($columns) ? array_keys($row) : $columns;
+            foreach ($targetCols as $col) {
+                if (isset($row[$col]) && str_contains(strtolower((string)$row[$col]), $query)) {
+                    $match = true;
+                    break;
                 }
             }
-            // No matches found in this row
-            return false;
-        }));
-    }
-
-    /**
-     * Resolves and returns the full file path of a table JSON file inside the active database folder.
-     *
-     * @param string $tableName The table name.
-     * @return string Full path.
-     */
-    private function getFilePath(string $tableName): string
-    {
-        // If no active database is set, throw an Exception
-        if (!$this->currentDb) {
-            // Throw exception
-            throw new Exception("No active database selected. Call useDatabase('db_name') first.");
-        }
-        // Return full path of the requested table JSON file
-        return $this->currentDb . '/' . trim($tableName) . '.json';
-    }
-
-    /**
-     * Low-level helper to read and decode a JSON table file into a PHP array.
-     *
-     * @param string $tableName The table name.
-     * @return array Decoded records list.
-     */
-    private function readTable(string $tableName): array
-    {
-        // Resolve full file path of the table
-        $filePath = $this->getFilePath($tableName);
-
-        // If the table file does not exist, return an empty list
-        if (!file_exists($filePath)) {
-            // Return empty array
-            return [];
+            if ($match) {
+                $results[] = $row;
+            }
         }
 
-        // Fetch contents from table file
-        $content = file_get_contents($filePath);
-
-        // Decode JSON content into an associative PHP array; fallback to empty array on any decoding errors
-        return json_decode($content, true) ?: [];
+        return $results;
     }
 
     /**
-     * Low-level helper to safely write data back to a JSON table file.
-     *
-     * @param string $tableName The table name.
-     * @param array $data Records to write.
-     * @return bool True on success, false on failure.
+     * Helper to resolve clean absolute file paths for table JSON files.
      */
-    private function writeTable(string $tableName, array $data): bool
+    private function getTableFilePath(string $tableName): string
     {
-        // Resolve target file path
-        $filePath = $this->getFilePath($tableName);
+        return $this->storagePath . '/' . $this->activeDb . '/' . $tableName . '.json';
+    }
 
-        // Write encoded JSON back with exclusive locking to prevent write conflicts
-        return file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX) !== false;
+    /**
+     * Lock the table file and read records.
+     */
+    private function readRecordsWithLock(string $filePath, &$lockHandle): ?array
+    {
+        // Open file handle in read/write mode
+        $lockHandle = fopen($filePath, 'c+');
+        if (!$lockHandle) {
+            return null;
+        }
+
+        // Apply exclusive blocking write lock
+        if (!flock($lockHandle, LOCK_EX)) {
+            fclose($lockHandle);
+            return null;
+        }
+
+        // Read all contents
+        $size = filesize($filePath);
+        $content = '';
+        if ($size > 0) {
+            rewind($lockHandle);
+            $content = fread($lockHandle, $size);
+        }
+
+        return json_decode($content ?: '[]', true) ?: [];
+    }
+
+    /**
+     * Write records and release file lock.
+     */
+    private function writeRecordsWithLock($lockHandle, array $records): bool
+    {
+        // Truncate file length to zero before rewriting
+        ftruncate($lockHandle, 0);
+        rewind($lockHandle);
+        // Write formatted json back to file
+        $written = fwrite($lockHandle, json_encode($records, JSON_PRETTY_PRINT)) !== false;
+        // Release write lock and close handle
+        flock($lockHandle, LOCK_UN);
+        fclose($lockHandle);
+        return $written;
+    }
+
+    /**
+     * Release active lock and close file handle.
+     */
+    private function releaseLock($lockHandle): void
+    {
+        if ($lockHandle) {
+            flock($lockHandle, LOCK_UN);
+            fclose($lockHandle);
+        }
     }
 }
+?>

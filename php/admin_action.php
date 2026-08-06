@@ -2,133 +2,119 @@
 /**
  * admin_action.php
  *
- * Handles administrator backend operations (employing/suspending, role promotions, and account deletions).
- * Secured strictly to authenticated sessions with administrative role privileges.
+ * Implements administrative user profile adjustments inside the custom JSON Database.
+ * Securely restricts deletion and promotion operations to authorized personnel only.
  */
 
-// Enable strict typing for better safety and quality
-declare(strict_types=1);
-
-// Require central database configuration and security helpers from same folder
+// Require system connections and helper files
 require_once __DIR__ . '/db.php';
 
 // Instantiate secure session configurations
 secureSession();
 
-// Access Control: Strict check if active user session holds administrative role
+// Access Control: Check if active user holds administrative privileges
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    // Return unauthorized JSON forbidden response
-    jsonResponse([
-        'success' => false,
-        'message' => 'Access denied. Administrator privileges required.'
-    ], 403);
+    jsonResponse(['success' => false, 'message' => 'Unauthorized access.'], 401);
 }
 
-// Extract requested POST actions
-$action = $_POST['action'] ?? '';
-// Extract target user ID
-$targetUserId = isset($_POST['user_id']) ? (int)$_POST['user_id'] : 0;
+// Restrict authentication requests to POST actions only
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    jsonResponse(['success' => false, 'message' => 'Invalid request method.'], 405);
+}
 
-// Verify valid user ID parameters are provided
+// Extract administrative command parameters
+$action = cleanInput($_POST['action'] ?? '');
+$targetUserId = (int)($_POST['user_id'] ?? 0);
+
+// Reject requests with missing targets
 if ($targetUserId <= 0) {
-    // Return bad request error
-    jsonResponse([
-        'success' => false,
-        'message' => 'Invalid target user identifier provided.'
-    ], 400);
+    jsonResponse(['success' => false, 'message' => 'Invalid target user ID.'], 400);
 }
 
-// ------------------------------------------------------------
-// 1. TOGGLE USER STATUS (Employ / Suspend)
-// ------------------------------------------------------------
-if ($action === 'toggle_status') {
-    // Fetch matched user details from system database
-    $user = $conn->selectOne('users', ['id' => $targetUserId]);
-
-    // Check if user account exists
-    if ($user === null) {
-        // Return not found error response
-        jsonResponse(['success' => false, 'message' => 'User account not found.'], 404);
-    }
-
-    // Determine current status: default empty/missing status to 'Active'
-    $currentStatus = strtolower((string)($user['status'] ?? 'active'));
-    // Toggle active status between Active and Suspended states
-    $newStatus = ($currentStatus === 'suspended') ? 'Active' : 'Suspended';
-
-    // Update user status metrics in the database
-    $conn->update('users', ['status' => $newStatus], ['id' => $targetUserId]);
-
-    // Return success response details
-    jsonResponse([
-        'success' => true,
-        'message' => "User status successfully toggled to '{$newStatus}'."
-    ]);
+// Fetch the target user details from the database
+$targetUser = $conn->selectOne('users', ['id' => $targetUserId]);
+if ($targetUser === null) {
+    jsonResponse(['success' => false, 'message' => 'Designated user account not found.'], 404);
 }
 
-// ------------------------------------------------------------
-// 2. TOGGLE USER ROLE (Promote / Demote)
-// ------------------------------------------------------------
-if ($action === 'toggle_role') {
-    // Fetch target user details
-    $user = $conn->selectOne('users', ['id' => $targetUserId]);
+// Capture targets emails and roles
+$targetEmail = strtolower((string)($targetUser['email'] ?? ''));
+$targetRole  = strtolower((string)($targetUser['role'] ?? 'tenant'));
 
-    // Check if user exists
-    if ($user === null) {
-        // Return not found error response
-        jsonResponse(['success' => false, 'message' => 'User account not found.'], 404);
-    }
+// Capture current executing administrator email
+$executingAdminEmail = strtolower((string)($_SESSION['email'] ?? ''));
 
-    // Prevent administrators from self-demoting to avoid locking themselves out
-    if ($targetUserId === (int)($_SESSION['user_id'] ?? 0)) {
-        // Return bad request response
-        jsonResponse(['success' => false, 'message' => 'Self-demotion is restricted to maintain system access.'], 400);
-    }
+// Execute matched administrative operation
+switch ($action) {
 
-    // Capture current privilege role: default to 'tenant' if empty
-    $currentRole = strtolower((string)($user['role'] ?? 'tenant'));
-    // Toggle role values between 'admin' and 'tenant'
-    $newRole = ($currentRole === 'admin') ? 'tenant' : 'admin';
+    // ACTION: Toggle Role privilege level between 'admin' and 'tenant'
+    case 'toggle_role':
+        // CRITICAL CHECK: Main administrator account (admin@nodexplatform.com.ng) role cannot be demoted
+        if ($targetEmail === 'admin@nodexplatform.com.ng') {
+            jsonResponse(['success' => false, 'message' => 'CRITICAL PROTECTION: The main administrator account cannot be demoted.'], 403);
+        }
 
-    // Update user role level in the database
-    $conn->update('users', ['role' => $newRole], ['id' => $targetUserId]);
+        // Only the main administrator is allowed to toggle/promote other accounts to Admin
+        if ($executingAdminEmail !== 'admin@nodexplatform.com.ng') {
+            jsonResponse(['success' => false, 'message' => 'CRITICAL SECURITY: Only the main administrator (Cedar Anyanwu) can promote or demote other accounts.'], 403);
+        }
 
-    // Return success response details
-    jsonResponse([
-        'success' => true,
-        'message' => "User role successfully toggled to '{$newRole}'."
-    ]);
+        // Toggle role values between 'admin' and 'tenant'
+        $newRole = ($targetRole === 'admin') ? 'tenant' : 'admin';
+
+        // Update target row
+        $updated = $conn->update('users', ['role' => $newRole], ['id' => $targetUserId]);
+        if ($updated > 0) {
+            jsonResponse(['success' => true, 'message' => "User role toggled to " . strtoupper($newRole) . " successfully!"]);
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to toggle user role.'], 500);
+        }
+        break;
+
+    // ACTION: Toggle user Account status between 'Active' and 'Suspended'
+    case 'toggle_status':
+        // CRITICAL CHECK: Main administrator account (admin@nodexplatform.com.ng) cannot be suspended
+        if ($targetEmail === 'admin@nodexplatform.com.ng') {
+            jsonResponse(['success' => false, 'message' => 'CRITICAL PROTECTION: The main administrator account cannot be suspended.'], 403);
+        }
+
+        // Capture current target status
+        $currentStatus = strtolower((string)($targetUser['status'] ?? 'active'));
+        $newStatus = ($currentStatus === 'suspended') ? 'active' : 'suspended';
+
+        // Update target row
+        $updated = $conn->update('users', ['status' => $newStatus], ['id' => $targetUserId]);
+        if ($updated > 0) {
+            jsonResponse(['success' => true, 'message' => "User status toggled to " . strtoupper($newStatus) . " successfully!"]);
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to adjust user status.'], 500);
+        }
+        break;
+
+    // ACTION: Delete user account from system JSON tables completely
+    case 'delete_user':
+        // CRITICAL PROTECTION: The main administrator account can NEVER be deleted by anyone!
+        if ($targetEmail === 'admin@nodexplatform.com.ng') {
+            jsonResponse(['success' => false, 'message' => 'CRITICAL PROTECTION: The main administrator account (Cedar Anyanwu) can NEVER be deleted.'], 403);
+        }
+
+        // SECURITY CHECK: No administrator, other than the main administrator, can delete any administrator account
+        if ($targetRole === 'admin' && $executingAdminEmail !== 'admin@nodexplatform.com.ng') {
+            jsonResponse(['success' => false, 'message' => 'CRITICAL SECURITY: Only the main administrator (Cedar Anyanwu) is authorized to delete other administrator accounts.'], 403);
+        }
+
+        // Execute row deletion statement
+        $deleted = $conn->delete('users', ['id' => $targetUserId]);
+        if ($deleted > 0) {
+            jsonResponse(['success' => true, 'message' => 'User profile deleted completely from system records!']);
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to delete user account.'], 500);
+        }
+        break;
+
+    // DEFAULT Scenario: Return invalid action warning
+    default:
+        jsonResponse(['success' => false, 'message' => 'Invalid administrative action supplied.'], 400);
+        break;
 }
-
-// ------------------------------------------------------------
-// 3. DELETE USER ACCOUNT
-// ------------------------------------------------------------
-if ($action === 'delete_user') {
-    // Prevent administrators from deleting their own active accounts
-    if ($targetUserId === (int)($_SESSION['user_id'] ?? 0)) {
-        // Return bad request response
-        jsonResponse(['success' => false, 'message' => 'Self-deletion is restricted to maintain system integrity.'], 400);
-    }
-
-    // Attempt deleting user matching target id from users table
-    $deletedCount = $conn->delete('users', ['id' => $targetUserId]);
-
-    // Check if a record was deleted successfully
-    if ($deletedCount > 0) {
-        // Return success response details
-        jsonResponse([
-            'success' => true,
-            'message' => 'User account deleted successfully.'
-        ]);
-    } else {
-        // Return deletion failure error response
-        jsonResponse(['success' => false, 'message' => 'Failed to delete user account.'], 500);
-    }
-}
-
-// Return bad request if action parameter did not match any registered routine
-jsonResponse([
-    'success' => false,
-    'message' => 'Invalid administration action parameter requested.'
-], 400);
 ?>

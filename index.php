@@ -4,7 +4,7 @@
  *
  * This is the single entry point and core router for the entire nodexGosolutions architecture.
  * It coordinates routing for the main marketing pages, the multi-tenant system, CMS engine,
- * and handles host parameter isolation (port stripping).
+ * and handles host parameter isolation (port stripping) with LFI folder bounds.
  */
 
 // Enable strict typing for better software quality
@@ -14,7 +14,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/TenantManager.php';
 // Include the custom JSON Database engine class
 require_once __DIR__ . '/php/database.php';
-// Include the common database helpers and cache busting helper function
+// Include database and security helpers
 require_once __DIR__ . '/php/db.php';
 
 // Capture the incoming HTTP request host from server headers

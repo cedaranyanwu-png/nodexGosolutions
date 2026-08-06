@@ -2,90 +2,71 @@
 /**
  * save_page.php
  *
- * This file processes AJAX requests to create or update custom pages inside site_cms database.
- * Strictly verified to prevent unauthenticated users or non-admins from executing write actions.
+ * Persists customized Code-First CMS layout structures to pages JSON database tables.
  */
 
-// Return response as JSON payload
-header('Content-Type: application/json');
-
-// Require the secure session and database initialization context from db.php in the same folder
+// Include system configurations and database connection layers
 require_once __DIR__ . '/db.php';
 
-// Instantiate secure session properties configuration
+// Instantiate secure session configurations
 secureSession();
 
-// Strictly check if active user session holds administrative role
+// Access Control: Ensure target user is logged in as system administrator
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    // Send 403 Forbidden header
-    http_response_code(403);
-    // Return unauthorized JSON payload
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Access denied. Unauthenticated remote code execution prevented.'
-    ]);
-    // Terminate script execution immediately
-    exit;
+    jsonResponse(['success' => false, 'message' => 'Unauthorized access.'], 401);
 }
 
-// Require the centralized JSON Database engine
-require_once __DIR__ . '/database.php';
+// Restrict authentication requests to POST actions only
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    jsonResponse(['success' => false, 'message' => 'Invalid request method.'], 405);
+}
 
-try {
-    // Instantiate the database pointing to /app/databases/site_cms
-    $db = new Database(__DIR__ . '/../databases', 'site_cms');
+// Extract input fields
+$slug      = strtolower(cleanInput($_POST['slug'] ?? ''));
+$title     = cleanInput($_POST['title'] ?? 'Custom CMS Page');
+$headCode  = $_POST['head_code'] ?? '';
+$bodyCode  = $_POST['body_code'] ?? '';
 
-    // Extract form variables
-    $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;
-    $slug = trim($_POST['slug'] ?? '');
-    $title = trim($_POST['title'] ?? '');
-    $head_code = $_POST['head_code'] ?? '';
-    $body_code = $_POST['body_code'] ?? '';
+// Check that required fields are supplied
+if (empty($slug)) {
+    jsonResponse(['success' => false, 'message' => 'Please provide a valid page slug.'], 400);
+}
 
-    // Validate page parameters presence
-    if (empty($slug) || empty($title)) {
-        // Output failure JSON response
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Slug and Title fields are required.'
-        ]);
-        // Stop execution
-        exit;
-    }
+// Initialize the site_cms database instance
+$siteCmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+$siteCmsDb->createTable('pages');
 
-    // Prepare page fields payload structure
-    $payload = [
-        'slug' => $slug,
-        'title' => $title,
-        'head_code' => $head_code,
-        'body_code' => $body_code
-    ];
+// Check if a page record with this slug already exists in pages.json
+$existingPage = $siteCmsDb->selectOne('pages', ['slug' => $slug]);
 
-    // If an ID was provided, perform update; otherwise insert a new record
-    if ($id) {
-        // Perform update
-        $db->update('pages', $payload, ['id' => $id]);
-        // Hold saved page id
-        $savedId = $id;
+if ($existingPage !== null) {
+    // Update existing page record
+    $updatedCount = $siteCmsDb->update('pages', [
+        'title'     => $title,
+        'head_code' => $headCode,
+        'body_code' => $bodyCode
+    ], [
+        'slug' => $slug
+    ]);
+
+    if ($updatedCount > 0) {
+        jsonResponse(['success' => true, 'message' => "Page '{$slug}' updated successfully!"]);
     } else {
-        // Perform insert
-        $result = $db->insert('pages', $payload);
-        // Extract inserted record ID
-        $savedId = $result['id'] ?? null;
+        jsonResponse(['success' => false, 'message' => 'Failed to update page or no values were changed.'], 200);
     }
-
-    // Return successfully completed page save response
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Code payload written to JSON successfully!',
-        'id' => $savedId
+} else {
+    // Insert new page record
+    $newPage = $siteCmsDb->insert('pages', [
+        'slug'      => $slug,
+        'title'     => $title,
+        'head_code' => $headCode,
+        'body_code' => $bodyCode
     ]);
 
-} catch (Exception $e) {
-    // Return failed database operations exception details
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Database operation failed: ' . $e->getMessage()
-    ]);
+    if ($newPage !== false) {
+        jsonResponse(['success' => true, 'message' => "Page '{$slug}' created and saved successfully!"]);
+    } else {
+        jsonResponse(['success' => false, 'message' => 'Failed to save new CMS page.'], 500);
+    }
 }
 ?>

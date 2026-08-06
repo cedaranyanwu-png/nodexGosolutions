@@ -44,21 +44,10 @@ switch ($endpoint) {
         require_once __DIR__ . '/verify.php';
         break;
 
-    // ENDPOINT: Resend verification email links to users
-    case 'resend_verification':
-        require_once __DIR__ . '/resend_verification.php';
-        break;
-
-    // ENDPOINT: Persist custom Code-First CMS pages in database
-    case 'save_page':
-        require_once __DIR__ . '/save_page.php';
-        break;
-
     // DEFAULT Scenario: Require and export all modular system functions for general file inclusions
     default:
         require_once __DIR__ . '/database.php';
         require_once __DIR__ . '/db.php';
-        require_once __DIR__ . '/session.php';
         break;
 }
 ?>

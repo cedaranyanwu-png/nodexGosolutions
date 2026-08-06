@@ -3,6 +3,7 @@
  * login.php
  *
  * Implements secure login authentication utilizing the custom JSON Database.
+ * Authenticates users and administrators purely from the persistent database table.
  */
 
 // Require the connection and security helper configurations from same folder
@@ -30,7 +31,7 @@ if (empty($email) || empty($password)) {
 // Restrict auth frequency based on unique IP and Email identifier combination
 $rateKey = 'login_' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . '_' . $email;
 // Invoke the rate limits validator
-$rateCheck = checkRateLimit($rateKey, 5, 900);
+$rateCheck = checkRateLimit($rateKey, 10, 900);
 
 // If the user has exceeded rate limits, reject authorization
 if (!$rateCheck['allowed']) {
@@ -38,26 +39,7 @@ if (!$rateCheck['allowed']) {
     jsonResponse(['success' => false, 'message' => $rateCheck['message']], 429);
 }
 
-// 1. Dual Login Check: Fallback for hardcoded administrative access using requested credentials (admin123)
-if ($email === 'admin@nodexplatform.com.ng' && $password === 'admin123') {
-    // Reset rate limits on successful authentication
-    resetRateLimit($rateKey);
-    // Assign admin session parameters aligned with persistent Admin record (ID 3) in users.json
-    $_SESSION['user_id']   = 3;
-    $_SESSION['email']     = $email;
-    $_SESSION['role']      = 'admin';
-    $_SESSION['fullname']  = 'System Administrator';
-
-    // Return administrative success response
-    jsonResponse([
-        'success'  => true,
-        'role'     => 'admin',
-        'redirect' => '/admin/dashboard.php',
-        'message'  => 'Admin authentication successful! Redirecting...'
-    ]);
-}
-
-// 2. Database User Authentication via custom JSON database engine (works for both tenants and admin)
+// 1. Database User Authentication via custom JSON database engine (works for both tenants and admins)
 $user = $conn->selectOne('users', ['email' => $email]);
 
 // Validate user presence and password match
@@ -66,7 +48,7 @@ if (!$user || !password_verify($password, $user['password'] ?? '')) {
     jsonResponse(['success' => false, 'message' => 'Invalid credentials provided.'], 401);
 }
 
-// 3. Suspended Status Check: Reject authentication if the user's account is suspended
+// 2. Suspended Status Check: Reject authentication if the user's account is suspended
 if (strtolower((string)($user['status'] ?? '')) === 'suspended') {
     // Return forbidden/suspended response status
     jsonResponse([
@@ -75,7 +57,7 @@ if (strtolower((string)($user['status'] ?? '')) === 'suspended') {
     ], 403);
 }
 
-// 4. Email Verification Enforcer
+// 3. Email Verification Enforcer
 if ((int)($user['is_verified'] ?? 0) !== 1) {
     // Return unverified response status
     jsonResponse([
@@ -95,7 +77,7 @@ $_SESSION['role']     = $user['role'] ?? 'tenant';
 $_SESSION['fullname'] = $user['fullname'] ?? '';
 
 // Direct authenticated user to appropriate dashboard path based on role (admin or tenant)
-$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard.php' : '/user/dashboard.php';
+$redirectUrl = ($user['role'] === 'admin') ? '/admin/dashboard' : '/user/dashboard';
 
 // Return authentication success response
 jsonResponse([

@@ -25,20 +25,20 @@ class TenantManager
         // Tenant 1: The primary domain entry
         [
             'id'         => 1,
-            'identifier' => 'nodexplatform.com.ng', // The domain name to match
-            'name'       => 'NodeX Platform HQ', // Display name
+            'identifier' => 'nodexgosolutions.com', // The domain name to match
+            'name'       => 'NodeX Go Solutions HQ', // Display name
             'theme_color'=> '#2c3e50',               // Primary brand color (Midnight Blue)
             'logo_url'   => 'https://placehold.co/200x50/2c3e50/ffffff?text=NodeX+HQ', // Logo placeholder
-            'content'    => 'Welcome to the central hub of NodeX Platform. We provide modular PHP architectures.'
+            'content'    => 'Welcome to the central hub of NodeX Go Solutions. We provide modular PHP architectures.'
         ],
         // Tenant 2: A subdomain-based tenant
         [
             'id'         => 2,
-            'identifier' => 'tenant1.nodexplatform.com.ng', // The subdomain to match
+            'identifier' => 'tenant1.nodexgosolutions.com', // The subdomain to match
             'name'       => 'Acme Corp Portal',             // Tenant specific name
             'theme_color'=> '#27ae60',                      // Tenant brand color (Nephritis Green)
             'logo_url'   => 'https://placehold.co/200x50/27ae60/ffffff?text=Acme+Corp', // Logo placeholder
-            'content'    => 'This is the private portal for Acme Corp. Managed by NodeX Platform.'
+            'content'    => 'This is the private portal for Acme Corp. Managed by NodeX Go Solutions.'
         ],
         // Tenant 3: A custom apex domain tenant
         [

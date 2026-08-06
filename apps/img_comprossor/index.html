@@ -1,110 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batch Image Compressor & Converter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compressor | nodexGosolutions</title>
 
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/img_com.css">
+    <!-- Load Orbitron and standard fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0072ff;
+            --accent: #00d2ff;
+            --light-bg: #f8fafc;
+            --dark: #0f172a;
+            --border-color: rgba(0, 114, 255, 0.1);
+        }
+        body {
+            background-color: var(--light-bg);
+            color: #1e293b;
+            font-family: 'Source Sans 3', sans-serif;
+            min-height: 100vh;
+        }
+        .header-nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+        }
+        .compressor-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 114, 255, 0.03);
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        .dropzone {
+            border: 2px dashed #0072ff;
+            background-color: #f0f4ff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .dropzone:hover {
+            background-color: #e5edff;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container py-5">
-  <!-- Header -->
-  <div class="text-center mb-4">
-    <h1 class="fw-bold"><i class="fa-solid fa-file-image text-primary me-2"></i> Image Compressor</h1>
-    <p class="text-muted">Compress, resize, and convert images (JPG, PNG, WebP) in bulk for fast web loading.</p>
-  </div>
+    <!-- Header Navigation -->
+    <nav class="header-nav d-flex justify-content-between align-items-center">
+        <a href="/user/dashboard" class="text-decoration-none fw-bold text-primary" style="font-family: 'Orbitron', sans-serif; font-size: 1.3rem;">
+            <i class="fa-solid fa-server me-2"></i>nodex<span class="text-dark">Go</span>
+        </a>
+        <a href="/user/dashboard" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i> Dashboard</a>
+    </nav>
 
-  <!-- Main Grid -->
-  <div class="row g-4">
+    <!-- Compressor Container -->
+    <div class="container">
+        <div class="compressor-card">
+            <h3 class="fw-bold text-primary mb-2" style="font-family: 'Orbitron', sans-serif;"><i class="fa-solid fa-file-image me-2"></i>Batch Image Compressor</h3>
+            <p class="text-muted small mb-4">Compress JPEG, PNG, or WebP images instantly in your browser with no file size limit.</p>
 
-    <!-- LEFT: Settings & Dropzone -->
-    <div class="col-lg-5">
-      <div class="card shadow-sm border-0 rounded-4 p-4">
-        <h5 class="fw-bold mb-3"><i class="fa-solid fa-sliders text-primary me-2"></i> Compression Settings</h5>
-        <hr>
-
-        <form id="compressForm">
-          <!-- Quality Control -->
-          <div class="mb-3">
-            <div class="d-flex justify-content-between">
-              <label for="qualityRange" class="form-label fw-semibold">Quality Level</label>
-              <span id="qualityVal" class="fw-bold text-primary">80%</span>
+            <div id="dropzone" class="dropzone mb-4">
+                <i class="fa-solid fa-cloud-arrow-up fs-1 text-primary mb-3"></i>
+                <h5 class="fw-bold text-dark">Drag & Drop Image Here</h5>
+                <p class="text-muted small mb-0">or click to browse local files</p>
+                <input type="file" id="fileInput" accept="image/*" class="d-none" />
             </div>
-            <input type="range" class="form-range" id="qualityRange" min="10" max="100" value="80">
-          </div>
 
-          <!-- Format Conversion -->
-          <div class="mb-3">
-            <label for="targetFormat" class="form-label fw-semibold">Target Output Format</label>
-            <select id="targetFormat" class="form-select">
-              <option value="original">Keep Original Format</option>
-              <option value="webp">Convert to WebP (Recommended)</option>
-              <option value="jpeg">Convert to JPG</option>
-              <option value="png">Convert to PNG</option>
-            </select>
-          </div>
-
-          <!-- Resize Options -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Resize Max Dimensions (px)</label>
-            <div class="row g-2">
-              <div class="col-6">
-                <input type="number" id="maxWidth" class="form-control" placeholder="Max Width (e.g. 1920)">
-              </div>
-              <div class="col-6">
-                <input type="number" id="maxHeight" class="form-control" placeholder="Max Height (e.g. 1080)">
-              </div>
+            <!-- Configuration Slider -->
+            <div id="configArea" class="d-none mb-4 text-start">
+                <label class="form-label text-dark fw-bold small">COMPRESSION QUALITY: <span id="qualityVal" class="text-primary">80%</span></label>
+                <input type="range" class="form-range" id="qualityRange" min="10" max="100" value="80" />
             </div>
-            <div class="form-text">Aspect ratio will be automatically preserved.</div>
-          </div>
-        </form>
 
-        <!-- Dropzone Area -->
-        <div class="dropzone-area mt-3 text-center p-4 rounded-3 border-2 border-dashed" id="dropzone">
-          <i class="fa-solid fa-cloud-arrow-up fa-3x text-primary mb-2"></i>
-          <p class="mb-1 fw-semibold">Drag & Drop images here</p>
-          <span class="text-muted small">or click to browse from device</span>
-          <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/webp" class="d-none">
+            <!-- Savings Metrics Area -->
+            <div id="savingsPanel" class="d-none row g-3 text-start mb-4">
+                <div class="col-6">
+                    <div class="p-3 border rounded" style="background-color: #f8fafc;">
+                        <span class="text-muted small d-block">Original Size</span>
+                        <strong class="text-dark fs-5" id="origSize">0 KB</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded" style="background-color: #f0fdf4; border-color: #bbf7d0 !important;">
+                        <span class="text-success small d-block">Compressed Size</span>
+                        <strong class="text-success fs-5" id="compSize">0 KB</strong>
+                    </div>
+                </div>
+                <div class="col-12 text-center text-success fw-bold small" id="ratioSavings">
+                    Size Saved: 0%
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <button class="btn btn-primary rounded-pill px-5 fw-bold py-2 d-none w-100 mb-2" id="btnCompress"><i class="fa-solid fa-compress me-1"></i>Compress Image</button>
+            <a class="btn btn-success rounded-pill px-5 fw-bold py-2 d-none w-100" id="btnDownload" download="compressed_image.jpg"><i class="fa-solid fa-download me-1"></i>Download Compressed Image</a>
         </div>
-      </div>
     </div>
 
-    <!-- RIGHT: Batch Processing Queue -->
-    <div class="col-lg-7">
-      <div class="card shadow-sm border-0 rounded-4 p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold m-0"><i class="fa-solid fa-list-check text-success me-2"></i> Process Queue</h5>
-          <button id="downloadAllBtn" class="btn btn-success btn-sm rounded-3 d-none">
-            <i class="fa-solid fa-file-zipper me-1"></i> Download All (.ZIP)
-          </button>
-        </div>
-        <hr>
+    <!-- JS image compression script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const configArea = document.getElementById('configArea');
+        const qualityRange = document.getElementById('qualityRange');
+        const qualityVal = document.getElementById('qualityVal');
+        const btnCompress = document.getElementById('btnCompress');
+        const btnDownload = document.getElementById('btnDownload');
+        const savingsPanel = document.getElementById('savingsPanel');
+        const origSize = document.getElementById('origSize');
+        const compSize = document.getElementById('compSize');
+        const ratioSavings = document.getElementById('ratioSavings');
 
-        <div id="queueList" class="queue-container">
-          <div class="text-center py-5 text-muted" id="emptyQueueMsg">
-            <i class="fa-regular fa-images fa-3x mb-2 text-secondary"></i>
-            <p>No images selected yet. Drag & drop files on the left panel.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+        let loadedImage = null;
+        let originalFile = null;
 
-  </div>
-</div>
+        // Trigger file input dialog on dropzone click
+        dropzone.addEventListener('click', () => fileInput.click());
 
-<!-- Libraries: jQuery, Bootstrap -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        // File dragover
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#e5edff';
+        });
 
-<!-- Custom JS -->
-<script src="/js/img_com.js"></script>
+        // File dragleave
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.backgroundColor = '#f0f4ff';
+        });
 
+        // File drop
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#f0f4ff';
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input selection
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Slider value dynamic update
+        qualityRange.addEventListener('input', (e) => {
+            qualityVal.textContent = e.target.value + '%';
+        });
+
+        // Handle uploaded image file
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+            originalFile = file;
+            origSize.textContent = formatBytes(file.size);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                loadedImage = new Image();
+                loadedImage.onload = function() {
+                    configArea.classList.remove('d-none');
+                    btnCompress.classList.remove('d-none');
+                    btnDownload.classList.add('d-none');
+                    savingsPanel.classList.add('d-none');
+                };
+                loadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Execute browser canvas compression routine
+        btnCompress.addEventListener('click', () => {
+            if (!loadedImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = loadedImage.width;
+            canvas.height = loadedImage.height;
+            ctx.drawImage(loadedImage, 0, 0);
+
+            const quality = parseFloat(qualityRange.value) / 100;
+
+            // Output compressed image source blob
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+
+                compSize.textContent = formatBytes(blob.size);
+                const percentSaved = Math.round(((originalFile.size - blob.size) / originalFile.size) * 100);
+                ratioSavings.textContent = `Size Saved: ${percentSaved > 0 ? percentSaved : 0}%`;
+
+                // Update download link
+                const compressedUrl = URL.createObjectURL(blob);
+                btnDownload.href = compressedUrl;
+                btnDownload.download = `compressed_${originalFile.name}`;
+
+                savingsPanel.classList.remove('d-none');
+                btnDownload.classList.remove('d-none');
+            }, 'image/jpeg', quality);
+        });
+
+        // Helper to format file sizes
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    });
+    </script>
 </body>
 </html>
