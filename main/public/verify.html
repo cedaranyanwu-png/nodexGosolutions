@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification - nodexGosolutions</title>
+    <!-- jQuery Library -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Fullscreen Viewport Setup */
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #f8fafc;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Container Card */
+        .card {
+            position: relative;
+            z-index: 1;
+            background: #ffffff;
+            border: 1px solid rgba(0, 114, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 114, 255, 0.05);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 440px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 22px;
+            color: #0072ff;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* CSS Spinner */
+        .loader {
+            border: 3px solid rgba(0, 114, 255, 0.1);
+            border-top: 3px solid #0072ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.9s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Button Styling */
+        .btn-login {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #0072ff, #00d2ff);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.2);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="title" style="font-family: 'Orbitron', sans-serif;">nodexGosolutions</div>
+    <div id="loader" class="loader"></div>
+    <div id="statusMsg" class="status-msg">Verifying your account details...</div>
+    <div id="actionArea"></div>
+</div>
+
+<script>
+// Execute actions upon page readiness
+$(document).ready(function() {
+    // Parse URL query string parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    // Extract email address query value
+    const email = urlParams.get('email');
+    // Extract verification token query value
+    const token = urlParams.get('token');
+
+    // Make sure parameters are supplied
+    if (!email || !token) {
+        // Hide spinner loading indicator
+        $('#loader').hide();
+        // Show validation error styling
+        $('#statusMsg').css('color', '#ff4d4d').text('Invalid or missing verification details.');
+        // Display fallback button back to portal login
+        $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
+        // Stop execution
+        return;
+    }
+
+    // Submit AJAX verification payload asynchronously
+    $.ajax({
+        // Target unified local PHP verification script path
+        url: '/php/verify.php',
+        type: 'POST',
+        data: {
+            email: email,
+            token: token
+        },
+        dataType: 'json',
+        // On ajax request success
+        success: function(response) {
+            // Hide the spinner loading indicator
+            $('#loader').hide();
+
+            // Check if response flag validates verification success
+            if (response.success) {
+                // Show success status styling
+                $('#statusMsg').css('color', '#10b981').text(response.message || 'Verification successful! Redirecting to login...');
+
+                // Redirect user to login screen
+                setTimeout(function() {
+                    // Navigate to single sign-on screen
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                // Show verification failure alerts
+                $('#statusMsg').css('color', '#ff4d4d').text(response.message || 'Verification failed.');
+                // Display fallback navigation button
+                $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
+            }
+        },
+        // On ajax error scenario
+        error: function(xhr, status, error) {
+            // Hide the loading spinner
+            $('#loader').hide();
+
+            // Console log debugging context
+            console.error("HTTP Status:", xhr.status);
+            // Console log response text context
+            console.error("Raw Response:", xhr.responseText);
+
+            // Establish standard error fallback message text
+            let message = 'Network error or invalid server response.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                // Grab descriptive message from response JSON payload
+                message = xhr.responseJSON.message;
+            }
+
+            // Display error alerts
+            $('#statusMsg').css('color', '#ff4d4d').text(message);
+            // Output fallback button
+            $('#actionArea').html('<a href="/login" class="btn-login">Go to Login</a>');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
