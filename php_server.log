@@ -1,53 +1,19 @@
-[Tue Aug 11 15:49:03 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Tue Aug 11 15:49:09 2026] [::1]:54490 Accepted
-[Tue Aug 11 15:49:09 2026] [::1]:54490 Closing
-[Tue Aug 11 15:49:09 2026] [::1]:54506 Accepted
-[Tue Aug 11 15:49:09 2026] [::1]:54506 [200]: GET /css/style.css?v=1786398433
-[Tue Aug 11 15:49:09 2026] [::1]:54506 Closing
-[Tue Aug 11 15:49:12 2026] [::1]:54514 Accepted
-[Tue Aug 11 15:49:12 2026] [::1]:54514 [200]: POST /php/login.php
-[Tue Aug 11 15:49:12 2026] [::1]:54514 Closing
-[Tue Aug 11 15:49:13 2026] [::1]:54516 Accepted
-[Tue Aug 11 15:49:13 2026] [::1]:54516 Closing
-[Tue Aug 11 15:49:14 2026] [::1]:54528 Accepted
-[Tue Aug 11 15:49:14 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
-[Tue Aug 11 15:49:14 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
-[Tue Aug 11 15:49:14 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
-[Tue Aug 11 15:49:14 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
-[Tue Aug 11 15:49:14 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
-[Tue Aug 11 15:49:14 2026] [::1]:54528 [200]: POST /php/admin_backup_action.php
-[Tue Aug 11 15:49:14 2026] [::1]:54528 Closing
-[Tue Aug 11 15:49:15 2026] [::1]:54544 Accepted
-[Tue Aug 11 15:49:15 2026] [::1]:54544 Closing
-[Tue Aug 11 15:49:15 2026] [::1]:54554 Accepted
-[Tue Aug 11 15:49:15 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
-[Tue Aug 11 15:49:15 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
-[Tue Aug 11 15:49:15 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
-[Tue Aug 11 15:49:15 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
-[Tue Aug 11 15:49:15 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
-[Tue Aug 11 15:49:15 2026] [::1]:54554 [200]: POST /php/admin_backup_action.php
-[Tue Aug 11 15:49:15 2026] [::1]:54554 Closing
-[Tue Aug 11 15:49:17 2026] [::1]:54562 Accepted
-[Tue Aug 11 15:49:17 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
-[Tue Aug 11 15:49:17 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
-[Tue Aug 11 15:49:17 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
-[Tue Aug 11 15:49:17 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
-[Tue Aug 11 15:49:17 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
-[Tue Aug 11 15:49:17 2026] [::1]:54562 [200]: POST /php/admin_backup_action.php
-[Tue Aug 11 15:49:17 2026] [::1]:54562 Closing
-[Tue Aug 11 15:49:19 2026] [::1]:53060 Accepted
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
-[Tue Aug 11 15:49:19 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
-[Tue Aug 11 15:49:19 2026] [::1]:53060 [200]: POST /php/admin_backup_action.php
-[Tue Aug 11 15:49:19 2026] [::1]:53060 Closing
-[Tue Aug 11 15:49:19 2026] [::1]:53076 Accepted
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
-[Tue Aug 11 15:49:19 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
-[Tue Aug 11 15:49:19 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
-[Tue Aug 11 15:49:19 2026] [::1]:53076 [200]: POST /php/admin_backup_action.php
-[Tue Aug 11 15:49:19 2026] [::1]:53076 Closing
+[Tue Aug 11 16:57:16 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug 11 17:02:56 2026] [::1]:50934 Accepted
+[Tue Aug 11 17:02:56 2026] [::1]:50934 Closing
+[Tue Aug 11 17:02:56 2026] [::1]:50944 Accepted
+[Tue Aug 11 17:02:56 2026] [::1]:50944 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 17:02:56 2026] [::1]:50944 Closing
+[Tue Aug 11 17:02:58 2026] [::1]:50958 Accepted
+[Tue Aug 11 17:02:58 2026] [::1]:50958 [200]: POST /php/login.php
+[Tue Aug 11 17:02:58 2026] [::1]:50958 Closing
+[Tue Aug 11 17:02:59 2026] [::1]:50966 Accepted
+[Tue Aug 11 17:02:59 2026] [::1]:50966 Closing
+[Tue Aug 11 17:03:00 2026] [::1]:59568 Accepted
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
+[Tue Aug 11 17:03:00 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
+[Tue Aug 11 17:03:00 2026] [::1]:59568 [200]: POST /php/admin_backup_action.php
+[Tue Aug 11 17:03:00 2026] [::1]:59568 Closing

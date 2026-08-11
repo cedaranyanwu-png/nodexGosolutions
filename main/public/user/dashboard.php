@@ -463,9 +463,12 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
                                 <button class="btn btn-xs btn-outline-primary rounded-md me-1 btn-open-file-manager" data-subdomain="<?php echo $wSub; ?>">
                                   <i class="fas fa-folder-open mr-1"></i> Manage Files
                                 </button>
-                                <a href="<?php echo htmlspecialchars((string)($web['url'] ?? '')); ?>" target="_blank" class="btn btn-xs btn-primary rounded-md text-white bg-blue-600 border-0 px-2.5 py-1">
+                                <a href="<?php echo htmlspecialchars((string)($web['url'] ?? '')); ?>" target="_blank" class="btn btn-xs btn-primary rounded-md text-white bg-blue-600 border-0 px-2.5 py-1 me-1">
                                   <i class="fas fa-external-link-alt mr-1"></i> Visit
                                 </a>
+                                <button class="btn btn-xs btn-outline-danger rounded-md btn-user-delete-site" data-id="<?php echo (int)($web['id'] ?? 0); ?>">
+                                  <i class="fas fa-trash"></i> Delete
+                                </button>
                               </td>
                             </tr>
                           <?php endforeach; ?>
@@ -1298,6 +1301,26 @@ $(document).ready(function() {
                 } else {
                     alert(res.message);
                 }
+            }
+        });
+    });
+
+    // Handle User Delete Website
+    $(document).on('click', '.btn-user-delete-site', function() {
+        const siteId = $(this).attr('data-id');
+        if (!confirm('Are you absolutely sure you want to permanently delete this website and all its file directories on disk?\nThis action is irreversible!')) return;
+
+        $.ajax({
+            url: '/php/delete_website_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'delete_website', website_id: siteId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Action failed.');
             }
         });
     });

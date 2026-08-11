@@ -446,17 +446,39 @@ function maskSecretKey(?string $key): string {
                     <th class="p-3.5">Subdomain Preview URL</th>
                     <th class="p-3.5">Physical Subfolder</th>
                     <th class="p-3.5">Provision Date</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
                   <?php if (count($websitesList) > 0): ?>
-                    <?php foreach ($websitesList as $web): ?>
+                    <?php foreach ($websitesList as $web):
+                      $webId = (int)($web['id'] ?? 0);
+                      $isSuspended = (int)($web['is_suspended'] ?? 0) === 1;
+                    ?>
                       <tr>
                         <td class="p-3.5">User ID: <?php echo (int)($web['user_id'] ?? 0); ?></td>
                         <td class="p-3.5 font-semibold text-gray-800"><?php echo htmlspecialchars($web['name'] ?? ''); ?></td>
                         <td class="p-3.5 font-mono text-blue-600"><a href="<?php echo htmlspecialchars($web['url'] ?? ''); ?>" target="_blank" class="hover:underline"><?php echo htmlspecialchars($web['url'] ?? ''); ?></a></td>
                         <td class="p-3.5"><span class="badge bg-secondary bg-opacity-10 text-secondary px-2.5 py-1">/public/<?php echo htmlspecialchars($web['folder'] ?? ''); ?>/</span></td>
                         <td class="p-3.5 text-gray-400"><?php echo date('M d, Y', strtotime($web['created_at'] ?? 'now')); ?></td>
+                        <td class="p-3.5">
+                          <?php if ($isSuspended): ?>
+                            <span class="badge bg-red-100 text-red-800 rounded font-bold">Suspended</span>
+                          <?php else: ?>
+                            <span class="badge bg-green-100 text-green-800 rounded font-bold">Active</span>
+                          <?php endif; ?>
+                        </td>
+                        <td class="p-3.5 text-right">
+                          <div class="d-flex justify-content-end gap-1.5 flex-wrap">
+                            <button class="btn btn-xs <?php echo $isSuspended ? 'btn-outline-success' : 'btn-outline-warning'; ?> rounded-md btn-admin-toggle-site-suspension" data-id="<?php echo $webId; ?>">
+                              <?php echo $isSuspended ? 'Unsuspend' : 'Suspend'; ?>
+                            </button>
+                            <button class="btn btn-xs btn-outline-danger rounded-md btn-admin-delete-site" data-id="<?php echo $webId; ?>">
+                              <i class="fas fa-trash"></i> Delete
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     <?php endforeach; ?>
                   <?php else: ?>
@@ -1430,6 +1452,50 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 alert("Delete Error: " + (xhr.responseJSON ? xhr.responseJSON.message : "Process failed."));
+            }
+        });
+    });
+
+    // ============================================================
+    // ADMIN WEBSITE MANAGER INTERACTIONS (SUSPEND / DELETE)
+    // ============================================================
+
+    // Handle Admin Toggle Site Suspension
+    $(document).on('click', '.btn-admin-toggle-site-suspension', function() {
+        const siteId = $(this).attr('data-id');
+        if (!confirm('Are you sure you want to toggle the suspension state of this website?')) return;
+
+        $.ajax({
+            url: '/php/delete_website_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'toggle_suspension', website_id: siteId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Action failed.');
+            }
+        });
+    });
+
+    // Handle Admin Delete Website
+    $(document).on('click', '.btn-admin-delete-site', function() {
+        const siteId = $(this).attr('data-id');
+        if (!confirm('Are you absolutely sure you want to permanently delete this website and all its file directories on disk?\nThis action is irreversible!')) return;
+
+        $.ajax({
+            url: '/php/delete_website_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'delete_website', website_id: siteId },
+            success: function(res) {
+                alert(res.message);
+                window.location.reload();
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Action failed.');
             }
         });
     });

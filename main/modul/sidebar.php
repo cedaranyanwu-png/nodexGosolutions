@@ -17,7 +17,8 @@ $activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
 $fullname   = $_SESSION['fullname'] ?? 'System User';
 ?>
 <!-- Sidebar Navigation Container -->
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end" style="width: 260px; min-height: 100vh; border-color: rgba(0, 114, 255, 0.1) !important; box-shadow: 4px 0 12px rgba(0, 114, 255, 0.03);">
+<!-- Enforce fixed min-width and max-width of 260px with flex-shrink disabled to prevent the sidebar from disappearing or shrinking on smaller screen viewports -->
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end" style="width: 260px; min-width: 260px; max-width: 260px; min-height: 100vh; border-color: rgba(0, 114, 255, 0.1) !important; box-shadow: 4px 0 12px rgba(0, 114, 255, 0.03);">
 
     <!-- Workspace Brand Header -->
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-primary text-decoration-none" style="font-family: 'Orbitron', sans-serif;">

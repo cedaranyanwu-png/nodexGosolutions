@@ -247,6 +247,70 @@ if (!in_array(strtolower($currentHost), $landingHosts, true)) {
 
     // If a valid tenant public directory is found on disk, resolve and serve the requested resource
     if ($tenantPublicDir !== null) {
+        // Enforce website suspension & subscription expiration checks
+        $websiteRecord = $conn->selectOne('websites', ['subdomain' => $folder]);
+        if ($websiteRecord !== null) {
+            // Check suspension status
+            if ((int)($websiteRecord['is_suspended'] ?? 0) === 1) {
+                http_response_code(403);
+                ?>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Website Suspended</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+                        .card { text-align: center; padding: 40px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.08); max-width: 500px; }
+                        h1 { font-size: 24px; font-weight: 800; color: #dc2626; margin: 0 0 10px; }
+                        p { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="card">
+                        <h1>Website Suspended</h1>
+                        <p>This website is temporarily suspended by the platform administrator. Please contact support or check your workspace dashboard for details.</p>
+                    </div>
+                </body>
+                </html>
+                <?php
+                exit;
+            }
+
+            // Check subscription expiration of owner
+            $owner = $conn->selectOne('users', ['id' => $websiteRecord['user_id']]);
+            if ($owner !== null) {
+                $subStatus = checkAndUpdateSubscription($owner, $conn);
+                if ($subStatus === 'expired' || $subStatus === 'suspended') {
+                    http_response_code(402);
+                    ?>
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Website Deactivated</title>
+                        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+                        <style>
+                            body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+                            .card { text-align: center; padding: 40px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.08); max-width: 500px; }
+                            h1 { font-size: 24px; font-weight: 800; color: #e11d48; margin: 0 0 10px; }
+                            p { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="card">
+                            <h1>Website Deactivated</h1>
+                            <p>This website hosting has been temporarily deactivated because the owner's free trial or hosting subscription has expired.</p>
+                        </div>
+                    </body>
+                    </html>
+                    <?php
+                    exit;
+                }
+            }
+        }
+
         // Canonicalize base tenant directory path
         $realPublicDir = realpath($tenantPublicDir);
 

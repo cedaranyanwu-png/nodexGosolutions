@@ -400,7 +400,9 @@ function checkAndUpdateSubscription(array &$user, Database $dbConnection): strin
     // Capture current server-side timestamp
     $now = time();
     // Resolve trial boundaries as Unix timestamps
-    $trialEnd = strtotime($user['trial_end']);
+    $trialEnd = strtotime($user['trial_end'] ?: date('Y-m-d H:i:s'));
+    // The 7-day free grace period ends exactly 7 days after trial ends
+    $graceEnd = strtotime(date('Y-m-d H:i:s', $trialEnd) . ' +7 days');
     // Resolve paid subscription end boundary as timestamp if specified
     $subEnd = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
 
@@ -417,12 +419,15 @@ function checkAndUpdateSubscription(array &$user, Database $dbConnection): strin
             $newStatus = 'expired';
         }
     } else {
-        // If no active subscription is active, evaluate trial duration
+        // Evaluate trial duration with the 7-day free grace period
         if ($now < $trialEnd) {
-            // Keep or transition back to trial state
+            // Under normal active trial
             $newStatus = 'trial';
+        } elseif ($now < $graceEnd) {
+            // Inside the 7-day free grace period post-trial expiration
+            $newStatus = 'grace';
         } else {
-            // Mark as expired since trial duration has run out and no paid plan is active
+            // Completely expired past both the trial and the 7-day grace periods
             $newStatus = 'expired';
         }
     }

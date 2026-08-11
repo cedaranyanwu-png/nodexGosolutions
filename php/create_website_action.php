@@ -36,11 +36,24 @@ if (!$user) {
 
 // Server-side enforcement check: restrict workspace creations to accounts on ACTIVE or TRIAL plans
 $status = checkAndUpdateSubscription($user, $conn);
-if ($status === 'expired' || $status === 'suspended') {
+if ($status === 'expired' || $status === 'suspended' || $status === 'grace') {
     jsonResponse([
         'success' => false,
-        'message' => 'Your subscription has expired. Please select a plan to activate website provisioning.'
+        'message' => 'Your active free trial or subscription has expired. Please select a plan to activate website provisioning.'
     ], 403);
+}
+
+// Enforce Trial Constraint: trial users are strictly limited to exactly 1 website subdomain
+if ($status === 'trial') {
+    // Select all website projects owned by the session user
+    $existingUserSites = $conn->select('websites', ['user_id' => $user['id']]) ?: [];
+    // If they already have 1 or more websites, block the creation
+    if (count($existingUserSites) >= 1) {
+        jsonResponse([
+            'success' => false,
+            'message' => 'Free trial accounts are restricted to exactly 1 website subdomain. Please select a premium plan to build more websites.'
+        ], 403);
+    }
 }
 
 // Extract website creation payload parameters
