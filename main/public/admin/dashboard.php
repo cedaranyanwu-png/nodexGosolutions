@@ -153,6 +153,13 @@ function maskSecretKey(?string $key): string {
     .main-content {
         flex-grow: 1;
         padding: 30px;
+        overflow-x: hidden;
+        min-width: 0;
+    }
+    @media (max-width: 767.98px) {
+        .main-content {
+            padding: 15px;
+        }
     }
     .analytic-card {
         background: #ffffff;

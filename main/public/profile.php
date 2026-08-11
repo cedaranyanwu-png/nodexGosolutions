@@ -173,7 +173,7 @@ $initialLetter = strtoupper(substr($userProfile['fullname'] ?? 'S', 0, 1));
   <nav class="main-header navbar navbar-expand navbar-white navbar-light border-b border-gray-100 px-3">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button" id="sidebarToggleBtn"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="/" class="nav-link font-semibold">Home</a>

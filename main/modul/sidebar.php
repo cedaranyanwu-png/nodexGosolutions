@@ -100,7 +100,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- Website Dropdown Menu -->
                         <div class="accordion-item border-0">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWebsiteTools" aria-expanded="false" aria-controls="collapseWebsiteTools" style="background: transparent; font-size: 14px;">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseWebsiteTools" data-target="#collapseWebsiteTools" aria-expanded="false" aria-controls="collapseWebsiteTools" style="background: transparent; font-size: 14px;">
                                     <i class="fa-solid fa-earth-americas me-2 text-primary" style="width: 20px;"></i>
                                     Website
                                 </button>
@@ -120,7 +120,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- Database Dropdown Menu -->
                         <div class="accordion-item border-0 mt-1">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDatabaseTools" aria-expanded="false" aria-controls="collapseDatabaseTools" style="background: transparent; font-size: 14px;">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseDatabaseTools" data-target="#collapseDatabaseTools" aria-expanded="false" aria-controls="collapseDatabaseTools" style="background: transparent; font-size: 14px;">
                                     <i class="fa-solid fa-database me-2 text-primary" style="width: 20px;"></i>
                                     Database
                                 </button>
@@ -146,16 +146,13 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- Websites (Admin) Dropdown Menu -->
                         <div class="accordion-item border-0">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdminWebsites" aria-expanded="false" aria-controls="collapseAdminWebsites" style="background: transparent; font-size: 14px;">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminWebsites" data-target="#collapseAdminWebsites" aria-expanded="false" aria-controls="collapseAdminWebsites" style="background: transparent; font-size: 14px;">
                                     <i class="fa-solid fa-globe me-2 text-primary" style="width: 20px;"></i>
                                     Websites
                                 </button>
                             </div>
                             <div id="collapseAdminWebsites" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
                                 <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#build-website" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-laptop-code me-2" style="font-size: 11px;"></i> Build Website
-                                    </a>
                                     <a href="/admin/dashboard#websites-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
                                         <i class="fa-solid fa-sliders me-2" style="font-size: 11px;"></i> Manage Websites
                                     </a>
@@ -172,7 +169,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- Database (Admin) Dropdown Menu -->
                         <div class="accordion-item border-0 mt-1">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdminDatabases" aria-expanded="false" aria-controls="collapseAdminDatabases" style="background: transparent; font-size: 14px;">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminDatabases" data-target="#collapseAdminDatabases" aria-expanded="false" aria-controls="collapseAdminDatabases" style="background: transparent; font-size: 14px;">
                                     <i class="fa-solid fa-database me-2 text-primary" style="width: 20px;"></i>
                                     Database
                                 </button>
@@ -195,7 +192,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- System (Admin) Dropdown Menu -->
                         <div class="accordion-item border-0 mt-1">
                             <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdminSystem" aria-expanded="false" aria-controls="collapseAdminSystem" style="background: transparent; font-size: 14px;">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminSystem" data-target="#collapseAdminSystem" aria-expanded="false" aria-controls="collapseAdminSystem" style="background: transparent; font-size: 14px;">
                                     <i class="fa-solid fa-server me-2 text-primary" style="width: 20px;"></i>
                                     System
                                 </button>
@@ -355,7 +352,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
 
     /* Fix CSS Conflict between Tailwind CSS and Bootstrap 5 Accordion Collapse elements */
     /* Prevents active/expanded accordion elements from disappearing due to visibility conflicts */
-    .collapse {
+    .sidebar-container .collapse {
         visibility: visible !important;
     }
 </style>

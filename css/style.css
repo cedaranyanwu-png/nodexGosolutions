@@ -145,6 +145,6 @@ section {
 
 /* Fix CSS Conflict between Tailwind CSS and Bootstrap 5 Accordion Collapse elements */
 /* Prevents active/expanded accordion elements from disappearing due to visibility conflicts */
-.collapse {
+.sidebar-container .collapse {
     visibility: visible !important;
 }

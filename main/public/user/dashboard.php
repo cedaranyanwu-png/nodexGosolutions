@@ -951,6 +951,7 @@ $(document).ready(function() {
                 fileManagerBtn.click();
             } else {
                 $('#manage-files').removeClass('d-none');
+                $('#fileManagerListGroup').html('<div class="text-center text-gray-500 py-4 text-xs"><i class="fas fa-info-circle me-1"></i> No website directory is active. Please <a href="#build-website" class="text-blue-600 font-bold hover:underline">Build a Website</a> first!</div>');
             }
         } else if (hash === '#build-website') {
             $('html, body').animate({
