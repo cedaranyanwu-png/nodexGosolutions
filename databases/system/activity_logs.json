@@ -1,0 +1,42 @@
+[
+    {
+        "email": "admin_restore_test@nodexplatform.com.ng",
+        "action": "backup_restored",
+        "details": "Restored backup ID: backup_2026-08-11_15-45-40_23cab8c3 (Safety copy: backup_2026-08-11_15-45-40_8671b510)",
+        "created_at": "2026-08-11 15:45:40",
+        "id": 1,
+        "updated_at": "2026-08-11 15:45:40"
+    },
+    {
+        "email": "admin@nodexplatform.com.ng",
+        "action": "backup_created",
+        "details": "Created manual backup ID: backup_2026-08-11_15-49-19_955eb523",
+        "created_at": "2026-08-11 15:49:19",
+        "id": 2,
+        "updated_at": "2026-08-11 15:49:19"
+    },
+    {
+        "email": "admin_restore_test@nodexplatform.com.ng",
+        "action": "backup_restored",
+        "details": "Restored backup ID: backup_2026-08-11_16-54-28_4e3d913d (Safety copy: backup_2026-08-11_16-54-28_1e331235)",
+        "created_at": "2026-08-11 16:54:28",
+        "id": 3,
+        "updated_at": "2026-08-11 16:54:28"
+    },
+    {
+        "email": "admin_restore_test@nodexplatform.com.ng",
+        "action": "backup_restored",
+        "details": "Restored backup ID: backup_2026-08-11_19-04-19_c5d8c74c (Safety copy: backup_2026-08-11_19-04-19_b0ab2b12)",
+        "created_at": "2026-08-11 19:04:19",
+        "id": 4,
+        "updated_at": "2026-08-11 19:04:19"
+    },
+    {
+        "email": "admin_restore_test@nodexplatform.com.ng",
+        "action": "backup_restored",
+        "details": "Restored backup ID: backup_2026-08-11_19-17-15_399fabaa (Safety copy: backup_2026-08-11_19-17-15_dc3b8188)",
+        "created_at": "2026-08-11 19:17:15",
+        "id": 5,
+        "updated_at": "2026-08-11 19:17:15"
+    }
+]
