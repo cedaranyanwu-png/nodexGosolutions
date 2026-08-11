@@ -67,5 +67,43 @@
         "id": 4,
         "created_at": "2026-08-11 07:12:21",
         "updated_at": "2026-08-11 07:12:36"
+    },
+    {
+        "fullname": "Verified Tenant 41607",
+        "email": "verified_tenant_41607@nodexplatform.com.ng",
+        "password": "$2y$10$GWpzIWNNXBnLaxCKzLuFf.wCeK7yAP8XEPIAlleHXsbNYYR..ndHy",
+        "role": "tenant",
+        "status": "active",
+        "is_verified": 0,
+        "email_verified": 0,
+        "verification_token": "ed4cc6f2ab5106252a5ebc36a5baef97",
+        "trial_start": "2026-08-11 12:39:12",
+        "trial_end": "2026-09-11 12:39:12",
+        "subscription_status": "trial",
+        "subscription_plan": "Starter Space",
+        "subscription_start": null,
+        "subscription_end": null,
+        "id": 5,
+        "created_at": "2026-08-11 12:39:12",
+        "updated_at": "2026-08-11 12:39:12"
+    },
+    {
+        "fullname": "Verified Tenant 70367",
+        "email": "verified_tenant_70367@nodexplatform.com.ng",
+        "password": "$2y$10$BOEkfgeOMFUOxTe9RImdH.ClLSQ5tVba3WiZ.6rwPQOIHfoKFiKp2",
+        "role": "tenant",
+        "status": "active",
+        "is_verified": 1,
+        "email_verified": 1,
+        "verification_token": null,
+        "trial_start": "2026-08-11 12:43:58",
+        "trial_end": "2026-09-11 12:43:58",
+        "subscription_status": "trial",
+        "subscription_plan": "Starter Space",
+        "subscription_start": null,
+        "subscription_end": null,
+        "id": 6,
+        "created_at": "2026-08-11 12:43:58",
+        "updated_at": "2026-08-11 12:44:00"
     }
 ]

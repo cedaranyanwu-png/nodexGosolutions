@@ -89,6 +89,20 @@ $routeMap = [
     '/php/admin_action' => __DIR__ . '/php/admin_action.php',
     '/php/process_payment.php' => __DIR__ . '/php/process_payment.php',
     '/php/process_payment' => __DIR__ . '/php/process_payment.php',
+    '/php/create_website_action' => __DIR__ . '/php/create_website_action.php',
+    '/php/create_website_action.php' => __DIR__ . '/php/create_website_action.php',
+    '/php/manage_files_action' => __DIR__ . '/php/manage_files_action.php',
+    '/php/manage_files_action.php' => __DIR__ . '/php/manage_files_action.php',
+    '/php/initialize_payment' => __DIR__ . '/php/initialize_payment.php',
+    '/php/initialize_payment.php' => __DIR__ . '/php/initialize_payment.php',
+    '/php/verify_payment' => __DIR__ . '/php/verify_payment.php',
+    '/php/verify_payment.php' => __DIR__ . '/php/verify_payment.php',
+    '/php/admin_pricing_action' => __DIR__ . '/php/admin_pricing_action.php',
+    '/php/admin_pricing_action.php' => __DIR__ . '/php/admin_pricing_action.php',
+    '/php/admin_settings_action' => __DIR__ . '/php/admin_settings_action.php',
+    '/php/admin_settings_action.php' => __DIR__ . '/php/admin_settings_action.php',
+    '/php/admin_rbac_action' => __DIR__ . '/php/admin_rbac_action.php',
+    '/php/admin_rbac_action.php' => __DIR__ . '/php/admin_rbac_action.php',
 ];
 
 // Check if the current requested URI is registered in our hardcoded static routing map

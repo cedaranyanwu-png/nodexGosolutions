@@ -1,0 +1,93 @@
+[Tue Aug 11 12:34:39 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug 11 12:35:17 2026] [::1]:40566 Accepted
+[Tue Aug 11 12:35:17 2026] [::1]:40566 Closing
+[Tue Aug 11 12:36:49 2026] [::1]:34026 Accepted
+[Tue Aug 11 12:36:49 2026] [::1]:34026 Closing
+[Tue Aug 11 12:36:49 2026] [::1]:34040 Accepted
+[Tue Aug 11 12:36:49 2026] [::1]:34040 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:36:49 2026] [::1]:34040 Closing
+[Tue Aug 11 12:39:10 2026] [::1]:33470 Accepted
+[Tue Aug 11 12:39:10 2026] [::1]:33470 Closing
+[Tue Aug 11 12:39:10 2026] [::1]:33480 Accepted
+[Tue Aug 11 12:39:10 2026] [::1]:33480 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:39:10 2026] [::1]:33480 Closing
+[Tue Aug 11 12:39:12 2026] [::1]:33486 Accepted
+sh: 1: /usr/sbin/sendmail: not found
+[Tue Aug 11 12:39:12 2026] [::1]:33486 [200]: POST /php/register.php
+[Tue Aug 11 12:39:12 2026] [::1]:33486 Closing
+[Tue Aug 11 12:39:14 2026] [::1]:33492 Accepted
+[Tue Aug 11 12:39:14 2026] [::1]:33492 Closing
+[Tue Aug 11 12:39:14 2026] [::1]:33496 Accepted
+[Tue Aug 11 12:39:14 2026] [::1]:33496 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:39:14 2026] [::1]:33496 Closing
+[Tue Aug 11 12:39:16 2026] [::1]:33502 Accepted
+[Tue Aug 11 12:39:16 2026] [::1]:33502 [403]: POST /php/login.php
+[Tue Aug 11 12:39:16 2026] [::1]:33502 Closing
+[Tue Aug 11 12:39:20 2026] [::1]:58354 Accepted
+[Tue Aug 11 12:39:20 2026] [::1]:58354 Closing
+[Tue Aug 11 12:39:20 2026] [::1]:58368 Accepted
+[Tue Aug 11 12:39:20 2026] [::1]:58368 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:39:20 2026] [::1]:58368 Closing
+[Tue Aug 11 12:39:22 2026] [::1]:58378 Accepted
+[Tue Aug 11 12:39:22 2026] [::1]:58378 [200]: POST /php/login.php
+[Tue Aug 11 12:39:22 2026] [::1]:58378 Closing
+[Tue Aug 11 12:39:23 2026] [::1]:58386 Accepted
+[Tue Aug 11 12:39:23 2026] PHP Fatal error:  Uncaught TypeError: htmlspecialchars(): Argument #1 ($string) must be of type string, int given in /app/main/public/admin/dashboard.php:485
+Stack trace:
+#0 /app/main/public/admin/dashboard.php(485): htmlspecialchars()
+#1 /app/index.php(111): require_once('...')
+#2 {main}
+  thrown in /app/main/public/admin/dashboard.php on line 485
+[Tue Aug 11 12:39:23 2026] [::1]:58386 Closing
+[Tue Aug 11 12:43:56 2026] [::1]:48166 Accepted
+[Tue Aug 11 12:43:56 2026] [::1]:48166 Closing
+[Tue Aug 11 12:43:56 2026] [::1]:48170 Accepted
+[Tue Aug 11 12:43:56 2026] [::1]:48170 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:43:56 2026] [::1]:48170 Closing
+[Tue Aug 11 12:43:58 2026] [::1]:56262 Accepted
+sh: 1: /usr/sbin/sendmail: not found
+[Tue Aug 11 12:43:58 2026] [::1]:56262 [200]: POST /php/register.php
+[Tue Aug 11 12:43:58 2026] [::1]:56262 Closing
+[Tue Aug 11 12:44:00 2026] [::1]:56266 Accepted
+[Tue Aug 11 12:44:00 2026] [::1]:56266 Closing
+[Tue Aug 11 12:44:00 2026] [::1]:56278 Accepted
+[Tue Aug 11 12:44:00 2026] [::1]:56278 [200]: POST /php/verify.php
+[Tue Aug 11 12:44:00 2026] [::1]:56278 Closing
+[Tue Aug 11 12:44:02 2026] [::1]:56286 Accepted
+[Tue Aug 11 12:44:02 2026] [::1]:56286 Closing
+[Tue Aug 11 12:44:02 2026] [::1]:56298 Accepted
+[Tue Aug 11 12:44:02 2026] [::1]:56298 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:44:02 2026] [::1]:56298 Closing
+[Tue Aug 11 12:44:03 2026] [::1]:56300 Accepted
+[Tue Aug 11 12:44:03 2026] [::1]:56300 Closing
+[Tue Aug 11 12:44:03 2026] [::1]:56302 Accepted
+[Tue Aug 11 12:44:03 2026] [::1]:56302 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:44:03 2026] [::1]:56302 Closing
+[Tue Aug 11 12:44:04 2026] [::1]:56318 Accepted
+[Tue Aug 11 12:44:04 2026] [::1]:56318 [200]: POST /php/login.php
+[Tue Aug 11 12:44:04 2026] [::1]:56318 Closing
+[Tue Aug 11 12:44:06 2026] [::1]:56326 Accepted
+[Tue Aug 11 12:44:06 2026] PHP Warning:  Undefined variable $hostDomain in /app/main/public/user/dashboard.php on line 344
+[Tue Aug 11 12:44:06 2026] PHP Fatal error:  Uncaught TypeError: htmlspecialchars(): Argument #1 ($string) must be of type string, int given in /app/main/public/user/dashboard.php:572
+Stack trace:
+#0 /app/main/public/user/dashboard.php(572): htmlspecialchars()
+#1 /app/index.php(111): require_once('...')
+#2 {main}
+  thrown in /app/main/public/user/dashboard.php on line 572
+[Tue Aug 11 12:44:06 2026] [::1]:56326 Closing
+[Tue Aug 11 12:44:08 2026] [::1]:40524 Accepted
+[Tue Aug 11 12:44:08 2026] [::1]:40524 Closing
+[Tue Aug 11 12:44:08 2026] [::1]:40538 Accepted
+[Tue Aug 11 12:44:08 2026] [::1]:40538 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 12:44:08 2026] [::1]:40538 Closing
+[Tue Aug 11 12:44:10 2026] [::1]:40546 Accepted
+[Tue Aug 11 12:44:10 2026] [::1]:40546 [200]: POST /php/login.php
+[Tue Aug 11 12:44:10 2026] [::1]:40546 Closing
+[Tue Aug 11 12:44:11 2026] [::1]:40554 Accepted
+[Tue Aug 11 12:44:11 2026] PHP Fatal error:  Uncaught TypeError: htmlspecialchars(): Argument #1 ($string) must be of type string, int given in /app/main/public/admin/dashboard.php:485
+Stack trace:
+#0 /app/main/public/admin/dashboard.php(485): htmlspecialchars()
+#1 /app/index.php(111): require_once('...')
+#2 {main}
+  thrown in /app/main/public/admin/dashboard.php on line 485
+[Tue Aug 11 12:44:11 2026] [::1]:40554 Closing

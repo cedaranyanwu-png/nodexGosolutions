@@ -22,6 +22,13 @@ $conn->createTable('users');
 $conn->createTable('rate_limits');
 $conn->createTable('login_attempts');
 $conn->createTable('tickets'); // Support tickets database table
+$conn->createTable('plans'); // Pricing plans configuration table
+$conn->createTable('settings'); // Global application settings table (like Flutterwave keys)
+$conn->createTable('payments'); // Central payment history log table
+$conn->createTable('subscriptions'); // Active/expired hosting subscriptions
+$conn->createTable('roles'); // Custom roles listing
+$conn->createTable('permissions'); // Granular permissions mapped to roles
+$conn->createTable('activity_logs'); // Secure administrative activity audits
 
 // Dynamic Auto-Seeder: Seed the main administrator account if users table is empty
 $usersCount = count($conn->select('users'));
@@ -33,13 +40,108 @@ if ($usersCount === 0) {
         'fullname' => 'Cedar Anyanwu',
         'email' => 'admin@nodexplatform.com.ng',
         'password' => $hashedPassword,
-        'role' => 'admin',
+        'role' => 'super admin', // Upgraded to default Super Admin for complete RBAC support
         'status' => 'active',
         'is_verified' => 1,
         'email_verified' => 1,
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
     ]);
+}
+
+// Auto-seed default pricing plans if the plans table is fresh
+$plansCount = count($conn->select('plans'));
+if ($plansCount === 0) {
+    // Insert Micro plan (₦3,000 / month)
+    $conn->insert('plans', [
+        'id' => 'micro',
+        'name' => 'Micro',
+        'price' => 3000,
+        'currency' => 'NGN',
+        'billing_period' => 'month',
+        'description' => 'Perfect for launching small custom hosting websites and projects.',
+        'features' => json_encode(['1 Website', 'Shared SSL', '1 GB Bandwidth']),
+        'is_active' => 1,
+        'display_order' => 1,
+        'is_recommended' => 0
+    ]);
+    // Insert Growth plan (₦25,000 / month)
+    $conn->insert('plans', [
+        'id' => 'growth',
+        'name' => 'Growth',
+        'price' => 25000,
+        'currency' => 'NGN',
+        'billing_period' => 'month',
+        'description' => 'Ideal for growing developer portals and custom subdomain hosting sites.',
+        'features' => json_encode(['Unlimited Websites', 'Full database integration', '10 GB Bandwidth', 'Priority SLA support']),
+        'is_active' => 1,
+        'display_order' => 2,
+        'is_recommended' => 1
+    ]);
+    // Insert Business Pro plan (₦75,000 / month)
+    $conn->insert('plans', [
+        'id' => 'business_pro',
+        'name' => 'Business Pro',
+        'price' => 75000,
+        'currency' => 'NGN',
+        'billing_period' => 'month',
+        'description' => 'High-capacity computational limits with multi-server cloud capabilities.',
+        'features' => json_encode(['Dedicated servers', 'SLA 99.99% uptime', 'Unmetered bandwidth', 'All features included']),
+        'is_active' => 1,
+        'display_order' => 3,
+        'is_recommended' => 0
+    ]);
+}
+
+// Auto-seed initial Flutterwave payment settings configuration parameters
+$settingsCount = count($conn->select('settings'));
+if ($settingsCount === 0) {
+    $conn->insert('settings', [
+        'id' => 'flutterwave',
+        'flw_public_key' => 'FLWPUBK_TEST-sandbox-pubkey-123456789',
+        'flw_secret_key' => 'FLWSECK_TEST-sandbox-secretkey-123456789',
+        'flw_encryption_key' => 'FLWENCK_TEST-sandbox-encryptionkey-123456789',
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+}
+
+// Auto-seed standard RBAC roles and permissions mapping
+$rolesCount = count($conn->select('roles'));
+if ($rolesCount === 0) {
+    // Standard role registry records
+    $conn->insert('roles', ['id' => 'super admin', 'name' => 'Super Admin', 'description' => 'Complete absolute administrative privileges']);
+    $conn->insert('roles', ['id' => 'admin', 'name' => 'Admin', 'description' => 'General administration capabilities']);
+    $conn->insert('roles', ['id' => 'manager', 'name' => 'Manager', 'description' => 'Manages users and website workspaces']);
+    $conn->insert('roles', ['id' => 'support', 'name' => 'Support', 'description' => 'Assists clients and processes tickets']);
+    $conn->insert('roles', ['id' => 'moderator', 'name' => 'Moderator', 'description' => 'Audits content and custom templates']);
+}
+
+$permissionsCount = count($conn->select('permissions'));
+if ($permissionsCount === 0) {
+    // Define initial helper permissions array mapping
+    $defaultPermissions = [
+        // Admin permissions assignments
+        ['role' => 'admin', 'permission' => 'users.view', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'users.edit', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'users.suspend', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'websites.view', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'websites.suspend', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'payments.view', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'subscriptions.view', 'is_allowed' => 1],
+        ['role' => 'admin', 'permission' => 'pricing.view', 'is_allowed' => 1],
+
+        // Manager permissions assignments
+        ['role' => 'manager', 'permission' => 'users.view', 'is_allowed' => 1],
+        ['role' => 'manager', 'permission' => 'websites.view', 'is_allowed' => 1],
+        ['role' => 'manager', 'permission' => 'websites.suspend', 'is_allowed' => 1],
+
+        // Support permissions assignments
+        ['role' => 'support', 'permission' => 'users.view', 'is_allowed' => 1],
+        ['role' => 'support', 'permission' => 'websites.view', 'is_allowed' => 1],
+    ];
+    foreach ($defaultPermissions as $p) {
+        $conn->insert('permissions', $p);
+    }
 }
 
 /**
@@ -228,7 +330,8 @@ function assetUrl(string $path): string {
  */
 function checkAndUpdateSubscription(array &$user, Database $dbConnection): string {
     // Admin role accounts are fully exempt from subscription constraints and are always active
-    if (strtolower((string)($user['role'] ?? '')) === 'admin') {
+    $uRole = strtolower((string)($user['role'] ?? ''));
+    if ($uRole === 'admin' || $uRole === 'super admin' || $uRole === 'manager' || $uRole === 'support' || $uRole === 'moderator') {
         // Return active state for administrators
         return 'active';
     }
@@ -393,5 +496,44 @@ function enforceSubscription(bool $isApi = false): void {
             }
         }
     }
+}
+
+/**
+ * Checks if the currently authenticated user has a specific granular permission.
+ * Supports absolute bypass for super administrators.
+ *
+ * @param string $permission Unique permission string (e.g. 'users.suspend')
+ * @return bool True if authorized, false otherwise
+ */
+function checkAdminPermission(string $permission): bool {
+    // Access central database connector
+    global $conn;
+    // Instantiate secure sessions
+    secureSession();
+
+    // Block non-logged in or non-admin roles
+    if (!isset($_SESSION['email']) || !isset($_SESSION['role'])) {
+        return false;
+    }
+
+    $role = strtolower((string)$_SESSION['role']);
+
+    // Super Admin role possesses absolute override capabilities across all permission elements
+    if ($role === 'super admin') {
+        return true;
+    }
+
+    // Standard Admin is also granted super privilege bypass in our simple model
+    if ($role === 'admin') {
+        return true;
+    }
+
+    // Query exact granular capability in local permissions registry
+    $record = $conn->selectOne('permissions', ['role' => $role, 'permission' => $permission]);
+    if ($record && (int)($record['is_allowed'] ?? 0) === 1) {
+        return true;
+    }
+
+    return false;
 }
 ?>
