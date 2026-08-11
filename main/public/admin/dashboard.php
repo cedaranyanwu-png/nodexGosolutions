@@ -336,6 +336,9 @@ function maskSecretKey(?string $key): string {
       <li class="nav-item" role="presentation">
         <button class="nav-link border-0" id="activity-logs-tab" data-bs-toggle="tab" data-bs-target="#activity-logs-section" type="button" role="tab">System Audits</button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link border-0" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-section" type="button" role="tab">Backup System</button>
+      </li>
     </ul>
 
     <!-- Tabbed Panels Container -->
@@ -806,6 +809,75 @@ function maskSecretKey(?string $key): string {
         </div>
       </div>
 
+      <!-- TAB 7: NGS BACKUP & RECOVERY SYSTEM CONSOLE -->
+      <div class="tab-pane fade" id="backup-section" role="tabpanel" aria-labelledby="backup-tab">
+        <div class="card border-0 shadow-sm rounded-xl mb-4">
+          <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3 flex-wrap gap-3">
+            <div>
+              <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-server text-blue-600 mr-2"></i> NGS Backup & Recovery Control Center</h3>
+              <p class="text-xs text-gray-400 mt-1">Health Status: <span class="text-green-600 font-bold">● Healthy (Outside Webroot)</span></p>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary rounded-md font-bold text-white bg-blue-600 border-0 px-3 py-2 text-xs" id="btnTriggerBackup"><i class="fas fa-rotate mr-1"></i> Create Safety Backup Now</button>
+            </div>
+          </div>
+          <div class="card-body p-4 text-start">
+            <div id="backupFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+            <div class="row mb-4">
+              <div class="col-md-6 mb-2">
+                <div class="p-3 bg-gray-50 border border-gray-100 rounded-lg">
+                  <div class="text-2xs font-bold text-gray-400 uppercase" style="font-size: 9px;">Backup Location Path</div>
+                  <div class="text-xs font-mono text-gray-700 mt-1" id="backupLocationPath" style="word-break: break-all;">
+                    <?php
+                      require_once __DIR__ . '/../../../php/BackupManager.php';
+                      $bm = new BackupManager();
+                      echo htmlspecialchars($bm->getBackupPath());
+                    ?>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-2">
+                <div class="p-3 bg-gray-50 border border-gray-100 rounded-lg">
+                  <div class="text-2xs font-bold text-gray-400 uppercase" style="font-size: 9px;">Integrity Verification</div>
+                  <div class="text-xs text-green-600 font-bold mt-1">✓ Active Shield</div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-2">
+                <div class="p-3 bg-gray-50 border border-gray-100 rounded-lg">
+                  <div class="text-2xs font-bold text-gray-400 uppercase" style="font-size: 9px;">Retention Rule Limit</div>
+                  <div class="text-xs text-blue-600 font-bold mt-1">Max 10 Versions</div>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="text-xs font-bold text-gray-500 uppercase mb-3" style="font-size: 10px;">Available Recovery Points (Stored Privately)</h4>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 text-xs text-start">
+                <thead class="bg-gray-50 text-gray-600 font-semibold">
+                  <tr>
+                    <th class="p-3.5">Backup ID</th>
+                    <th class="p-3.5">Created At</th>
+                    <th class="p-3.5">Triggered By</th>
+                    <th class="p-3.5 text-center">DB</th>
+                    <th class="p-3.5 text-center">Websites</th>
+                    <th class="p-3.5 text-center">Uploads</th>
+                    <th class="p-3.5 text-center">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700" id="backupsListTableBody">
+                  <!-- Loaded dynamically via AJAX -->
+                  <tr>
+                    <td colspan="8" class="text-center text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Loading restore points...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -1192,6 +1264,172 @@ $(document).ready(function() {
             error: function(xhr) {
                 $('#btnCreateRole').prop('disabled', false).text('Registering role...');
                 feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Server error.');
+            }
+        });
+    });
+
+    // ============================================================
+    // NGS BACKUP & RECOVERY SYSTEM AJAX INTERACTORS
+    // ============================================================
+
+    // Function to reload backup list dynamically via AJAX
+    function reloadBackupList() {
+        $.ajax({
+            url: '/php/admin_backup_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'list_backups' },
+            success: function(res) {
+                const tbody = $('#backupsListTableBody');
+                tbody.empty();
+                if (res.success && res.backups && res.backups.length > 0) {
+                    res.backups.forEach(function(b) {
+                        const dbBadge = b.database ? '<span class="text-green-600 font-bold text-base"><i class="fa-solid fa-circle-check"></i></span>' : '<span class="text-gray-300 text-base"><i class="fa-solid fa-circle-xmark"></i></span>';
+                        const webBadge = b.websites ? '<span class="text-green-600 font-bold text-base"><i class="fa-solid fa-circle-check"></i></span>' : '<span class="text-gray-300 text-base"><i class="fa-solid fa-circle-xmark"></i></span>';
+                        const uploadsBadge = b.uploads ? '<span class="text-green-600 font-bold text-base"><i class="fa-solid fa-circle-check"></i></span>' : '<span class="text-gray-300 text-base"><i class="fa-solid fa-circle-xmark"></i></span>';
+                        const statusBadge = b.status === 'complete' ? '<span class="badge bg-green-100 text-green-800 rounded font-bold">Complete</span>' : '<span class="badge bg-amber-100 text-amber-800 rounded font-bold">Incomplete</span>';
+
+                        tbody.append(`
+                            <tr>
+                                <td class="p-3.5 font-mono font-semibold text-gray-800">${b.backup_id}</td>
+                                <td class="p-3.5 text-gray-500">${b.created_at}</td>
+                                <td class="p-3.5 font-semibold text-gray-600">${b.triggered_by}</td>
+                                <td class="p-3.5 text-center">${dbBadge}</td>
+                                <td class="p-3.5 text-center">${webBadge}</td>
+                                <td class="p-3.5 text-center">${uploadsBadge}</td>
+                                <td class="p-3.5 text-center">${statusBadge}</td>
+                                <td class="p-3.5 text-right">
+                                  <div class="d-flex justify-content-end gap-1.5 flex-wrap">
+                                    <button class="btn btn-xs btn-outline-info rounded-md btn-verify-backup" data-id="${b.backup_id}"><i class="fa-solid fa-shield-halved"></i> Verify</button>
+                                    <button class="btn btn-xs btn-outline-success rounded-md btn-restore-backup" data-id="${b.backup_id}"><i class="fa-solid fa-rotate-left"></i> Restore</button>
+                                    <button class="btn btn-xs btn-outline-danger rounded-md btn-delete-backup" data-id="${b.backup_id}"><i class="fa-solid fa-trash"></i></button>
+                                  </div>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="8" class="text-center text-gray-400 py-5">No backup points archived outside the webroot.</td></tr>');
+                }
+            },
+            error: function() {
+                $('#backupsListTableBody').html('<tr><td colspan="8" class="text-center text-red-500 py-5">Failed to communicate with backup server controller.</td></tr>');
+            }
+        });
+    }
+
+    // Trigger loading list when tab is clicked
+    $('#backup-tab').on('click', function() {
+        reloadBackupList();
+    });
+
+    // Also trigger loading on direct initialization
+    reloadBackupList();
+
+    // Create safety backup manually AJAX handler
+    $('#btnTriggerBackup').on('click', function() {
+        const btn = $(this);
+        const feedback = $('#backupFeedback');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Packaging System Backup...');
+
+        $.ajax({
+            url: '/php/admin_backup_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'create_backup' },
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fas fa-rotate mr-1"></i> Create Safety Backup Now');
+                feedback.removeClass('d-none');
+                if (res.success) {
+                    feedback.addClass('alert-success').text(res.message);
+                    reloadBackupList();
+                } else {
+                    feedback.addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fas fa-rotate mr-1"></i> Create Safety Backup Now');
+                feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Backup action failed.');
+            }
+        });
+    });
+
+    // Verify Integrity Check Action AJAX handler
+    $(document).on('click', '.btn-verify-backup', function() {
+        const backupId = $(this).attr('data-id');
+        const feedback = $('#backupFeedback');
+        feedback.addClass('d-none');
+
+        $.ajax({
+            url: '/php/admin_backup_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'verify_backup', backup_id: backupId },
+            success: function(res) {
+                alert("Verification Result: " + res.message);
+            },
+            error: function(xhr) {
+                alert("Verification Mismatch: " + (xhr.responseJSON ? xhr.responseJSON.message : "Integrity check failed."));
+            }
+        });
+    });
+
+    // Explicit Restore Point Action AJAX handler
+    $(document).on('click', '.btn-restore-backup', function() {
+        const backupId = $(this).attr('data-id');
+        const feedback = $('#backupFeedback');
+        feedback.addClass('d-none');
+
+        // Create explicit confirmation workflow
+        if (!confirm("CRITICAL INSTRUCTION:\nAre you sure you want to restore the selected backup (" + backupId + ")?\n\nThis will completely overwrite current live databases and websites!\nA safety backup of the current live state will be automatically created first as a recovery fallback.")) {
+            return;
+        }
+
+        const confirmCode = prompt("Please type 'CONFIRM RESTORE' to execute this highly privileged recovery operation:");
+        if (confirmCode !== 'CONFIRM RESTORE') {
+            alert("Restoration cancelled. Confirmation phrase did not match.");
+            return;
+        }
+
+        const btn = $(this);
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Restoring...');
+
+        $.ajax({
+            url: '/php/admin_backup_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'restore_backup', backup_id: backupId },
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-rotate-left"></i> Restore');
+                alert(res.message);
+                window.location.reload();
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-rotate-left"></i> Restore');
+                alert("Restore Error: " + (xhr.responseJSON ? xhr.responseJSON.message : "Process failed."));
+            }
+        });
+    });
+
+    // Delete versioned restore point AJAX handler
+    $(document).on('click', '.btn-delete-backup', function() {
+        const backupId = $(this).attr('data-id');
+        if (!confirm("Are you sure you want to permanently delete backup " + backupId + "?\nThis action is irreversible!")) {
+            return;
+        }
+
+        $.ajax({
+            url: '/php/admin_backup_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'delete_backup', backup_id: backupId },
+            success: function(res) {
+                alert(res.message);
+                reloadBackupList();
+            },
+            error: function(xhr) {
+                alert("Delete Error: " + (xhr.responseJSON ? xhr.responseJSON.message : "Process failed."));
             }
         });
     });

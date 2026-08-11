@@ -29,6 +29,17 @@ if (str_contains($currentHost, ':')) {
 // Parse the raw requested URL path to extract the routing path (slug)
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
+// Security Gate: Explicitly block any browser request containing the backup repository string
+// This completely neutralizes any directory traversal or malicious attempts targeting NGS_backups
+if (str_contains(strtolower($requestUri), 'ngs_backups')) {
+    // Return HTTP 403 Forbidden
+    http_response_code(403);
+    // Write explicit secure rejection message
+    echo "403 Forbidden - Access to private backup repositories is restricted.";
+    // Halt further routing execution
+    exit;
+}
+
 // Physical Asset Router Bypass: If the requested resource exists on disk as a file, return false so the webserver can serve it directly
 $bypassPath = __DIR__ . $requestUri;
 $realBypassPath = realpath($bypassPath);

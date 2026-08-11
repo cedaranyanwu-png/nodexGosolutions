@@ -144,6 +144,26 @@ if ($permissionsCount === 0) {
     }
 }
 
+// Ensure the new granular backup permissions exist in the dynamic database
+// This ensures backward compatibility for pre-existing installations
+$backupPerms = ['backups.view', 'backups.create', 'backups.verify', 'backups.restore', 'backups.delete'];
+// Loop through each required backup permission
+foreach ($backupPerms as $perm) {
+    // Check if the permission is already mapped for the admin role
+    $hasPerm = $conn->selectOne('permissions', ['role' => 'admin', 'permission' => $perm]);
+    // If not, insert it securely
+    if (!$hasPerm) {
+        $conn->insert('permissions', ['role' => 'admin', 'permission' => $perm, 'is_allowed' => 1]);
+    }
+}
+
+// Require the central BackupManager class module
+require_once __DIR__ . '/BackupManager.php';
+// Instantiate the BackupManager service
+$backupManager = new BackupManager();
+// Automatically initialize the NGS Backups private folder structure on bootstrap
+$backupManager->ensureBackupDirectory();
+
 /**
  * Configure secure and isolated session properties.
  */
