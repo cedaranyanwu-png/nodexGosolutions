@@ -1,0 +1,90 @@
+[Tue Aug 11 16:57:16 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug 11 17:02:56 2026] [::1]:50934 Accepted
+[Tue Aug 11 17:02:56 2026] [::1]:50934 Closing
+[Tue Aug 11 17:02:56 2026] [::1]:50944 Accepted
+[Tue Aug 11 17:02:56 2026] [::1]:50944 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 17:02:56 2026] [::1]:50944 Closing
+[Tue Aug 11 17:02:58 2026] [::1]:50958 Accepted
+[Tue Aug 11 17:02:58 2026] [::1]:50958 [200]: POST /php/login.php
+[Tue Aug 11 17:02:58 2026] [::1]:50958 Closing
+[Tue Aug 11 17:02:59 2026] [::1]:50966 Accepted
+[Tue Aug 11 17:02:59 2026] [::1]:50966 Closing
+[Tue Aug 11 17:03:00 2026] [::1]:59568 Accepted
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
+[Tue Aug 11 17:03:00 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
+[Tue Aug 11 17:03:00 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
+[Tue Aug 11 17:03:00 2026] [::1]:59568 [200]: POST /php/admin_backup_action.php
+[Tue Aug 11 17:03:00 2026] [::1]:59568 Closing
+[Tue Aug 11 19:58:57 2026] [::1]:55954 Accepted
+[Tue Aug 11 19:58:57 2026] [::1]:55954 Closing
+[Tue Aug 11 19:58:57 2026] [::1]:55966 Accepted
+[Tue Aug 11 19:58:57 2026] [::1]:55966 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 19:58:57 2026] [::1]:55966 Closing
+[Tue Aug 11 20:01:42 2026] [::1]:55954 Accepted
+[Tue Aug 11 20:01:42 2026] [::1]:55954 Closing
+[Tue Aug 11 20:01:42 2026] [::1]:55962 Accepted
+[Tue Aug 11 20:01:42 2026] [::1]:55962 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:01:42 2026] [::1]:55962 Closing
+[Tue Aug 11 20:01:45 2026] [::1]:55966 Accepted
+sh: 1: /usr/sbin/sendmail: not found
+[Tue Aug 11 20:01:45 2026] [::1]:55966 [200]: POST /php/register.php
+[Tue Aug 11 20:01:45 2026] [::1]:55966 Closing
+[Tue Aug 11 20:01:48 2026] [::1]:55980 Accepted
+[Tue Aug 11 20:01:48 2026] [::1]:55980 Closing
+[Tue Aug 11 20:01:48 2026] [::1]:55994 Accepted
+[Tue Aug 11 20:01:48 2026] [::1]:55994 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:01:48 2026] [::1]:55994 Closing
+[Tue Aug 11 20:04:28 2026] [::1]:48728 Accepted
+[Tue Aug 11 20:04:28 2026] [::1]:48728 Closing
+[Tue Aug 11 20:04:28 2026] [::1]:48740 Accepted
+[Tue Aug 11 20:04:28 2026] [::1]:48740 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:04:28 2026] [::1]:48740 Closing
+[Tue Aug 11 20:04:31 2026] [::1]:52038 Accepted
+sh: 1: /usr/sbin/sendmail: not found
+[Tue Aug 11 20:04:31 2026] [::1]:52038 [200]: POST /php/register.php
+[Tue Aug 11 20:04:31 2026] [::1]:52038 Closing
+[Tue Aug 11 20:04:34 2026] [::1]:52048 Accepted
+[Tue Aug 11 20:04:34 2026] [::1]:52048 Closing
+[Tue Aug 11 20:04:34 2026] [::1]:52058 Accepted
+[Tue Aug 11 20:04:34 2026] [::1]:52058 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:04:34 2026] [::1]:52058 Closing
+[Tue Aug 11 20:04:36 2026] [::1]:52066 Accepted
+[Tue Aug 11 20:04:36 2026] [::1]:52066 [403]: POST /php/login.php
+[Tue Aug 11 20:04:36 2026] [::1]:52066 Closing
+[Tue Aug 11 20:04:38 2026] [::1]:52072 Accepted
+[Tue Aug 11 20:04:38 2026] [::1]:52072 Closing
+[Tue Aug 11 20:04:38 2026] [::1]:52082 Accepted
+[Tue Aug 11 20:04:38 2026] [::1]:52082 Closing
+[Tue Aug 11 20:04:38 2026] [::1]:52088 Accepted
+[Tue Aug 11 20:04:38 2026] [::1]:52088 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:04:38 2026] [::1]:52088 Closing
+[Tue Aug 11 20:04:40 2026] [::1]:54050 Accepted
+[Tue Aug 11 20:04:40 2026] [::1]:54050 Closing
+[Tue Aug 11 20:04:40 2026] [::1]:54064 Accepted
+[Tue Aug 11 20:04:40 2026] [::1]:54064 [200]: GET /css/style.css?v=1786398433
+[Tue Aug 11 20:04:40 2026] [::1]:54064 Closing
+[Tue Aug 11 20:04:42 2026] [::1]:54066 Accepted
+[Tue Aug 11 20:04:42 2026] [::1]:54066 [200]: POST /php/login.php
+[Tue Aug 11 20:04:42 2026] [::1]:54066 Closing
+[Tue Aug 11 20:04:43 2026] [::1]:54072 Accepted
+[Tue Aug 11 20:04:43 2026] [::1]:54072 Closing
+[Tue Aug 11 20:04:44 2026] [::1]:54086 Accepted
+[Tue Aug 11 20:04:44 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
+[Tue Aug 11 20:04:44 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
+[Tue Aug 11 20:04:44 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
+[Tue Aug 11 20:04:44 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
+[Tue Aug 11 20:04:44 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
+[Tue Aug 11 20:04:44 2026] [::1]:54086 [200]: POST /php/admin_backup_action.php
+[Tue Aug 11 20:04:44 2026] [::1]:54086 Closing
+[Tue Aug 11 20:04:44 2026] [::1]:54102 Accepted
+[Tue Aug 11 20:04:44 2026] [::1]:54102 Closing
+[Tue Aug 11 20:04:45 2026] [::1]:54110 Accepted
+[Tue Aug 11 20:04:45 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 172
+[Tue Aug 11 20:04:45 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 174
+[Tue Aug 11 20:04:45 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 176
+[Tue Aug 11 20:04:45 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 178
+[Tue Aug 11 20:04:45 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 187
+[Tue Aug 11 20:04:45 2026] [::1]:54110 [200]: POST /php/admin_backup_action.php
+[Tue Aug 11 20:04:45 2026] [::1]:54110 Closing
