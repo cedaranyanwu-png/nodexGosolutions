@@ -15,6 +15,14 @@
 // Enable strict typing for better code quality and fewer bugs
 declare(strict_types=1);
 
+// If running with the PHP built-in web server and the file exists, serve it directly
+if (php_sapi_name() === 'cli-server') {
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($path !== null && file_exists(__DIR__ . $path) && is_file(__DIR__ . $path)) {
+        return false;
+    }
+}
+
 // Include the TenantManager class file
 // We use require_once to ensure the class is loaded exactly once
 require_once __DIR__ . '/TenantManager.php';

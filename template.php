@@ -18,6 +18,13 @@ if (!isset($tenant)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Use the tenant's name as the page title -->
     <title><?php echo htmlspecialchars($tenant['name']); ?> | NodeX Multi-Tenant</title>
+    <?php
+    // If this is the main website (Tenant ID 1: nodexgosolutions.com), add the company favicon reference.
+    if (isset($tenant['id']) && $tenant['id'] === 1) {
+        // Output standard favicon with cache-busting parameter
+        echo '    <link rel="icon" type="image/png" href="/assets/images/favicon.png?v=1">' . PHP_EOL;
+    }
+    ?>
     <style>
         /* Base styles for the layout */
         body {
