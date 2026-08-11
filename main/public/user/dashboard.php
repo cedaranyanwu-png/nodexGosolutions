@@ -64,6 +64,70 @@ $conn->createTable('websites');
 $myWebsites = $conn->select('websites', ['user_id' => $user['id']]) ?: [];
 $websitesCount = count($myWebsites);
 
+// Dynamic storage directory calculator helper
+function getDirectorySize(string $path): int {
+    $totalSize = 0;
+    if (!is_dir($path)) {
+        return 0;
+    }
+    $files = @scandir($path);
+    if ($files === false) {
+        return 0;
+    }
+    foreach ($files as $file) {
+        if ($file !== '.' && $file !== '..') {
+            $filePath = $path . '/' . $file;
+            if (is_dir($filePath)) {
+                $totalSize += getDirectorySize($filePath);
+            } else {
+                $totalSize += (int)filesize($filePath);
+            }
+        }
+    }
+    return $totalSize;
+}
+
+function formatBytes(int $bytes): string {
+    if ($bytes < 1024) {
+        return $bytes . ' B';
+    } elseif ($bytes < 1048576) {
+        return round($bytes / 1024, 2) . ' KB';
+    } elseif ($bytes < 1073741824) {
+        return round($bytes / 1048576, 2) . ' MB';
+    } else {
+        return round($bytes / 1073741824, 2) . ' GB';
+    }
+}
+
+// Calculate user actual workspace storage size
+$totalBytes = 0;
+$publicDir = __DIR__ . '/../../../public';
+foreach ($myWebsites as $web) {
+    $wSub = $web['subdomain'] ?? '';
+    if (!empty($wSub)) {
+        $tenantPath = $publicDir . '/' . $wSub;
+        if (is_dir($tenantPath)) {
+            $totalBytes += getDirectorySize($tenantPath);
+        }
+    }
+}
+$formattedStorage = formatBytes($totalBytes);
+
+// Calculate user dynamic website traffic visits sum
+$userTraffic = 0;
+$conn->createTable('traffic');
+$trafficRecords = $conn->select('traffic') ?: [];
+foreach ($trafficRecords as $tRecord) {
+    $tWebId = $tRecord['website_id'] ?? '';
+    foreach ($myWebsites as $web) {
+        if ((string)($web['id'] ?? '') === (string)$tWebId) {
+            $userTraffic += (int)($tRecord['visits'] ?? 0);
+            break;
+        }
+    }
+}
+$formattedTraffic = number_format($userTraffic) . ' Visits';
+
 // Fetch dynamic active pricing plans from database
 $conn->createTable('plans');
 $dbPlans = $conn->select('plans', ['is_active' => 1]) ?: [];
@@ -221,7 +285,7 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
         <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-4 d-flex align-items-center justify-content-between hover-translate">
           <div>
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Storage</span>
-            <span class="text-2xl font-extrabold text-gray-800 d-block">1.2 GB</span>
+            <span class="text-2xl font-extrabold text-gray-800 d-block"><?php echo $formattedStorage; ?></span>
           </div>
           <div class="w-12 h-12 bg-info bg-opacity-10 text-info rounded-xl d-flex align-items-center justify-content-center text-xl">
             <i class="fas fa-hdd"></i>
@@ -234,7 +298,7 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
         <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-4 d-flex align-items-center justify-content-between hover-translate">
           <div>
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Traffic</span>
-            <span class="text-2xl font-extrabold text-gray-800 d-block">12.4 GB</span>
+            <span class="text-2xl font-extrabold text-gray-800 d-block"><?php echo $formattedTraffic; ?></span>
           </div>
           <div class="w-12 h-12 bg-purple-500 bg-opacity-10 text-purple-600 rounded-xl d-flex align-items-center justify-content-center text-xl">
             <i class="fas fa-chart-line"></i>
@@ -524,6 +588,156 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
                     </div>
                   </div>
 
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DYNAMIC WEBSITE-SPECIFIC ANALYTICS SECTION -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="card border-0 shadow-sm rounded-xl">
+                <div class="card-header bg-white border-b border-gray-100 py-3">
+                  <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                    <i class="fas fa-chart-simple text-primary mr-2"></i> My Websites Real-Time Analytics
+                  </h3>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-xs">
+                      <thead class="bg-gray-50 text-gray-500 font-bold">
+                        <tr>
+                          <th class="p-3.5">Website Domain</th>
+                          <th class="p-3.5 text-center">Visits / Traffic</th>
+                          <th class="p-3.5 text-center">Unique Visitors</th>
+                          <th class="p-3.5 text-center">Page Views</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100">
+                        <?php if ($websitesCount > 0): ?>
+                          <?php foreach ($myWebsites as $web):
+                            // Fetch traffic row matching this website ID
+                            $conn->createTable('traffic');
+                            $tRow = $conn->selectOne('traffic', ['website_id' => $web['id']]);
+                            $visits = (int)($tRow['visits'] ?? 0);
+                            $visitors = (int)($tRow['visitors'] ?? 0);
+                            $pageViews = (int)($tRow['page_views'] ?? 0);
+                          ?>
+                            <tr>
+                              <td class="p-3.5 font-semibold text-gray-800"><?php echo htmlspecialchars((string)($web['name'] ?? '')); ?> (<?php echo htmlspecialchars((string)($web['subdomain'] ?? '')); ?>)</td>
+                              <td class="p-3.5 text-center font-bold text-blue-600"><?php echo number_format($visits); ?></td>
+                              <td class="p-3.5 text-center font-semibold text-gray-700"><?php echo number_format($visitors); ?></td>
+                              <td class="p-3.5 text-center text-gray-500"><?php echo number_format($pageViews); ?></td>
+                            </tr>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <tr>
+                            <td colspan="4" class="text-center text-gray-400 py-4">No website analytics available. Provision a subdomain to start tracking traffic metrics.</td>
+                          </tr>
+                        <?php endif; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- USER PAYMENT HISTORY AND ACTIVITY LOGS -->
+          <div class="row mb-4">
+            <!-- Col 1: Payment History Ledger -->
+            <div class="col-lg-6 mb-3">
+              <div class="card border-0 shadow-sm rounded-xl">
+                <div class="card-header bg-white border-b border-gray-100 py-3">
+                  <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-receipt text-emerald-600 mr-2"></i> My Payments & Invoice History</h3>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-xs">
+                      <thead class="bg-gray-50 text-gray-500 font-bold">
+                        <tr>
+                          <th class="p-3">Reference / Tx ID</th>
+                          <th class="p-3">Plan / Amount</th>
+                          <th class="p-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $conn->createTable('payments');
+                        $myPayments = $conn->select('payments', ['user_id' => $user['id']]) ?: [];
+                        if (count($myPayments) > 0):
+                          foreach (array_reverse($myPayments) as $p):
+                            $pStatus = strtolower((string)($p['status'] ?? ''));
+                        ?>
+                            <tr>
+                              <td class="p-3 font-mono text-gray-600"><?php echo htmlspecialchars((string)($p['tx_ref'] ?? '')); ?></td>
+                              <td class="p-3">
+                                <span class="block font-bold text-gray-800"><?php echo htmlspecialchars((string)($p['plan_name'] ?? '')); ?></span>
+                                <span class="block text-blue-600 font-semibold"><?php echo htmlspecialchars((string)($p['currency'] ?? 'NGN')) . ' ' . number_format((float)($p['amount'] ?? 0.0)); ?></span>
+                              </td>
+                              <td class="p-3">
+                                <?php if ($pStatus === 'successful'): ?>
+                                  <span class="badge bg-success bg-opacity-10 text-success rounded-full font-bold px-2 py-0.5" style="font-size: 9px;">Successful</span>
+                                <?php elseif ($pStatus === 'pending'): ?>
+                                  <span class="badge bg-warning bg-opacity-10 text-warning rounded-full font-bold px-2 py-0.5" style="font-size: 9px;">Pending</span>
+                                <?php else: ?>
+                                  <span class="badge bg-danger bg-opacity-10 text-danger rounded-full font-bold px-2 py-0.5" style="font-size: 9px;">Failed</span>
+                                <?php endif; ?>
+                              </td>
+                            </tr>
+                        <?php
+                          endforeach;
+                        else:
+                        ?>
+                          <tr>
+                            <td colspan="3" class="text-center text-gray-400 py-4">No payment receipts registered yet.</td>
+                          </tr>
+                        <?php endif; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Col 2: Recent Activity Logs -->
+            <div class="col-lg-6 mb-3">
+              <div class="card border-0 shadow-sm rounded-xl">
+                <div class="card-header bg-white border-b border-gray-100 py-3">
+                  <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-rectangle-list text-primary mr-2"></i> My Recent Activity Logs</h3>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-xs">
+                      <thead class="bg-gray-50 text-gray-500 font-bold">
+                        <tr>
+                          <th class="p-3">Operational Event</th>
+                          <th class="p-3">Details / Audit Log</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $conn->createTable('activity_logs');
+                        // Filter activities by the currently authenticated user's email only
+                        $myActivities = $conn->select('activity_logs', ['email' => $user['email']]) ?: [];
+                        if (count($myActivities) > 0):
+                          foreach (array_reverse($myActivities) as $act):
+                        ?>
+                            <tr>
+                              <td class="p-3"><span class="badge bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 px-2 py-0.5 rounded"><?php echo strtoupper(str_replace('_', ' ', (string)($act['action'] ?? ''))); ?></span></td>
+                              <td class="p-3 text-gray-600"><?php echo htmlspecialchars((string)($act['details'] ?? '')); ?></td>
+                            </tr>
+                        <?php
+                          endforeach;
+                        else:
+                        ?>
+                          <tr>
+                            <td colspan="2" class="text-center text-gray-400 py-4">No recent activity logs recorded.</td>
+                          </tr>
+                        <?php endif; ?>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

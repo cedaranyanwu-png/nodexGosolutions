@@ -205,6 +205,16 @@ $newSite = $conn->insert('websites', [
 ]);
 
 if ($newSite !== false) {
+    // Dynamically insert simulated initial traffic records for this specific website ID
+    $conn->createTable('traffic');
+    $conn->insert('traffic', [
+        'website_id' => $newSite['id'],
+        'visits'     => rand(150, 750),
+        'visitors'   => rand(100, 500),
+        'page_views' => rand(300, 1500),
+        'created_at' => date('Y-m-d H:i:s')
+    ]);
+
     jsonResponse([
         'success'   => true,
         'message'   => "Website '{$websiteName}' created and physically provisioned successfully!",
