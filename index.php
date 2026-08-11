@@ -123,23 +123,47 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
     // Initialize the CMS Database to query custom-created pages from JSON databases
     $cmsDb = new Database(__DIR__ . '/databases', 'site_cms');
 
-    // Attempt to locate a custom page matching the slug from pages.json
-    $cmsPage = $cmsDb->selectOne('pages', ['slug' => $normalizedSlug]);
+    // Instantiate session if none exists to resolve visitor session state
+    if (session_status() === PHP_SESSION_NONE) {
+        session_name('NODX_SESSION');
+        @session_start();
+    }
+
+    // Isolate active visitor tenant identification to support page collision resolutions
+    $visitorTenantId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+    $cmsPage = null;
+
+    if ($visitorTenantId !== null) {
+        // Prioritize custom slug layout matching active logged-in tenant ID
+        $cmsPage = $cmsDb->selectOne('pages', ['slug' => $normalizedSlug, 'user_id' => $visitorTenantId]);
+    }
+
+    if ($cmsPage === null) {
+        // Fall back to matching admin system-wide custom page overrides (user_id = 0)
+        $cmsPage = $cmsDb->selectOne('pages', ['slug' => $normalizedSlug, 'user_id' => 0]);
+    }
 
     // If a custom CMS page was found and has active custom code, render its custom code payload
     if ($cmsPage !== null && !empty($cmsPage['body_code'])) {
-        /**
-         * Helper to evaluate raw user PHP/HTML code within isolated variables context.
-         *
-         * @param string $code Raw markup or PHP script context.
-         * @param array $context Context variables array to extract.
-         */
-        function renderCmsPayload(string $code, array $context = []): void {
-            // Extract keys as variables
-            extract($context);
-            // Evaluate raw PHP codes or print direct HTML structures safely
-            eval('?>' . $code);
-        }
+        // Retrieve owner details or roles
+        $pageUserId = (int)($cmsPage['user_id'] ?? 0);
+        $isAdminPage = ($pageUserId === 0);
+
+        // Define a closure-local safe renderer to satisfy scope & sandboxing requirements
+        $renderPayload = function(string $code, bool $isCodeFirstAdmin, array $context = []) use ($cmsDb) {
+            if ($isCodeFirstAdmin) {
+                // Administrators are trusted; execute with isolated variable context
+                extract($context);
+                eval('?>' . $code);
+            } else {
+                // Standard tenants are sandbox restricted: strip PHP tags to prevent RCE/eval hazards
+                $sanitized = preg_replace('/<\?php(.*?)\?>/is', '', $code);
+                $sanitized = preg_replace('/<\?(.*?)\?>/is', '', $sanitized);
+                // Print safe HTML/CSS payload directly
+                echo $sanitized;
+            }
+        };
+
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -147,12 +171,12 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title><?php echo htmlspecialchars($cmsPage['title'] ?? 'CMS Page'); ?></title>
-            <?php // Render head tags payload
-            renderCmsPayload($cmsPage['head_code'] ?? '', ['db' => $cmsDb, 'page' => $cmsPage]); ?>
+            <?php // Render head tags payload with sandboxed logic
+            $renderPayload($cmsPage['head_code'] ?? '', $isAdminPage, ['db' => $cmsDb, 'page' => $cmsPage]); ?>
         </head>
         <body>
-            <?php // Render body content payload
-            renderCmsPayload($cmsPage['body_code'] ?? '', ['db' => $cmsDb, 'page' => $cmsPage]); ?>
+            <?php // Render body content payload with sandboxed logic
+            $renderPayload($cmsPage['body_code'] ?? '', $isAdminPage, ['db' => $cmsDb, 'page' => $cmsPage]); ?>
         </body>
         </html>
         <?php

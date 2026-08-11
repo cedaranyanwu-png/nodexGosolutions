@@ -10,6 +10,7 @@
  * - Restricts workspace access dynamically if trial is expired, prompting plan selection.
  * - App Launcher (Google Dots Menu) and Bottom Right Floating Action Button (FAB).
  * - Dynamic "My Websites" creation and manager backed by custom JSON database table.
+ * - Unified Tenant Code-First CMS Panel allowing users to publish custom routed layout pages.
  * - Interactive Workspace Database Manager for custom user-created JSON table schemas.
  * - Clean, fully responsive White & Blue design.
  * - All code contains line-by-line comments for readability and scale.
@@ -97,6 +98,11 @@ $websitesCount = count($myWebsites);
 
 // Load system databases to fetch general platform analytics
 $siteCmsDb = new Database(__DIR__ . '/../../../databases', 'site_cms');
+$siteCmsDb->createTable('pages');
+
+// Retrieve custom CMS pages published by this specific tenant
+$myCmsPages = $siteCmsDb->select('pages', ['user_id' => $user['id']]) ?: [];
+
 $urlDb     = new Database(__DIR__ . '/../../../databases', 'url_shortner');
 $qrDb      = new Database(__DIR__ . '/../../../databases', 'qrcode');
 
@@ -228,6 +234,23 @@ if (empty($newsStories)) {
       width: 100%;
       height: 100%;
       border: none;
+    }
+    .code-editor-textarea {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 13px;
+      background-color: #0f172a;
+      color: #38bdf8;
+      border: 1px solid rgba(0, 114, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px;
+      resize: vertical;
+    }
+    .code-editor-textarea:focus {
+      background-color: #0b0f19;
+      border-color: #0072ff;
+      outline: none;
+      box-shadow: 0 0 12px rgba(0, 114, 255, 0.15);
+      color: #38bdf8;
     }
   </style>
 </head>
@@ -464,6 +487,68 @@ if (empty($newsStories)) {
                       </li>
                     <?php endforeach; ?>
                   </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UNIFIED CODE-FIRST CMS EDITOR PANEL FOR TENANTS -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="card border-0 shadow-sm rounded-xl">
+                <div class="card-header bg-white border-b border-gray-100 py-3 d-flex justify-content-between align-items-center">
+                  <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                    <i class="fas fa-code text-primary mr-2"></i> Custom CMS Slugs Page Builder
+                  </h3>
+                  <button class="btn btn-primary btn-sm rounded-md font-bold px-3 py-1.5" id="btnCreateCmsPage"><i class="fas fa-plus mr-1"></i> Create Custom Slug</button>
+                </div>
+                <div class="card-body p-4">
+                  <div class="row g-4">
+                    <!-- CMS Pages Directory Sidebar -->
+                    <div class="col-md-4 border-r border-gray-100 pr-4">
+                      <label class="block text-2xs uppercase font-bold text-gray-500 mb-2" style="font-size: 10px;">Published CMS Pages</label>
+                      <div class="list-group list-group-flush pl-0 mb-0" id="cmsPagesListGroup">
+                        <?php if (count($myCmsPages) > 0): ?>
+                          <?php foreach ($myCmsPages as $p):
+                            $pSlug = htmlspecialchars($p['slug'] ?? '');
+                          ?>
+                            <button class="list-group-item list-group-item-action py-2 px-3 fw-bold btn-select-cms-slug text-dark text-start border border-gray-100 rounded-md mb-2" data-slug="<?php echo $pSlug; ?>">
+                              <i class="fa-solid fa-file-code me-2 text-primary"></i><?php echo $pSlug; ?>
+                            </button>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <div class="text-center text-gray-400 py-4 text-xs">No CMS pages published yet. Click "Create Custom Slug" to start.</div>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+
+                    <!-- Editor Console Form -->
+                    <div class="col-md-8">
+                      <div id="cmsSaveFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+                      <form id="cmsUserEditorForm">
+                        <div class="mb-3 text-start">
+                          <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Endpoint Slug</label>
+                          <input type="text" id="cmsUserSlug" class="form-control text-sm rounded-md px-3 py-2 border-gray-200 w-full" placeholder="e.g. about-us, my-app, bio" required />
+                          <div class="form-text text-muted small" style="font-size: 10px;">Accessible directly at http://localhost:8000/slug</div>
+                        </div>
+                        <div class="mb-3 text-start">
+                          <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Page Title Metadata</label>
+                          <input type="text" id="cmsUserTitle" class="form-control text-sm rounded-md px-3 py-2 border-gray-200 w-full" placeholder="Enter browser tab title..." />
+                        </div>
+                        <div class="mb-3 text-start">
+                          <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Custom Head Codes & Link Tags</label>
+                          <textarea id="cmsUserHead" class="form-control code-editor-textarea w-full" rows="3" placeholder="<!-- Inject link tags, stylesheets, metadata tags here -->"></textarea>
+                        </div>
+                        <div class="mb-3 text-start">
+                          <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Custom Body Markup & Executable PHP Code</label>
+                          <textarea id="cmsUserBody" class="form-control code-editor-textarea w-full" style="min-height: 250px;" placeholder="<!-- Enter custom HTML/CSS and standard PHP code blocks -->"></textarea>
+                        </div>
+                        <button type="submit" id="btnPublishCmsUser" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full transition border-0">
+                          Publish Page Layout
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -810,7 +895,72 @@ if (empty($newsStories)) {
 <script>
 $(document).ready(function() {
 
-    // 1. Handle secure payment simulation via AJAX to process_payment.php
+    // 1. Dynamic CMS Slugs Selection and Load in Dashboard
+    let cmsPagesDb = <?php echo json_encode($myCmsPages); ?>;
+
+    $(document).on('click', '.btn-select-cms-slug', function() {
+        const slug = $(this).attr('data-slug');
+        $('.btn-select-cms-slug').removeClass('active bg-primary text-white');
+        $(this).addClass('active bg-primary text-white');
+
+        const page = cmsPagesDb.find(p => p.slug === slug);
+        if (page) {
+            $('#cmsUserSlug').val(page.slug).prop('readonly', true);
+            $('#cmsUserTitle').val(page.title || '');
+            $('#cmsUserHead').val(page.head_code || '');
+            $('#cmsUserBody').val(page.body_code || '');
+        }
+    });
+
+    $('#btnCreateCmsPage').on('click', function() {
+        $('.btn-select-cms-slug').removeClass('active bg-primary text-white');
+        $('#cmsUserSlug').val('').prop('readonly', false).focus();
+        $('#cmsUserTitle').val('');
+        $('#cmsUserHead').val('');
+        $('#cmsUserBody').val('<!-- Enter custom HTML or executable PHP code tags here -->');
+    });
+
+    // Handle CMS Page Publishing via AJAX to /cms/save_page
+    $('#cmsUserEditorForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#cmsSaveFeedback');
+        const btn = $('#btnPublishCmsUser');
+
+        btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Publishing Layout...');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+
+        $.ajax({
+            url: '/cms/save_page',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                slug: $('#cmsUserSlug').val(),
+                title: $('#cmsUserTitle').val(),
+                head_code: $('#cmsUserHead').val(),
+                body_code: $('#cmsUserBody').val()
+            },
+            success: function(res) {
+                btn.prop('disabled', false).html('Publish Page Layout');
+                feedback.removeClass('d-none');
+
+                if (res.success) {
+                    feedback.addClass('alert-success').text(res.message);
+                    // Schedule reload to update lists
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    feedback.addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).html('Publish Page Layout');
+                feedback.removeClass('d-none').addClass('alert-danger').text('Failed to publish custom layout page.');
+            }
+        });
+    });
+
+    // 2. Handle secure payment simulation via AJAX to process_payment.php
     $('.btn-process-payment').on('click', function() {
         const selectedPlan = $(this).attr('data-plan-name');
         const feedback = $('#paymentFeedback');
@@ -840,7 +990,7 @@ $(document).ready(function() {
         });
     });
 
-    // 2. Handle Website creation form submission
+    // 3. Handle Website creation form submission
     $('#createWebsiteForm').on('submit', function(e) {
         e.preventDefault();
         const feedback = $('#websiteFeedback');
@@ -872,7 +1022,7 @@ $(document).ready(function() {
         });
     });
 
-    // 3. Dynamic App Loading into Dashboard Iframe Modal
+    // 4. Dynamic App Loading into Dashboard Iframe Modal
     $(document).on('click', '.btn-app-trigger', function() {
         const appUrl = $(this).attr('data-app-url');
         if (!appUrl) return;
@@ -904,7 +1054,7 @@ $(document).ready(function() {
         });
     }
 
-    // 4. Fetch schemas list dynamically
+    // 5. Fetch schemas list dynamically
     function loadTablesList() {
         if ($('#activeTableSelect').length === 0) return;
         $.ajax({
@@ -928,7 +1078,7 @@ $(document).ready(function() {
 
     loadTablesList();
 
-    // 5. Create Custom Table Schema
+    // 6. Create Custom Table Schema
     $('#btnCreateTable').on('click', function() {
         const tableName = $('#newTableName').val().trim();
         if (!tableName) {
@@ -952,7 +1102,7 @@ $(document).ready(function() {
         });
     });
 
-    // 6. Load & Render Custom Rows
+    // 7. Load & Render Custom Rows
     function loadTableRows(tableName) {
         if (!tableName) {
             $('#tableDisplayPanel').addClass('hidden');
@@ -1015,7 +1165,7 @@ $(document).ready(function() {
         loadTableRows($(this).val());
     });
 
-    // 7. Purge Table Schema
+    // 8. Purge Table Schema
     $('#btnDropTable').on('click', function() {
         const tableName = $('#activeTableSelect').val();
         if (!tableName) {
@@ -1041,7 +1191,7 @@ $(document).ready(function() {
         });
     });
 
-    // 8. Dynamic Input Fields inside Insertion Modal
+    // 9. Dynamic Input Fields inside Insertion Modal
     $('#btnAddColumnInput').on('click', function() {
         $('#modalColumnsContainer').append(`
             <div class="row g-2 mb-2 column-input-row d-flex gap-2">
@@ -1055,7 +1205,7 @@ $(document).ready(function() {
         `);
     });
 
-    // 9. Save Custom Database Row Record
+    // 10. Save Custom Database Row Record
     $('#btnSubmitInsertRow').on('click', function() {
         const tableName = $('#activeTableSelect').val();
         if (!tableName) return;
@@ -1107,7 +1257,7 @@ $(document).ready(function() {
         });
     });
 
-    // 10. Delete Custom Database Row Record
+    // 11. Delete Custom Database Row Record
     $(document).on('click', '.btn-delete-row', function() {
         const tableName = $('#activeTableSelect').val();
         const rowId = $(this).attr('data-id');
@@ -1129,6 +1279,9 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Select first item by default if any exists
+    $('.btn-select-cms-slug').first().click();
 });
 </script>
 </body>
