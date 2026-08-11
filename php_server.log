@@ -1,21 +1,11 @@
-[Tue Aug 11 19:08:26 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Tue Aug 11 19:08:30 2026] [::1]:57790 Accepted
-[Tue Aug 11 19:08:30 2026] [::1]:57790 [401]: GET /php/admin_backup_action.php
-[Tue Aug 11 19:08:30 2026] [::1]:57790 Closing
-[Tue Aug 11 19:18:29 2026] [::1]:55518 Accepted
-[Tue Aug 11 19:18:29 2026] [::1]:55518 [404]: GET /php/track_metrics.php?subdomain=demo&event=page_view
-[Tue Aug 11 19:18:29 2026] [::1]:55518 Closing
-[Tue Aug 11 19:19:36 2026] [::1]:35176 Accepted
-[Tue Aug 11 19:19:36 2026] [::1]:35176 [200]: GET /php/track_metrics.php?subdomain=demo&event=page_view
-[Tue Aug 11 19:19:36 2026] [::1]:35176 Closing
-[Tue Aug 11 19:20:37 2026] [::1]:44748 Accepted
-[Tue Aug 11 19:20:37 2026] [::1]:44748 [200]: GET /php/track_metrics.php?subdomain=demo&event=click
-[Tue Aug 11 19:20:37 2026] [::1]:44748 Closing
-[Tue Aug 11 19:25:07 2026] [::1]:45718 Accepted
-[Tue Aug 11 19:25:07 2026] [::1]:45718 Closing
-[Tue Aug 11 19:25:07 2026] [::1]:45732 Accepted
-[Tue Aug 11 19:25:07 2026] [::1]:45748 Accepted
-[Tue Aug 11 19:25:07 2026] [::1]:45732 [200]: GET /css/style.css?v=1786475026
-[Tue Aug 11 19:25:07 2026] [::1]:45748 [200]: GET /main/assets/images/logo.png?v=2
-[Tue Aug 11 19:25:07 2026] [::1]:45732 Closing
-[Tue Aug 11 19:25:07 2026] [::1]:45748 Closing
+[Tue Aug 11 20:05:20 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Tue Aug 11 20:05:43 2026] [::1]:49130 Accepted
+[Tue Aug 11 20:05:43 2026] [::1]:49130 Closing
+[Tue Aug 11 20:05:43 2026] [::1]:49146 Accepted
+[Tue Aug 11 20:05:43 2026] [::1]:49146 Closing
+[Tue Aug 11 20:05:43 2026] [::1]:49150 Accepted
+[Tue Aug 11 20:05:43 2026] [::1]:49164 Accepted
+[Tue Aug 11 20:05:43 2026] [::1]:49150 [200]: GET /css/style.css?v=1786475026
+[Tue Aug 11 20:05:43 2026] [::1]:49164 [200]: GET /main/assets/images/logo.png?v=2
+[Tue Aug 11 20:05:43 2026] [::1]:49150 Closing
+[Tue Aug 11 20:05:43 2026] [::1]:49164 Closing

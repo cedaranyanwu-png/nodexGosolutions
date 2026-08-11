@@ -219,9 +219,15 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
 
     <!-- Header Section / Topbar -->
     <div class="d-flex justify-content-between align-items-center mb-4 border-b border-gray-100 pb-3 flex-wrap gap-3">
-      <div>
-        <h2 class="fw-bold text-dark mb-0">Welcome back, <?php echo htmlspecialchars((string)($user['fullname'] ?? '')); ?></h2>
-        <p class="text-muted small mb-0">Deploy real subdomains, manage sandboxed file assets, edit database tables, and track subscriptions.</p>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Responsive hamburger toggle button (Mobile only) -->
+        <button class="btn btn-primary d-md-none rounded-pill" id="sidebarToggleBtn" type="button" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <h2 class="fw-bold text-dark mb-0" style="font-size: 1.5rem;">Welcome back, <?php echo htmlspecialchars((string)($user['fullname'] ?? '')); ?></h2>
+          <p class="text-muted small mb-0 d-none d-sm-block">Deploy real subdomains, manage sandboxed file assets, edit database tables, and track subscriptions.</p>
+        </div>
       </div>
       <div class="d-flex align-items-center gap-3">
         <!-- Unified Header Subscription Status indicators -->
@@ -932,6 +938,34 @@ $(document).ready(function() {
 
         loadFileTreeList();
     });
+
+    // Handle hash links / routing from sidebar dropdowns inside the dashboard
+    const handleDashboardHashes = function() {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        if (hash === '#manage-files') {
+            // Find and click the first manage files button if available to activate file manager
+            const fileManagerBtn = $('.btn-open-file-manager').first();
+            if (fileManagerBtn.length > 0) {
+                fileManagerBtn.click();
+            } else {
+                $('#manage-files').removeClass('d-none');
+            }
+        } else if (hash === '#build-website') {
+            $('html, body').animate({
+                scrollTop: $("#build-website").offset().top - 20
+            }, 300);
+        } else if (hash === '#user-db-manager') {
+            $('html, body').animate({
+                scrollTop: $("#user-db-manager").offset().top - 20
+            }, 300);
+        }
+    };
+
+    // Trigger on hash loads and hash change events
+    handleDashboardHashes();
+    $(window).on('hashchange', handleDashboardHashes);
 
     $('#btnCloseFileManager').on('click', function() {
         $('#manage-files').addClass('d-none');

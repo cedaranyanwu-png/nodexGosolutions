@@ -142,3 +142,9 @@ html, body {
 section {
     padding: 80px 0;
 }
+
+/* Fix CSS Conflict between Tailwind CSS and Bootstrap 5 Accordion Collapse elements */
+/* Prevents active/expanded accordion elements from disappearing due to visibility conflicts */
+.collapse {
+    visibility: visible !important;
+}

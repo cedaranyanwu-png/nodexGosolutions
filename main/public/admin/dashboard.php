@@ -196,9 +196,15 @@ function maskSecretKey(?string $key): string {
   <div class="main-content">
 
     <div class="d-flex justify-content-between align-items-center mb-4 border-b border-gray-100 pb-3 flex-wrap gap-3">
-      <div>
-        <h2 class="fw-bold text-dark mb-0" style="font-family: 'Orbitron', sans-serif;">System Administration Center</h2>
-        <p class="text-muted small mb-0">Review analytical counters, update plan pricing, audit payments, configure Flutterwave, and assign permissions.</p>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Responsive hamburger toggle button (Mobile only) -->
+        <button class="btn btn-primary d-md-none rounded-pill" id="sidebarToggleBtn" type="button" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <h2 class="fw-bold text-dark mb-0" style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem;">System Administration Center</h2>
+          <p class="text-muted small mb-0 d-none d-sm-block">Review analytical counters, update plan pricing, audit payments, configure Flutterwave, and assign permissions.</p>
+        </div>
       </div>
       <div>
         <span class="badge bg-primary text-white px-2.5 py-1.5 text-xs rounded-md">
@@ -1499,6 +1505,37 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Handle administrative sidebar hashes and activate bootstrap tabs
+    const handleAdminHashes = function() {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        // Map hash tags to active tab button IDs
+        const tabMap = {
+            '#websites-section': 'websites-tab',
+            '#build-website': 'websites-tab',
+            '#payment-settings-section': 'payment-settings-tab',
+            '#activity-logs-section': 'activity-logs-tab'
+        };
+
+        const targetTabId = tabMap[hash];
+        if (targetTabId) {
+            const tabTriggerEl = document.getElementById(targetTabId);
+            if (tabTriggerEl) {
+                const tab = new bootstrap.Tab(tabTriggerEl);
+                tab.show();
+                // Smooth scroll to the tab content area
+                $('html, body').animate({
+                    scrollTop: $("#adminTabs").offset().top - 20
+                }, 300);
+            }
+        }
+    };
+
+    // Trigger on hash load and change events
+    handleAdminHashes();
+    $(window).on('hashchange', handleAdminHashes);
 
     // Select first plan by default
     $('.btn-select-plan').first().click();

@@ -16,15 +16,24 @@ declare(strict_types=1);
 $activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
 $fullname   = $_SESSION['fullname'] ?? 'System User';
 ?>
+<!-- Sidebar Responsive Backdrop/Overlay (Mobile only) -->
+<div class="sidebar-overlay d-md-none" id="sidebarOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); z-index: 1040;"></div>
+
 <!-- Sidebar Navigation Container -->
-<!-- Enforce fixed min-width and max-width of 260px with flex-shrink disabled to prevent the sidebar from disappearing or shrinking on smaller screen viewports -->
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end" style="width: 260px; min-width: 260px; max-width: 260px; min-height: 100vh; border-color: rgba(0, 114, 255, 0.1) !important; box-shadow: 4px 0 12px rgba(0, 114, 255, 0.03);">
+<!-- Enforce fixed min-width and max-width of 260px with flex-shrink disabled. Uses mobile offcanvas transitions -->
+<div class="sidebar-container d-flex flex-column flex-shrink-0 p-3 bg-white border-end" id="sidebarContainer" style="width: 260px; min-width: 260px; max-width: 260px; min-height: 100vh; border-color: rgba(0, 114, 255, 0.1) !important; box-shadow: 4px 0 12px rgba(0, 114, 255, 0.03); z-index: 1050; transition: transform 0.3s ease;">
 
     <!-- Workspace Brand Header -->
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-primary text-decoration-none" style="font-family: 'Orbitron', sans-serif;">
-        <i class="fa-solid fa-server fs-4 me-2"></i>
-        <span class="fs-4 fw-bold">nodex<span class="text-dark">Go</span></span>
-    </a>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="/" class="d-flex align-items-center text-primary text-decoration-none" style="font-family: 'Orbitron', sans-serif;">
+            <i class="fa-solid fa-server fs-4 me-2"></i>
+            <span class="fs-4 fw-bold">nodex<span class="text-dark">Go</span></span>
+        </a>
+        <!-- Close button (Mobile only) -->
+        <button class="btn btn-sm btn-light border-0 d-md-none rounded-circle" id="sidebarCloseBtn" type="button">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 
     <hr class="my-3" style="border-color: rgba(0, 114, 255, 0.1);">
 
@@ -328,4 +337,89 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
         background-color: rgba(239, 68, 68, 0.06) !important;
         color: #ef4444 !important;
     }
+
+    /* Off-canvas Responsive Sidebar Styles */
+    @media (max-width: 767.98px) {
+        .sidebar-container {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            height: 100vh !important;
+            transform: translateX(-100%);
+            z-index: 1050 !important;
+        }
+        .sidebar-container.active {
+            transform: translateX(0);
+        }
+    }
+
+    /* Fix CSS Conflict between Tailwind CSS and Bootstrap 5 Accordion Collapse elements */
+    /* Prevents active/expanded accordion elements from disappearing due to visibility conflicts */
+    .collapse {
+        visibility: visible !important;
+    }
 </style>
+
+<!-- Sidebar mobile helper script for off-canvas drawer toggling and auto expanding active links -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const sidebarContainer = document.getElementById("sidebarContainer");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
+    const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+
+    const openSidebar = function() {
+        if (sidebarContainer) sidebarContainer.classList.add("active");
+        if (sidebarOverlay) sidebarOverlay.style.display = "block";
+    };
+
+    const closeSidebar = function() {
+        if (sidebarContainer) sidebarContainer.classList.remove("active");
+        if (sidebarOverlay) sidebarOverlay.style.display = "none";
+    };
+
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener("click", openSidebar);
+    }
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener("click", closeSidebar);
+    }
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener("click", closeSidebar);
+    }
+
+    // Automatically expand the corresponding accordion tools drawer on page hashes or active states
+    const autoExpandActiveDropdown = function() {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        // Map hash identifiers to active collapsible containers
+        const targetMap = {
+            '#build-website': 'collapseWebsiteTools',
+            '#manage-files': 'collapseWebsiteTools',
+            '#user-db-manager': 'collapseDatabaseTools',
+            '#websites-section': 'collapseAdminWebsites',
+            '#activity-logs-section': 'collapseAdminSystem',
+            '#payment-settings-section': 'collapseAdminSystem'
+        };
+
+        const targetCollapseId = targetMap[hash];
+        if (targetCollapseId) {
+            const collapseEl = document.getElementById(targetCollapseId);
+            if (collapseEl && !collapseEl.classList.contains("show")) {
+                // Use Bootstrap collapse API to show if available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                    const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl);
+                    bsCollapse.show();
+                } else {
+                    collapseEl.classList.add("show");
+                }
+            }
+        }
+    };
+
+    // Auto expand on load and hash change
+    autoExpandActiveDropdown();
+    window.addEventListener("hashchange", autoExpandActiveDropdown);
+});
+</script>
