@@ -22,13 +22,19 @@ class TenantManager
      * Each entry represents a tenant with its configuration and content.
      */
     private array $tenants = [
-        // Tenant 1: The primary domain entry
+        // Tenant 1: The primary domain entry representing the main website
         [
+            // The unique integer identifier for the main tenant
             'id'         => 1,
-            'identifier' => 'nodexgosolutions.com', // The domain name to match
-            'name'       => 'NodeX Go Solutions HQ', // Display name
-            'theme_color'=> '#2c3e50',               // Primary brand color (Midnight Blue)
-            'logo_url'   => 'https://placehold.co/200x50/2c3e50/ffffff?text=NodeX+HQ', // Logo placeholder
+            // The domain name matching the main website exactly
+            'identifier' => 'nodexgosolutions.com',
+            // Display name for the main NodeX Go Solutions website
+            'name'       => 'NodeX Go Solutions HQ',
+            // Primary brand color of midnight blue
+            'theme_color'=> '#2c3e50',
+            // Updated local logo URL pointing to the new logo asset with cache busting version 1
+            'logo_url'   => '/assets/images/logo.png?v=1',
+            // Welcome content displayed on the main website
             'content'    => 'Welcome to the central hub of NodeX Go Solutions. We provide modular PHP architectures.'
         ],
         // Tenant 2: A subdomain-based tenant
