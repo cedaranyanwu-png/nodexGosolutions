@@ -401,8 +401,6 @@ function checkAndUpdateSubscription(array &$user, Database $dbConnection): strin
     $now = time();
     // Resolve trial boundaries as Unix timestamps
     $trialEnd = strtotime($user['trial_end'] ?: date('Y-m-d H:i:s'));
-    // The 7-day free grace period ends exactly 7 days after trial ends
-    $graceEnd = strtotime(date('Y-m-d H:i:s', $trialEnd) . ' +7 days');
     // Resolve paid subscription end boundary as timestamp if specified
     $subEnd = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
 
@@ -419,15 +417,12 @@ function checkAndUpdateSubscription(array &$user, Database $dbConnection): strin
             $newStatus = 'expired';
         }
     } else {
-        // Evaluate trial duration with the 7-day free grace period
+        // Evaluate trial duration
         if ($now < $trialEnd) {
             // Under normal active trial
             $newStatus = 'trial';
-        } elseif ($now < $graceEnd) {
-            // Inside the 7-day free grace period post-trial expiration
-            $newStatus = 'grace';
         } else {
-            // Completely expired past both the trial and the 7-day grace periods
+            // Completely expired past the trial period
             $newStatus = 'expired';
         }
     }

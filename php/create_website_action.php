@@ -36,7 +36,7 @@ if (!$user) {
 
 // Server-side enforcement check: restrict workspace creations to accounts on ACTIVE or TRIAL plans
 $status = checkAndUpdateSubscription($user, $conn);
-if ($status === 'expired' || $status === 'suspended' || $status === 'grace') {
+if ($status === 'expired' || $status === 'suspended') {
     jsonResponse([
         'success' => false,
         'message' => 'Your active free trial or subscription has expired. Please select a plan to activate website provisioning.'

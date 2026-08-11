@@ -14,5 +14,13 @@
         "id": 2,
         "created_at": "2026-08-11 12:39:16",
         "updated_at": "2026-08-11 12:39:16"
+    },
+    {
+        "identifier": "login_::1_verified_tenant_1786478669@nodexplatform.com.ng",
+        "attempts": 1,
+        "last_attempt": 1786478676,
+        "id": 3,
+        "created_at": "2026-08-11 20:04:36",
+        "updated_at": "2026-08-11 20:04:36"
     }
 ]
