@@ -13,8 +13,14 @@
 declare(strict_types=1);
 
 // Guard against direct file inclusions without active session
-$activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
-$fullname   = $_SESSION['fullname'] ?? 'System User';
+if (session_status() === PHP_SESSION_NONE) {
+    secureSession();
+}
+// Retrieve actual logged-in user's role and details from the database dynamically in real-time
+$sidebarDb = new Database(__DIR__ . '/../../databases', 'system');
+$sidebarUser = isset($_SESSION['email']) ? $sidebarDb->selectOne('users', ['email' => $_SESSION['email']]) : null;
+$activeRole = strtolower((string)($sidebarUser['role'] ?? $_SESSION['role'] ?? 'tenant'));
+$fullname   = $sidebarUser['fullname'] ?? $_SESSION['fullname'] ?? 'System User';
 ?>
 <!-- Sidebar Responsive Backdrop/Overlay (Mobile only) -->
 <div class="sidebar-overlay d-md-none" id="sidebarOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.5); z-index: 1040;"></div>
@@ -46,13 +52,18 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
             <h6 class="mb-0 text-dark fw-bold text-truncate" style="font-size: 14px;"><?php echo htmlspecialchars($fullname); ?></h6>
             <small class="text-muted text-uppercase fw-bold" style="font-size: 11px;">
                 <?php
-                if ($activeRole === 'super admin') {
-                    echo 'Super Admin';
-                } elseif ($activeRole === 'admin') {
-                    echo 'Administrator';
-                } else {
-                    echo 'Tenant Account';
-                }
+                $roleLabelMap = [
+                    'super admin' => 'Super Admin',
+                    'superadmin' => 'Super Admin',
+                    'admin' => 'Administrator',
+                    'manager' => 'Manager',
+                    'support' => 'Support Staff',
+                    'moderator' => 'Moderator',
+                    'financial' => 'Financial Officer',
+                    'marketing_head' => 'Marketing Head',
+                    'marketinghead' => 'Marketing Head'
+                ];
+                echo htmlspecialchars($roleLabelMap[$activeRole] ?? 'Tenant Account');
                 ?>
             </small>
         </div>
@@ -64,7 +75,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
 
             <!-- Standard Hub/Dashboard Core triggers -->
             <li class="nav-item">
-                <?php if ($activeRole === 'super admin' || $activeRole === 'admin'): ?>
+                <?php if (isStaff()): ?>
                     <a href="/admin/dashboard" class="nav-link d-flex align-items-center py-2 px-3 fw-bold rounded-pill text-dark hover-blue <?php echo str_contains($_SERVER['REQUEST_URI'], 'admin/dashboard') ? 'active text-white bg-primary' : ''; ?>">
                         <i class="fa-solid fa-chart-line me-2" style="width: 20px;"></i>
                         System Overview
@@ -77,7 +88,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                 <?php endif; ?>
             </li>
 
-            <?php if ($activeRole === 'super admin' || $activeRole === 'admin'): ?>
+            <?php if (isStaff() && hasAdminPagePermission($activeRole, '/cms/admin')): ?>
                 <li>
                     <a href="/cms/admin" class="nav-link d-flex align-items-center py-2 px-3 fw-bold text-dark rounded-pill hover-blue">
                         <i class="fa-solid fa-code me-2" style="width: 20px;"></i>
@@ -94,7 +105,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
 
                 <div class="accordion accordion-flush" id="sidebarToolsAccordion" style="--bs-accordion-bg: transparent;">
 
-                    <?php if ($activeRole !== 'super admin' && $activeRole !== 'admin'): ?>
+                    <?php if (!isStaff()): ?>
                         <!-- ================= TENANT USER TOOLS ================= -->
 
                         <!-- Website Dropdown Menu -->
@@ -149,146 +160,55 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         </div>
 
                     <?php else: ?>
-                        <!-- ================= ADMIN TOOLS ================= -->
+                        <!-- ================= ADMIN STAFF TOOLS ================= -->
+                        <?php
+                        // Centralized dynamic admin/staff tools directory links array
+                        $adminSidebarItems = [
+                            ['label' => 'User Directory', 'icon' => 'fa-solid fa-users', 'url' => '/admin/users'],
+                            ['label' => 'Website Manager', 'icon' => 'fa-solid fa-globe', 'url' => '/admin/websites'],
+                            ['label' => 'Templates', 'icon' => 'fa-solid fa-object-group', 'url' => '/admin/templates'],
+                            ['label' => 'Categories', 'icon' => 'fa-solid fa-list', 'url' => '/admin/categories'],
+                            ['label' => 'Payments', 'icon' => 'fa-solid fa-credit-card', 'url' => '/admin/payments'],
+                            ['label' => 'Revenue', 'icon' => 'fa-solid fa-money-bill-wave', 'url' => '/admin/revenue'],
+                            ['label' => 'Financial Reports', 'icon' => 'fa-solid fa-file-invoice-dollar', 'url' => '/admin/financial-reports'],
+                            ['label' => 'Platform Analytics', 'icon' => 'fa-solid fa-chart-simple', 'url' => '/admin/analytics'],
+                            ['label' => 'Marketing', 'icon' => 'fa-solid fa-bullhorn', 'url' => '/admin/marketing'],
+                            ['label' => 'Support Tickets', 'icon' => 'fa-solid fa-headset', 'url' => '/admin/support'],
+                            ['label' => 'Moderation Queue', 'icon' => 'fa-solid fa-shield-halved', 'url' => '/admin/moderation'],
+                            ['label' => 'System Audits', 'icon' => 'fa-solid fa-rectangle-list', 'url' => '/admin/activity-logs'],
+                            ['label' => 'Settings', 'icon' => 'fa-solid fa-gears', 'url' => '/admin/settings']
+                        ];
 
-                        <!-- Websites (Admin) Dropdown Menu -->
-                        <?php if (hasPermission('websites.view')): ?>
-                        <div class="accordion-item border-0">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminWebsites" data-target="#collapseAdminWebsites" aria-expanded="false" aria-controls="collapseAdminWebsites" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-globe me-2 text-primary" style="width: 20px;"></i>
-                                    Websites
-                                </button>
-                            </div>
-                            <div id="collapseAdminWebsites" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#websites-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-sliders me-2" style="font-size: 11px;"></i> Manage Websites
-                                    </a>
-                                    <a href="/admin/dashboard#websites-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-folder-open me-2" style="font-size: 11px;"></i> Manage Files
-                                    </a>
-                                    <a href="/admin/dashboard" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-object-group me-2" style="font-size: 11px;"></i> Templates
-                                    </a>
-                                    <!-- Added dynamic global analytics and stats view page loading inside admin dashboard -->
-                                    <a href="/admin/dashboard#analytics" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-chart-simple me-2" style="font-size: 11px;"></i> Platform Analytics
-                                    </a>
-                                    <!-- Added secure admin profile edit settings page loading inside admin dashboard -->
-                                    <a href="/admin/dashboard#profile" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-user-gear me-2" style="font-size: 11px;"></i> My Profile
+                        // Dynamically render sidebar controls purely based on backend access rights
+                        foreach ($adminSidebarItems as $item):
+                            if (hasAdminPagePermission($activeRole, $item['url'])):
+                                // Check if this item is currently active based on requested path
+                                $requestPathClean = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '';
+                                $isActiveItem = (rtrim($requestPathClean, '/') === rtrim($item['url'], '/'));
+                        ?>
+                            <div class="accordion-item border-0 mt-1">
+                                <div class="accordion-header">
+                                    <a href="<?php echo $item['url']; ?>" class="nav-link d-flex align-items-center py-2 px-3 fw-bold rounded-pill hover-blue <?php echo $isActiveItem ? 'active text-white bg-primary' : 'text-dark'; ?>" style="font-size: 14px;">
+                                        <i class="<?php echo $item['icon']; ?> me-2 <?php echo $isActiveItem ? 'text-white' : 'text-primary'; ?>" style="width: 20px;"></i>
+                                        <?php echo $item['label']; ?>
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                        <?php endif; ?>
+                        <?php
+                            endif;
+                        endforeach;
 
-                        <!-- Database (Admin) Dropdown Menu -->
-                        <?php if (hasPermission('pricing.edit')): ?>
-                        <div class="accordion-item border-0 mt-1">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminDatabases" data-target="#collapseAdminDatabases" aria-expanded="false" aria-controls="collapseAdminDatabases" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-database me-2 text-primary" style="width: 20px;"></i>
-                                    Database
-                                </button>
-                            </div>
-                            <div id="collapseAdminDatabases" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-database me-2" style="font-size: 11px;"></i> Manage Databases
-                                    </a>
-                                    <a href="/admin/dashboard" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-users-gear me-2" style="font-size: 11px;"></i> Database Users
-                                    </a>
-                                    <a href="/admin/dashboard" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-gears me-2" style="font-size: 11px;"></i> Database Settings
+                        // Include System/Administration Backup page specifically for Superadmin
+                        if ($activeRole === 'superadmin' || $activeRole === 'super admin'):
+                        ?>
+                            <div class="accordion-item border-0 mt-1">
+                                <div class="accordion-header">
+                                    <a href="/admin/dashboard#backup-section" class="nav-link d-flex align-items-center py-2 px-3 fw-bold text-dark rounded-pill hover-blue" style="font-size: 14px;">
+                                        <i class="fa-solid fa-server me-2 text-primary" style="width: 20px;"></i>
+                                        System / Admin
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Teams Dropdown Menu -->
-                        <?php if (hasPermission('teams.view')): ?>
-                        <div class="accordion-item border-0 mt-1">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminTeams" data-target="#collapseAdminTeams" aria-expanded="false" aria-controls="collapseAdminTeams" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-users me-2 text-primary" style="width: 20px;"></i>
-                                    Teams
-                                </button>
-                            </div>
-                            <div id="collapseAdminTeams" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#teams-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-list-check me-2" style="font-size: 11px;"></i> Manage Teams
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Support Dropdown Menu -->
-                        <?php if (hasPermission('tickets.view')): ?>
-                        <div class="accordion-item border-0 mt-1">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminSupport" data-target="#collapseAdminSupport" aria-expanded="false" aria-controls="collapseAdminSupport" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-headset me-2 text-primary" style="width: 20px;"></i>
-                                    Support
-                                </button>
-                            </div>
-                            <div id="collapseAdminSupport" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#support-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-ticket me-2" style="font-size: 11px;"></i> Support Tickets
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Moderation Dropdown Menu -->
-                        <?php if (hasPermission('moderation.view')): ?>
-                        <div class="accordion-item border-0 mt-1">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminModeration" data-target="#collapseAdminModeration" aria-expanded="false" aria-controls="collapseAdminModeration" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-shield-halved me-2 text-primary" style="width: 20px;"></i>
-                                    Moderation
-                                </button>
-                            </div>
-                            <div id="collapseAdminModeration" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#moderation-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-circle-exclamation me-2" style="font-size: 11px;"></i> Moderate Content
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- System (Admin) Dropdown Menu -->
-                        <?php if (hasPermission('backups.view')): ?>
-                        <div class="accordion-item border-0 mt-1">
-                            <div class="accordion-header">
-                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminSystem" data-target="#collapseAdminSystem" aria-expanded="false" aria-controls="collapseAdminSystem" style="background: transparent; font-size: 14px;">
-                                    <i class="fa-solid fa-server me-2 text-primary" style="width: 20px;"></i>
-                                    System
-                                </button>
-                            </div>
-                            <div id="collapseAdminSystem" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
-                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
-                                    <a href="/admin/dashboard#activity-logs-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-rectangle-list me-2" style="font-size: 11px;"></i> Logs
-                                    </a>
-                                    <a href="/admin/dashboard#activity-logs-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-chart-line me-2" style="font-size: 11px;"></i> Activity
-                                    </a>
-                                    <a href="/admin/dashboard#payment-settings-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
-                                        <i class="fa-solid fa-screwdriver-wrench me-2" style="font-size: 11px;"></i> System Settings
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
                         <?php endif; ?>
 
                     <?php endif; ?>
@@ -300,7 +220,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
 
             <!-- Global Action Links (Visit Homepage, Profile Settings & Logout) -->
             <li>
-                <?php if ($activeRole === 'super admin' || $activeRole === 'admin' || $activeRole === 'manager' || $activeRole === 'moderator' || $activeRole === 'support'): ?>
+                <?php if (isStaff()): ?>
                     <!-- Dynamically target dashboard-embedded profile tabs instead of separate page reloads -->
                     <a href="/admin/dashboard#profile" class="nav-link d-flex align-items-center py-2 px-3 fw-bold text-dark rounded-pill hover-blue <?php echo str_contains($_SERVER['REQUEST_URI'], 'profile') ? 'active text-white bg-primary' : ''; ?>">
                         <i class="fa-solid fa-user me-2" style="width: 20px;"></i>

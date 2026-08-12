@@ -54,5 +54,13 @@
         "created_at": "2026-08-12 14:07:47",
         "id": 7,
         "updated_at": "2026-08-12 14:07:47"
+    },
+    {
+        "email": "admin_restore_test@nodexplatform.com.ng",
+        "action": "backup_restored",
+        "details": "Restored backup ID: backup_2026-08-12_16-41-34_7ed31e78 (Safety copy: backup_2026-08-12_16-41-34_294d3c9f)",
+        "created_at": "2026-08-12 16:41:34",
+        "id": 8,
+        "updated_at": "2026-08-12 16:41:34"
     }
 ]

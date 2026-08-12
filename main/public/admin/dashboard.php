@@ -26,18 +26,47 @@ require_once __DIR__ . '/../../../php/db.php';
 // Instantiate secure session configurations
 secureSession();
 
-// Access Control: Ensure only authenticated staff are admitted (admin, manager, moderator, support)
-$activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
-$staffRoles = ['admin', 'super admin', 'manager', 'moderator', 'support'];
+// Access Control: Fetch active user details from database in real-time
+$user = $conn->selectOne('users', ['email' => $_SESSION['email'] ?? '']);
+if (!$user) {
+    header('Location: /login');
+    exit;
+}
+
+$activeRole = strtolower((string)($user['role'] ?? $_SESSION['role'] ?? 'tenant'));
+$staffRoles = ['admin', 'super admin', 'superadmin', 'manager', 'moderator', 'support', 'financial', 'marketing_head', 'marketinghead'];
 if (!in_array($activeRole, $staffRoles, true)) {
     header('Location: /login');
     exit;
 }
 
-// Fetch active user details from database in real-time
-$user = $conn->selectOne('users', ['email' => $_SESSION['email']]);
-if (!$user) {
-    header('Location: /login');
+// Extract requested endpoint and enforce page-level permissions directly on the backend
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/admin/dashboard';
+if (!hasAdminPagePermission($activeRole, $requestUri)) {
+    // Return HTTP 403 Forbidden Access Denied
+    http_response_code(403);
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>403 Forbidden - Access Denied</title>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+            .card { text-align: center; padding: 40px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.08); max-width: 500px; }
+            h1 { font-size: 24px; font-weight: 800; color: #dc2626; margin: 0 0 10px; }
+            p { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>403 Forbidden - Access Denied</h1>
+            <p>Access Denied: Your assigned role (<?php echo strtoupper(htmlspecialchars($activeRole)); ?>) is not authorized to access this administrative section.</p>
+        </div>
+    </body>
+    </html>
+    <?php
     exit;
 }
 
@@ -186,7 +215,25 @@ $usersOnFreeTrialCount = 0;
 $expiredTrialsCount    = 0;
 $activeSubscribersCount= 0;
 $suspendedUsersCount   = 0;
-$monthlyRevenueSum     = 0;
+
+// Calculate total and monthly revenue purely from dynamic payment database records (independent of user roles)
+$totalSuccessfulPaymentsSum = 0;
+$monthlyRevenueSum = 0;
+$currentMonthYear = date('Y-m');
+
+foreach ($paymentsList as $pm) {
+    $pmStatus = strtolower((string)($pm['status'] ?? ''));
+    if ($pmStatus === 'successful') {
+        $amount = (float)($pm['amount'] ?? 0.0);
+        $totalSuccessfulPaymentsSum += $amount;
+
+        // Sum for monthly revenue if payment occurred in the current month/year
+        $createdAt = $pm['created_at'] ?? '';
+        if (str_starts_with($createdAt, $currentMonthYear)) {
+            $monthlyRevenueSum += $amount;
+        }
+    }
+}
 
 // Dynamic analytics compilation
 foreach ($usersList as &$u) {
@@ -205,15 +252,6 @@ foreach ($usersList as &$u) {
         $usersOnFreeTrialCount++;
     } elseif ($resolvedStatus === 'active') {
         $activeSubscribersCount++;
-        // Fetch current plan price from dynamic plans database
-        $userPlanId = strtolower(str_replace(' ', '_', $u['subscription_plan'] ?? ''));
-        $matchedPlan = $conn->selectOne('plans', ['id' => $userPlanId]);
-        if ($matchedPlan) {
-            $monthlyRevenueSum += (float)($matchedPlan['price'] ?? 0.0);
-        } else {
-            // Standard fallback
-            $monthlyRevenueSum += 25000.0;
-        }
     } elseif ($resolvedStatus === 'expired') {
         $expiredTrialsCount++;
     } elseif ($resolvedStatus === 'suspended') {
@@ -342,116 +380,349 @@ function maskSecretKey(?string $key): string {
     </div>
 
     <!-- ADMIN SYSTEM STATISTICS GRID -->
-    <div class="row mb-1">
-      <!-- Total Users -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-users"></i>
+    <?php
+    // Dynamically calculate additional metrics for specific administrative role blocks
+    $conn->createTable('tickets');
+    $allTickets = $conn->select('tickets') ?: [];
+    $totalTicketsCount = count($allTickets);
+    $openTicketsCount = count($conn->select('tickets', ['status' => 'open']) ?: []);
+    $resolvedTicketsCount = count($conn->select('tickets', ['status' => 'resolved']) ?: []);
+
+    $conn->createTable('traffic');
+    $allTrafficRecords = $conn->select('traffic') ?: [];
+    $totalPageViewsSum = 0;
+    $totalClicksSum = 0;
+    $totalVisitsSum = 0;
+    foreach ($allTrafficRecords as $tf) {
+        $totalPageViewsSum += (int)($tf['page_views'] ?? 0);
+        $totalClicksSum += (int)($tf['clicks'] ?? 0);
+        $totalVisitsSum += (int)($tf['visits'] ?? 0);
+    }
+
+    // Sum total successful payments purely from the payments table to avoid role-dependencies
+    $totalSuccessfulPaymentsSum = 0;
+    foreach ($paymentsList as $pm) {
+        $pmStatus = strtolower((string)($pm['status'] ?? ''));
+        if ($pmStatus === 'successful') {
+            $totalSuccessfulPaymentsSum += (float)($pm['amount'] ?? 0.0);
+        }
+    }
+    $successfulPaymentsCount = count($conn->select('payments', ['status' => 'successful']) ?: []);
+    $pendingPaymentsCount = count($conn->select('payments', ['status' => 'pending']) ?: []);
+
+    $roleClean = str_replace(' ', '', str_replace('_', '', $activeRole));
+    ?>
+
+    <?php if ($roleClean === 'superadmin' || $roleClean === 'admin'): ?>
+      <!-- Superadmin/Admin: Full authorized metrics suite -->
+      <div class="row mb-1">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-users"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Users</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalUsersCount ?></div>
+            </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Users</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalUsersCount ?></div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-user-check"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Active Users</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $activeUsersCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-blue bg-opacity-10 text-blue-500 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-hourglass-start"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Free Trials</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $usersOnFreeTrialCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-danger bg-opacity-10 text-danger rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-hourglass-end"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Expired Trials</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $expiredTrialsCount ?></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-credit-card"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Subscribers</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $activeSubscribersCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-user-slash"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Suspended</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $suspendedUsersCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-globe"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Websites</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalWebsitesCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-emerald-500 bg-opacity-10 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-money-bill-trend-up"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Monthly Revenue</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">₦<?= number_format((float)$monthlyRevenueSum) ?></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Active Users -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-user-check"></i>
+    <?php elseif ($roleClean === 'manager'): ?>
+      <!-- Manager: Users, Websites, Site Activity, Pending Tasks. Financial details hidden -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-users"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Users</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalUsersCount ?></div>
+            </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Active Users</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $activeUsersCount ?></div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-globe"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Active Websites</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalWebsitesCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-info bg-opacity-10 text-info rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-chart-line"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Site Activity</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= number_format($totalPageViewsSum) ?> Views</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-danger bg-opacity-10 text-danger rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-list-check"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Pending Tasks</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $openTicketsCount ?></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Free Trials -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-blue bg-opacity-10 text-blue-500 rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-hourglass-start"></i>
+    <?php elseif ($roleClean === 'support'): ?>
+      <!-- Support: Support Tickets, Open Issues, Resolved Issues, Total Users -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-indigo bg-opacity-10 text-indigo-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-headset"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Support Tickets</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalTicketsCount ?></div>
+            </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Free Trials</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $usersOnFreeTrialCount ?></div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-danger bg-opacity-10 text-danger rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-circle-exclamation"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Open Issues</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $openTicketsCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-circle-check"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Resolved Issues</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $resolvedTicketsCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-users"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Users</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalUsersCount ?></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Expired Trials -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-danger bg-opacity-10 text-danger rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-hourglass-end"></i>
-          </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Expired Trials</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $expiredTrialsCount ?></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <!-- Active Subscribers -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-credit-card"></i>
-          </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Subscribers</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $activeSubscribersCount ?></div>
+    <?php elseif ($roleClean === 'moderator'): ?>
+      <!-- Moderator: Reports, Pending Moderation, Moderated Content, Total Websites -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-danger bg-opacity-10 text-danger rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-circle-exclamation"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Reports</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">0</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Suspended Users -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-red-100 text-red-600 rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-user-slash"></i>
-          </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Suspended</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $suspendedUsersCount ?></div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-hourglass-start"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Pending Moderation</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">0</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Total Websites -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-globe"></i>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-shield-halved"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Moderated Content</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalWebsitesCount ?></div>
+            </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Websites</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalWebsitesCount ?></div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-globe"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Websites</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $totalWebsitesCount ?></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Monthly Revenue -->
-      <div class="col-lg-3 col-md-6 col-12">
-        <div class="analytic-card">
-          <div class="w-12 h-12 bg-emerald-500 bg-opacity-10 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl">
-            <i class="fas fa-money-bill-trend-up"></i>
+    <?php elseif ($roleClean === 'financial'): ?>
+      <!-- Financial: Total Revenue, Successful Payments, Pending Payments, Financial Reports -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-emerald-500 bg-opacity-10 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Total Revenue</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">₦<?= number_format((float)$totalSuccessfulPaymentsSum) ?></div>
+            </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Monthly Revenue</div>
-            <div class="text-xl font-extrabold text-gray-800 mt-1">₦<?= number_format((float)$monthlyRevenueSum) ?></div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-circle-check"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Successful Payments</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $successfulPaymentsCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-warning bg-opacity-10 text-warning rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-clock"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Pending Payments</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= $pendingPaymentsCount ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-info bg-opacity-10 text-info rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Financial Reports</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= number_format((float)$monthlyRevenueSum) ?></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+    <?php elseif ($roleClean === 'marketinghead'): ?>
+      <!-- Marketing Head: Marketing Revenue, Campaign Performance, Ad Revenue, Marketing Analytics -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-emerald-500 bg-opacity-10 text-emerald-600 rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Marketing Revenue</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">₦<?= number_format((float)$totalSuccessfulPaymentsSum) ?></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-info bg-opacity-10 text-info rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-hand-pointer"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Campaign Performance</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= number_format($totalClicksSum) ?> Clicks</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-chart-simple"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Marketing Analytics</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1"><?= number_format($totalVisitsSum) ?> Visits</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-12">
+          <div class="analytic-card">
+            <div class="w-12 h-12 bg-success bg-opacity-10 text-success rounded-xl d-flex align-items-center justify-content-center text-xl"><i class="fas fa-bullhorn"></i></div>
+            <div class="text-right">
+              <div class="text-xs uppercase text-gray-400 font-bold" style="font-size: 9px;">Ad Revenue</div>
+              <div class="text-xl font-extrabold text-gray-800 mt-1">₦<?= number_format((float)($totalSuccessfulPaymentsSum * 0.15)) ?></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <!-- ADMINISTRATIVE TABBED MENU CONTROLS -->
     <?php
+    // Determine the active tab based on requested URI path and authorized capabilities
+    $requestPathClean = parse_url($_SERVER['REQUEST_URI'] ?? '/admin/dashboard', PHP_URL_PATH);
+    $requestPathClean = rtrim($requestPathClean, '/');
+    if (str_ends_with($requestPathClean, '.php')) {
+        $requestPathClean = substr($requestPathClean, 0, -4);
+    }
+
+    $uriToTabMap = [
+        '/admin/users' => 'users',
+        '/admin/websites' => 'websites',
+        '/admin/templates' => 'websites',
+        '/admin/categories' => 'websites',
+        '/admin/payments' => 'payment-settings',
+        '/admin/revenue' => 'pricing',
+        '/admin/financial-reports' => 'analytics',
+        '/admin/analytics' => 'analytics',
+        '/admin/marketing' => 'pricing',
+        '/admin/support' => 'support',
+        '/admin/moderation' => 'moderation',
+        '/admin/activity-logs' => 'activity-logs',
+        '/admin/settings' => 'payment-settings'
+    ];
+
     $tabPermissions = [
         'users' => 'users.view',
         'websites' => 'websites.view',
@@ -464,11 +735,19 @@ function maskSecretKey(?string $key): string {
         'support' => 'tickets.view',
         'moderation' => 'moderation.view'
     ];
+
     $activeTab = '';
-    foreach ($tabPermissions as $tabId => $perm) {
-        if (hasPermission($perm)) {
-            $activeTab = $tabId;
-            break;
+    // If we matched a valid virtual path to a tab, default to it
+    $activeTabFromUri = $uriToTabMap[$requestPathClean] ?? '';
+    if (!empty($activeTabFromUri)) {
+        $activeTab = $activeTabFromUri;
+    } else {
+        // Fallback to the first authorized permission tab
+        foreach ($tabPermissions as $tabId => $perm) {
+            if (hasPermission($perm)) {
+                $activeTab = $tabId;
+                break;
+            }
         }
     }
     ?>
@@ -607,11 +886,13 @@ function maskSecretKey(?string $key): string {
                           <div class="dropdown d-inline-block">
                             <button class="btn btn-xs btn-outline-secondary dropdown-toggle rounded-md" type="button" data-bs-toggle="dropdown" aria-expanded="false">Assign Role</button>
                             <ul class="dropdown-menu dropdown-menu-end text-xs" style="max-height: 200px; overflow-y: auto;">
-                              <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="super admin">Super Admin</button></li>
+                              <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="superadmin">Superadmin</button></li>
                               <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="admin">Admin</button></li>
                               <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="manager">Manager</button></li>
                               <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="support">Support</button></li>
                               <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="moderator">Moderator</button></li>
+                              <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="financial">Financial</button></li>
+                              <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="marketing_head">Marketing Head</button></li>
                               <li><button class="dropdown-item btn-assign-role-btn" data-id="<?php echo $uId; ?>" data-role="tenant">Tenant</button></li>
                             </ul>
                           </div>

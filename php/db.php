@@ -640,8 +640,124 @@ function isStaff(): bool {
     if (session_status() === PHP_SESSION_NONE) {
         secureSession();
     }
-    $role = strtolower((string)($_SESSION['role'] ?? 'tenant'));
-    $staffRoles = ['admin', 'super admin', 'manager', 'moderator', 'support'];
-    return in_array($role, $staffRoles, true);
+    $role = strtolower(trim((string)($_SESSION['role'] ?? 'tenant')));
+    $roleNormalized = str_replace(' ', '', str_replace('_', '', $role));
+    $staffRoles = ['admin', 'superadmin', 'manager', 'moderator', 'support', 'financial', 'marketinghead'];
+    return in_array($roleNormalized, $staffRoles, true);
+}
+
+/**
+ * Centralized Role-Based Page Permissions mapping for all admin/staff roles.
+ * Controls sidebar visibility, direct page loads, backend validation and action gates.
+ */
+function getRolePagePermissions(): array {
+    return [
+        'superadmin' => ['*'],
+        'super admin' => ['*'],
+        'admin' => [
+            '/admin/dashboard',
+            '/admin/users',
+            '/admin/websites',
+            '/admin/templates',
+            '/admin/categories',
+            '/admin/payments',
+            '/admin/revenue',
+            '/admin/analytics',
+            '/admin/marketing',
+            '/admin/support',
+            '/admin/moderation',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ],
+        'manager' => [
+            '/admin/dashboard',
+            '/admin/users',
+            '/admin/websites',
+            '/admin/templates',
+            '/admin/categories',
+            '/admin/analytics',
+            '/admin/support',
+            '/admin/moderation',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ],
+        'support' => [
+            '/admin/dashboard',
+            '/admin/users',
+            '/admin/support',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ],
+        'moderator' => [
+            '/admin/dashboard',
+            '/admin/users',
+            '/admin/moderation',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ],
+        'financial' => [
+            '/admin/dashboard',
+            '/admin/payments',
+            '/admin/revenue',
+            '/admin/financial-reports',
+            '/admin/analytics',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ],
+        'marketing_head' => [
+            '/admin/dashboard',
+            '/admin/marketing',
+            '/admin/analytics',
+            '/admin/revenue',
+            '/admin/activity-logs',
+            '/admin/profile'
+        ]
+    ];
+}
+
+/**
+ * Checks if a specific role is authorized to access a given requested admin URI/endpoint.
+ */
+function hasAdminPagePermission(string $role, string $requestUri): bool {
+    // Clean and normalize input role
+    $roleClean = strtolower(trim($role));
+    $roleClean = str_replace(' ', '', $roleClean); // e.g. super admin -> superadmin, marketing head -> marketinghead
+    $roleClean = str_replace('_', '', $roleClean); // e.g. marketing_head -> marketinghead
+
+    $mapping = getRolePagePermissions();
+    // Normalize mapping keys
+    $normalizedMapping = [];
+    foreach ($mapping as $r => $perms) {
+        $key = str_replace('_', '', str_replace(' ', '', strtolower($r)));
+        $normalizedMapping[$key] = $perms;
+    }
+
+    if (!isset($normalizedMapping[$roleClean])) {
+        return false;
+    }
+
+    $allowed = $normalizedMapping[$roleClean];
+    if (in_array('*', $allowed, true)) {
+        return true;
+    }
+
+    // Isolate path part of requestUri (remove query and strip .php or trailing slashes)
+    $path = parse_url($requestUri, PHP_URL_PATH) ?? $requestUri;
+    $path = rtrim($path, '/');
+    if (str_ends_with($path, '.php')) {
+        $path = substr($path, 0, -4);
+    }
+
+    foreach ($allowed as $p) {
+        $pClean = rtrim($p, '/');
+        if (str_ends_with($pClean, '.php')) {
+            $pClean = substr($pClean, 0, -4);
+        }
+        if (strcasecmp($path, $pClean) === 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 ?>

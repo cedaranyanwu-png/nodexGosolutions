@@ -83,8 +83,9 @@ if ($requestUri === '/profile' || $requestUri === '/profile.php' || $requestUri 
 
     // Isolate active session role bounds
     $activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
-    $staffRoles = ['admin', 'super admin', 'manager', 'moderator', 'support'];
-    $isAdminContext = in_array($activeRole, $staffRoles, true);
+    $roleNormalized = str_replace(' ', '', str_replace('_', '', $activeRole));
+    $staffRoles = ['admin', 'superadmin', 'manager', 'moderator', 'support', 'financial', 'marketinghead'];
+    $isAdminContext = in_array($roleNormalized, $staffRoles, true);
 
     // Formulate target dashboard anchors depending on context role details
     if (str_contains($requestUri, 'profile')) {
@@ -124,6 +125,33 @@ $routeMap = [
     '/cms/php/save_page.php' => __DIR__ . '/php/save_page.php',
     '/admin/dashboard' => __DIR__ . '/main/public/admin/dashboard.php',
     '/admin/dashboard.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    // Virtual admin pages mapping to unify single entry templates and access verification
+    '/admin/users' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/users.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/websites' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/websites.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/templates' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/templates.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/categories' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/categories.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/payments' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/payments.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/revenue' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/revenue.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/financial-reports' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/financial-reports.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/analytics' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/analytics.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/marketing' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/marketing.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/support' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/support.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/moderation' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/moderation.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/activity-logs' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/activity-logs.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/settings' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/settings.php' => __DIR__ . '/main/public/admin/dashboard.php',
     '/user/dashboard' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.php' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.html' => __DIR__ . '/main/public/user/dashboard.php',

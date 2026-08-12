@@ -71,7 +71,11 @@ switch ($action) {
 
         // Accept requested target role
         $newRole = strtolower(cleanInput($_POST['role'] ?? 'tenant'));
-        $validRoles = ['super admin', 'admin', 'manager', 'support', 'moderator', 'tenant'];
+        if ($newRole === 'super admin') { $newRole = 'superadmin'; }
+        if ($newRole === 'marketing head') { $newRole = 'marketing_head'; }
+
+        // Securely support and validate all 7 administrative roles plus regular tenant
+        $validRoles = ['superadmin', 'admin', 'manager', 'support', 'moderator', 'financial', 'marketing_head', 'tenant'];
         if (!in_array($newRole, $validRoles, true)) {
             jsonResponse(['success' => false, 'message' => 'Invalid role assigned.'], 400);
         }
