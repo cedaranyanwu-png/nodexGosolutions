@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleek URL Shortener | nodexGo</title>
+    <!-- Load FontAwesome and Tailwind -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <a href="/user/dashboard" class="flex items-center text-xl font-bold text-blue-600 tracking-wide hover:opacity-90 transition duration-150">
+            <i class="fa-solid fa-server mr-2"></i>nodex<span class="text-slate-800 font-semibold">Go</span>
+        </a>
+        <a href="/user/dashboard" class="text-xs font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-100 transition duration-150">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Return Dashboard
+        </a>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-8 max-w-lg w-full text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-4">
+                <i class="fa-solid fa-link text-2xl"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">URL Shortener</h1>
+            <p class="text-xs text-gray-500 mb-6">Shorten long enterprise URLs instantly in your secure sandbox workspace.</p>
+
+            <div class="space-y-4 text-left mb-6">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Long Destination URL</label>
+                    <input type="url" id="longUrl" class="w-full text-sm rounded-md px-3.5 py-2.5 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="https://very-long-link-destination-path.com/sub/page?ref=campaign" required />
+                </div>
+
+                <button id="btnShorten" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg transition duration-150 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-compress-arrows-alt"></i> Shorten Link Destination
+                </button>
+            </div>
+
+            <!-- Short URL Output Box -->
+            <div id="shortResult" class="hidden p-4 border border-gray-100 rounded-xl bg-slate-50 flex items-center justify-between text-left mb-6">
+                <div>
+                    <span class="text-2xs font-bold uppercase text-gray-400 block mb-1">Short Link Generated</span>
+                    <a id="shortUrl" href="#" target="_blank" class="text-sm font-bold text-blue-600 underline"></a>
+                </div>
+                <button id="btnCopy" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3.5 py-2 rounded-lg transition duration-150">
+                    <i class="fa-solid fa-copy"></i> Copy
+                </button>
+            </div>
+
+            <!-- History List -->
+            <div class="text-left">
+                <h3 class="text-xs font-bold uppercase text-gray-500 mb-3"><i class="fa-solid fa-history mr-1.5"></i>Workspace History Logs</h3>
+                <ul id="historyList" class="divide-y divide-gray-100 border border-gray-100 rounded-xl bg-slate-50 max-h-40 overflow-y-auto p-2 space-y-1 text-xs">
+                    <!-- Dynamic rows populate -->
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-3 text-center text-2xs text-gray-400">
+        &copy; 2026 nodexGo. Secure URL Shortener.
+    </footer>
+
+    <script>
+        const btnShorten = document.getElementById('btnShorten');
+        const longUrlInput = document.getElementById('longUrl');
+        const shortResult = document.getElementById('shortResult');
+        const shortUrlA = document.getElementById('shortUrl');
+        const btnCopy = document.getElementById('btnCopy');
+        const historyList = document.getElementById('historyList');
+
+        function loadHistory() {
+            historyList.innerHTML = '';
+            const list = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            if (list.length === 0) {
+                historyList.innerHTML = '<li class="text-center text-gray-400 py-3 text-2xs">No active shortened links in history.</li>';
+                return;
+            }
+            list.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'py-2 flex justify-between items-center gap-2 border-b border-gray-100 last:border-b-0';
+                li.innerHTML = `
+                    <div class="truncate pr-4 flex-grow">
+                        <span class="font-semibold text-blue-600 block truncate">${item.short}</span>
+                        <span class="text-gray-400 text-3xs block truncate">${item.long}</span>
+                    </div>
+                    <button class="text-rose-500 hover:text-rose-700 px-1 py-1" onclick="deleteItem('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+
+        btnShorten.addEventListener('click', function() {
+            const longUrl = longUrlInput.value.trim();
+            if (!longUrl) {
+                alert('Please enter a destination URL.');
+                return;
+            }
+
+            const uniqueId = Math.random().toString(36).substr(2, 6);
+            const host = window.location.host;
+            const shortUrl = `${window.location.protocol}//${host}/l/${uniqueId}`;
+
+            shortUrlA.href = longUrl;
+            shortUrlA.textContent = shortUrl;
+            shortResult.classList.remove('hidden');
+
+            // Save to localStorage
+            const list = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            list.unshift({ id: uniqueId, long: longUrl, short: shortUrl });
+            localStorage.setItem('shortUrls', JSON.stringify(list));
+            loadHistory();
+        });
+
+        btnCopy.addEventListener('click', function() {
+            navigator.clipboard.writeText(shortUrlA.textContent);
+            btnCopy.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i> Copied!';
+            setTimeout(() => {
+                btnCopy.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+            }, 1500);
+        });
+
+        window.deleteItem = function(id) {
+            let list = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            list = list.filter(item => item.id !== id);
+            localStorage.setItem('shortUrls', JSON.stringify(list));
+            loadHistory();
+        };
+
+        loadHistory();
+    </script>
+</body>
+</html>

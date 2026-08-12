@@ -1,0 +1,37 @@
+[Wed Aug 12 19:39:19 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 Accepted
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 [200]: HEAD /main/public/cedar.php
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 [200]: GET /main/public/cedar.php
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 [200]: GET /main/public/about.php
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 [200]: GET /main/assets/images/about-banner-1.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 [200]: GET /main/assets/images/about-banner-2.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 [200]: GET /main/assets/images/about-team-1.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 [200]: GET /main/assets/images/about-team-2.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 [200]: GET /main/assets/images/about-team-3.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 Closing
