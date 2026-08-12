@@ -116,8 +116,11 @@ $routeMap = [
     '/php/admin_settings_action.php' => __DIR__ . '/php/admin_settings_action.php',
     '/php/admin_rbac_action' => __DIR__ . '/php/admin_rbac_action.php',
     '/php/admin_rbac_action.php' => __DIR__ . '/php/admin_rbac_action.php',
+    '/php/admin_team_action' => __DIR__ . '/php/admin_team_action.php',
+    '/php/admin_team_action.php' => __DIR__ . '/php/admin_team_action.php',
     '/php/track_metrics' => __DIR__ . '/php/track_metrics.php',
     '/php/track_metrics.php' => __DIR__ . '/php/track_metrics.php',
+    '/sitemap.xml' => __DIR__ . '/php/generate_sitemap.php',
 ];
 
 // Check if the current requested URI is registered in our hardcoded static routing map

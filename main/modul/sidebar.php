@@ -144,6 +144,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                         <!-- ================= ADMIN TOOLS ================= -->
 
                         <!-- Websites (Admin) Dropdown Menu -->
+                        <?php if (hasPermission('websites.view')): ?>
                         <div class="accordion-item border-0">
                             <div class="accordion-header">
                                 <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminWebsites" data-target="#collapseAdminWebsites" aria-expanded="false" aria-controls="collapseAdminWebsites" style="background: transparent; font-size: 14px;">
@@ -165,8 +166,10 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?>
 
                         <!-- Database (Admin) Dropdown Menu -->
+                        <?php if (hasPermission('pricing.edit')): ?>
                         <div class="accordion-item border-0 mt-1">
                             <div class="accordion-header">
                                 <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminDatabases" data-target="#collapseAdminDatabases" aria-expanded="false" aria-controls="collapseAdminDatabases" style="background: transparent; font-size: 14px;">
@@ -188,8 +191,67 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?>
+
+                        <!-- Teams Dropdown Menu -->
+                        <?php if (hasPermission('teams.view')): ?>
+                        <div class="accordion-item border-0 mt-1">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminTeams" data-target="#collapseAdminTeams" aria-expanded="false" aria-controls="collapseAdminTeams" style="background: transparent; font-size: 14px;">
+                                    <i class="fa-solid fa-users me-2 text-primary" style="width: 20px;"></i>
+                                    Teams
+                                </button>
+                            </div>
+                            <div id="collapseAdminTeams" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
+                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
+                                    <a href="/admin/dashboard#teams-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-list-check me-2" style="font-size: 11px;"></i> Manage Teams
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Support Dropdown Menu -->
+                        <?php if (hasPermission('tickets.view')): ?>
+                        <div class="accordion-item border-0 mt-1">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminSupport" data-target="#collapseAdminSupport" aria-expanded="false" aria-controls="collapseAdminSupport" style="background: transparent; font-size: 14px;">
+                                    <i class="fa-solid fa-headset me-2 text-primary" style="width: 20px;"></i>
+                                    Support
+                                </button>
+                            </div>
+                            <div id="collapseAdminSupport" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
+                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
+                                    <a href="/admin/dashboard#support-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-ticket me-2" style="font-size: 11px;"></i> Support Tickets
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Moderation Dropdown Menu -->
+                        <?php if (hasPermission('moderation.view')): ?>
+                        <div class="accordion-item border-0 mt-1">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminModeration" data-target="#collapseAdminModeration" aria-expanded="false" aria-controls="collapseAdminModeration" style="background: transparent; font-size: 14px;">
+                                    <i class="fa-solid fa-shield-halved me-2 text-primary" style="width: 20px;"></i>
+                                    Moderation
+                                </button>
+                            </div>
+                            <div id="collapseAdminModeration" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
+                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
+                                    <a href="/admin/dashboard#moderation-section" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-circle-exclamation me-2" style="font-size: 11px;"></i> Moderate Content
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
 
                         <!-- System (Admin) Dropdown Menu -->
+                        <?php if (hasPermission('backups.view')): ?>
                         <div class="accordion-item border-0 mt-1">
                             <div class="accordion-header">
                                 <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseAdminSystem" data-target="#collapseAdminSystem" aria-expanded="false" aria-controls="collapseAdminSystem" style="background: transparent; font-size: 14px;">
@@ -211,6 +273,7 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
@@ -219,7 +282,13 @@ $fullname   = $_SESSION['fullname'] ?? 'System User';
 
             <hr class="my-3" style="border-color: rgba(0, 114, 255, 0.1);">
 
-            <!-- Global Action Links (Visit Homepage & Logout) -->
+            <!-- Global Action Links (Visit Homepage, Profile Settings & Logout) -->
+            <li>
+                <a href="/profile" class="nav-link d-flex align-items-center py-2 px-3 fw-bold text-dark rounded-pill hover-blue <?php echo str_contains($_SERVER['REQUEST_URI'], 'profile') ? 'active text-white bg-primary' : ''; ?>">
+                    <i class="fa-solid fa-user me-2" style="width: 20px;"></i>
+                    Profile Settings
+                </a>
+            </li>
             <li>
                 <a href="/" class="nav-link d-flex align-items-center py-2 px-3 fw-bold text-dark rounded-pill hover-blue" target="_blank">
                     <i class="fa-solid fa-globe me-2" style="width: 20px;"></i>

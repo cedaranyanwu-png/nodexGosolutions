@@ -26,9 +26,10 @@ require_once __DIR__ . '/../../../php/db.php';
 // Instantiate secure session configurations
 secureSession();
 
-// Access Control: Ensure only authenticated admins/super-admins are admitted
+// Access Control: Ensure only authenticated staff are admitted (admin, manager, moderator, support)
 $activeRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
-if ($activeRole !== 'admin' && $activeRole !== 'super admin') {
+$staffRoles = ['admin', 'super admin', 'manager', 'moderator', 'support'];
+if (!in_array($activeRole, $staffRoles, true)) {
     header('Location: /login');
     exit;
 }
@@ -330,35 +331,89 @@ function maskSecretKey(?string $key): string {
     </div>
 
     <!-- ADMINISTRATIVE TABBED MENU CONTROLS -->
+    <?php
+    $tabPermissions = [
+        'users' => 'users.view',
+        'websites' => 'websites.view',
+        'pricing' => 'pricing.edit',
+        'payment-settings' => 'pricing.edit',
+        'rbac' => 'rbac.manage',
+        'activity-logs' => 'backups.view',
+        'backup' => 'backups.view',
+        'teams' => 'teams.view',
+        'support' => 'tickets.view',
+        'moderation' => 'moderation.view'
+    ];
+    $activeTab = '';
+    foreach ($tabPermissions as $tabId => $perm) {
+        if (hasPermission($perm)) {
+            $activeTab = $tabId;
+            break;
+        }
+    }
+    ?>
     <ul class="nav nav-tabs border-0 flex-wrap gap-2 mb-4" id="adminTabs" role="tablist">
+      <?php if (hasPermission('users.view')): ?>
       <li class="nav-item" role="presentation">
-        <button class="nav-link active border-0" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-section" type="button" role="tab">User Directory</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'users' ? 'active' : ''; ?>" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-section" type="button" role="tab">User Directory</button>
+      </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('websites.view')): ?>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link border-0 <?php echo $activeTab === 'websites' ? 'active' : ''; ?>" id="websites-tab" data-bs-toggle="tab" data-bs-target="#websites-section" type="button" role="tab">Website Manager</button>
+      </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('pricing.edit')): ?>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link border-0 <?php echo $activeTab === 'pricing' ? 'active' : ''; ?>" id="pricing-tab" data-bs-toggle="tab" data-bs-target="#pricing-section" type="button" role="tab">Pricing Management</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="websites-tab" data-bs-toggle="tab" data-bs-target="#websites-section" type="button" role="tab">Website Manager</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'payment-settings' ? 'active' : ''; ?>" id="payment-settings-tab" data-bs-toggle="tab" data-bs-target="#payment-settings-section" type="button" role="tab">Payment Settings & Logs</button>
+      </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('rbac.manage')): ?>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link border-0 <?php echo $activeTab === 'rbac' ? 'active' : ''; ?>" id="rbac-tab" data-bs-toggle="tab" data-bs-target="#rbac-section" type="button" role="tab">RBAC Security Matrix</button>
+      </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('backups.view')): ?>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link border-0 <?php echo $activeTab === 'activity-logs' ? 'active' : ''; ?>" id="activity-logs-tab" data-bs-toggle="tab" data-bs-target="#activity-logs-section" type="button" role="tab">System Audits</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="pricing-tab" data-bs-toggle="tab" data-bs-target="#pricing-section" type="button" role="tab">Pricing Management</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'backup' ? 'active' : ''; ?>" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-section" type="button" role="tab">Backup System</button>
       </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('teams.view')): ?>
       <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="payment-settings-tab" data-bs-toggle="tab" data-bs-target="#payment-settings-section" type="button" role="tab">Payment Settings & Logs</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'teams' ? 'active' : ''; ?>" id="teams-tab" data-bs-toggle="tab" data-bs-target="#teams-section" type="button" role="tab">Teams Management</button>
       </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('tickets.view')): ?>
       <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="rbac-tab" data-bs-toggle="tab" data-bs-target="#rbac-section" type="button" role="tab">RBAC Security Matrix</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'support' ? 'active' : ''; ?>" id="support-tab" data-bs-toggle="tab" data-bs-target="#support-section" type="button" role="tab">Support Tickets</button>
       </li>
+      <?php endif; ?>
+
+      <?php if (hasPermission('moderation.view')): ?>
       <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="activity-logs-tab" data-bs-toggle="tab" data-bs-target="#activity-logs-section" type="button" role="tab">System Audits</button>
+        <button class="nav-link border-0 <?php echo $activeTab === 'moderation' ? 'active' : ''; ?>" id="moderation-tab" data-bs-toggle="tab" data-bs-target="#moderation-section" type="button" role="tab">Moderation Queue</button>
       </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link border-0" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-section" type="button" role="tab">Backup System</button>
-      </li>
+      <?php endif; ?>
     </ul>
 
     <!-- Tabbed Panels Container -->
     <div class="tab-content" id="adminTabContent">
 
       <!-- TAB 1: USER MANAGEMENT DIRECTORY -->
-      <div class="tab-pane fade show active" id="users-section" role="tabpanel" aria-labelledby="users-tab">
+      <?php if (hasPermission('users.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'users' ? 'show active' : ''; ?>" id="users-section" role="tabpanel" aria-labelledby="users-tab">
         <div class="card border-0 shadow-sm rounded-xl">
           <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3 flex-wrap gap-3">
             <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-users-gear text-blue-600 mr-2"></i> Tenant Operations Directory</h3>
@@ -442,9 +497,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 2: WEBSITES MANAGEMENT DIRECTORY -->
-      <div class="tab-pane fade" id="websites-section" role="tabpanel" aria-labelledby="websites-tab">
+      <?php if (hasPermission('websites.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'websites' ? 'show active' : ''; ?>" id="websites-section" role="tabpanel" aria-labelledby="websites-tab">
         <div class="card border-0 shadow-sm rounded-xl">
           <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3">
             <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-globe text-primary mr-2"></i> System Website Workspaces</h3>
@@ -505,9 +562,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 3: PRICING MANAGEMENT CRUD CONSOLE -->
-      <div class="tab-pane fade" id="pricing-section" role="tabpanel" aria-labelledby="pricing-tab">
+      <?php if (hasPermission('pricing.edit')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'pricing' ? 'show active' : ''; ?>" id="pricing-section" role="tabpanel" aria-labelledby="pricing-tab">
         <div class="row g-4">
           <!-- Pricing Plans Registry list -->
           <div class="col-md-5">
@@ -610,9 +669,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 4: PAYMENT SETTINGS CONFIG & LOGS -->
-      <div class="tab-pane fade" id="payment-settings-section" role="tabpanel" aria-labelledby="payment-settings-tab">
+      <?php if (hasPermission('pricing.edit')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'payment-settings' ? 'show active' : ''; ?>" id="payment-settings-section" role="tabpanel" aria-labelledby="payment-settings-tab">
         <div class="row g-4">
           <!-- Configuration Form -->
           <div class="col-md-5">
@@ -700,9 +761,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 5: RBAC & PERMISSIONS ASSIGNMENTS MATRIX -->
-      <div class="tab-pane fade" id="rbac-section" role="tabpanel" aria-labelledby="rbac-tab">
+      <?php if (hasPermission('rbac.manage')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'rbac' ? 'show active' : ''; ?>" id="rbac-section" role="tabpanel" aria-labelledby="rbac-tab">
         <div class="row g-4">
           <!-- Create Role Form -->
           <div class="col-md-4">
@@ -803,9 +866,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 6: AUDIT ACTIVITY LOG SYSTEM -->
-      <div class="tab-pane fade" id="activity-logs-section" role="tabpanel" aria-labelledby="activity-logs-tab">
+      <?php if (hasPermission('backups.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'activity-logs' ? 'show active' : ''; ?>" id="activity-logs-section" role="tabpanel" aria-labelledby="activity-logs-tab">
         <div class="card border-0 shadow-sm rounded-xl">
           <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3">
             <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-rectangle-list text-primary mr-2"></i> Complete System Activities Audits</h3>
@@ -843,9 +908,11 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
 
       <!-- TAB 7: NGS BACKUP & RECOVERY SYSTEM CONSOLE -->
-      <div class="tab-pane fade" id="backup-section" role="tabpanel" aria-labelledby="backup-tab">
+      <?php if (hasPermission('backups.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'backup' ? 'show active' : ''; ?>" id="backup-section" role="tabpanel" aria-labelledby="backup-tab">
         <div class="card border-0 shadow-sm rounded-xl mb-4">
           <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3 flex-wrap gap-3">
             <div>
@@ -912,6 +979,139 @@ function maskSecretKey(?string $key): string {
           </div>
         </div>
       </div>
+      <?php endif; ?>
+
+      <!-- TAB 8: TEAMS MANAGEMENT -->
+      <?php if (hasPermission('teams.view')):
+         $staffMembersList = [];
+         foreach ($usersList as $usr) {
+             $uRoleStr = strtolower((string)($usr['role'] ?? 'tenant'));
+             if (in_array($uRoleStr, ['admin', 'super admin', 'manager', 'moderator', 'support'], true)) {
+                 $staffMembersList[] = $usr;
+             }
+         }
+      ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'teams' ? 'show active' : ''; ?>" id="teams-section" role="tabpanel" aria-labelledby="teams-tab">
+        <div class="row g-4">
+          <!-- Create / Edit Team panel Form -->
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-xl">
+              <div class="card-header bg-white border-b border-gray-100 py-3">
+                <h3 class="text-base font-bold text-gray-800 m-0" id="teamFormTitle"><i class="fas fa-users-gear text-blue-600 mr-2"></i> Register New Staff Team</h3>
+              </div>
+              <div class="card-body p-4 text-start">
+                <div id="teamFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+                <form id="teamCrudForm">
+                  <input type="hidden" id="teamId" value="">
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Team Name</label>
+                    <input type="text" id="teamName" class="form-control text-sm rounded-md px-3 py-2 border-gray-200" placeholder="e.g. Moderation Team" required />
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Description</label>
+                    <textarea id="teamDescription" class="form-control text-sm rounded-md px-3 py-2 border-gray-200" rows="2" placeholder="Responsibilities of this team..."></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Type / Category</label>
+                    <input type="text" id="teamType" class="form-control text-sm rounded-md px-3 py-2 border-gray-200" placeholder="e.g. Content, Support" value="General" required />
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Designated Team Leader (Eligible Staff Only)</label>
+                    <select id="teamLeaderId" class="form-control text-sm rounded-md px-3 py-2 border-gray-200">
+                      <option value="">-- No Leader Assigned --</option>
+                      <?php foreach ($staffMembersList as $sm): ?>
+                        <option value="<?php echo $sm['id']; ?>"><?php echo htmlspecialchars($sm['fullname']); ?> (<?php echo strtoupper($sm['role']); ?>)</option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Team Members (Multi-select Staff Only)</label>
+                    <select id="teamMembers" class="form-control text-sm rounded-md px-3 py-2 border-gray-200" multiple style="height: 120px;">
+                      <?php foreach ($staffMembersList as $sm): ?>
+                        <option value="<?php echo $sm['id']; ?>"><?php echo htmlspecialchars($sm['fullname']); ?> (<?php echo strtoupper($sm['role']); ?>)</option>
+                      <?php endforeach; ?>
+                    </select>
+                    <div class="form-text text-muted text-2xs" style="font-size: 9px;">Hold Ctrl (or Cmd) to select multiple members.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-2xs uppercase font-bold text-gray-500 mb-1" style="font-size: 10px;">Status</label>
+                    <select id="teamStatus" class="form-control text-sm rounded-md px-3 py-2 border-gray-200">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="submit" id="btnSaveTeam" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg flex-grow transition border-0">Save Team Profile</button>
+                    <button type="button" id="btnDeleteTeam" class="btn btn-outline-danger text-xs px-3 rounded-lg border d-none">Delete</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teams Directory List table view -->
+          <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-xl">
+              <div class="card-header bg-white border-b border-gray-100 flex justify-between items-center py-3">
+                <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-users text-primary mr-2"></i> Dynamically Provisioned Staff Teams</h3>
+                <button class="btn btn-xs btn-outline-secondary rounded-pill" id="btnNewTeamReset"><i class="fas fa-plus"></i> New Team</button>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0 text-xs">
+                    <thead class="bg-gray-50 text-gray-600 font-semibold">
+                      <tr>
+                        <th class="p-3.5">Team Details</th>
+                        <th class="p-3.5">Category</th>
+                        <th class="p-3.5">Team Leader</th>
+                        <th class="p-3.5">Members Count</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-gray-700" id="teamsListTableBody">
+                      <!-- Loaded dynamically via AJAX -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- TAB 9: SUPPORT TICKETS -->
+      <?php if (hasPermission('tickets.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'support' ? 'show active' : ''; ?>" id="support-section" role="tabpanel" aria-labelledby="support-tab">
+        <div class="card border-0 shadow-sm rounded-xl">
+          <div class="card-header bg-white border-b border-gray-100 py-3">
+            <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-ticket text-emerald-600 mr-2"></i> Client Support Queues</h3>
+          </div>
+          <div class="card-body p-4 text-center text-gray-400 py-10">
+            <i class="fas fa-ticket text-4xl mb-3 text-gray-300"></i>
+            <p class="text-sm fw-semibold mb-1 text-dark">No Active Support Tickets in Queue</p>
+            <p class="text-xs text-gray-400">All customer tickets have been cleanly resolved. Excellent job, support team!</p>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- TAB 10: MODERATION QUEUE -->
+      <?php if (hasPermission('moderation.view')): ?>
+      <div class="tab-pane fade <?php echo $activeTab === 'moderation' ? 'show active' : ''; ?>" id="moderation-section" role="tabpanel" aria-labelledby="moderation-tab">
+        <div class="card border-0 shadow-sm rounded-xl">
+          <div class="card-header bg-white border-b border-gray-100 py-3">
+            <h3 class="text-base font-bold text-gray-800 m-0"><i class="fas fa-shield-halved text-primary mr-2"></i> Content Moderation & Abuse Reports</h3>
+          </div>
+          <div class="card-body p-4 text-center text-gray-400 py-10">
+            <i class="fas fa-circle-check text-4xl mb-3 text-emerald-400"></i>
+            <p class="text-sm fw-semibold mb-1 text-dark">Moderation Queue Clear</p>
+            <p class="text-xs text-gray-400">Zero active abuse reports on tenant websites or content pages reported.</p>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
 
     </div>
 
@@ -1543,6 +1743,189 @@ $(document).ready(function() {
     // Trigger on hash load and change events
     handleAdminHashes();
     $(window).on('hashchange', handleAdminHashes);
+
+    // ============================================================
+    // TEAMS MANAGEMENT INTERACTIVE CONTROLS
+    // ============================================================
+    function reloadTeamsList() {
+        $.ajax({
+            url: '/php/admin_team_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'list_teams' },
+            success: function(res) {
+                const tbody = $('#teamsListTableBody');
+                tbody.empty();
+                if (res.success && res.teams && res.teams.length > 0) {
+                    res.teams.forEach(function(team) {
+                        const mCount = JSON.parse(team.members || '[]').length;
+                        tbody.append(`
+                            <tr>
+                                <td class="p-3.5">
+                                    <div class="font-bold text-gray-800">${team.name}</div>
+                                    <div class="text-2xs text-gray-400" style="font-size: 10px;">${team.description || 'No description provided.'}</div>
+                                </td>
+                                <td class="p-3.5"><span class="badge bg-primary bg-opacity-10 text-primary rounded-md px-2 py-1">${team.type}</span></td>
+                                <td class="p-3.5 font-semibold text-gray-700">${team.leader_id ? 'Staff ID: ' + team.leader_id : '<em>No Leader</em>'}</td>
+                                <td class="p-3.5 font-mono text-center">${mCount} members</td>
+                                <td class="p-3.5">
+                                    <span class="badge ${team.status === 'active' ? 'bg-success' : 'bg-secondary'} bg-opacity-10 ${team.status === 'active' ? 'text-success' : 'text-secondary'} font-bold px-2 py-1 rounded-md" style="font-size: 10px;">${team.status.toUpperCase()}</span>
+                                </td>
+                                <td class="p-3.5 text-right">
+                                    <button class="btn btn-xs btn-outline-primary rounded-md btn-select-team"
+                                        data-id="${team.id}"
+                                        data-name="${team.name}"
+                                        data-desc="${team.description}"
+                                        data-type="${team.type}"
+                                        data-leader="${team.leader_id || ''}"
+                                        data-members='${team.members || '[]'}'
+                                        data-status="${team.status}">
+                                        Edit
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="6" class="text-center text-gray-400 py-5">No teams provisioned on the platform yet.</td></tr>');
+                }
+            }
+        });
+    }
+
+    // New Team reset form trigger
+    $('#btnNewTeamReset').on('click', function() {
+        $('#teamFormTitle').html('<i class="fas fa-users-gear text-blue-600 mr-2"></i> Register New Staff Team');
+        $('#teamId').val('');
+        $('#teamName').val('');
+        $('#teamDescription').val('');
+        $('#teamType').val('General');
+        $('#teamLeaderId').val('');
+        $('#teamMembers').val([]);
+        $('#teamStatus').val('active');
+        $('#btnDeleteTeam').addClass('d-none');
+    });
+
+    // Select and fill team for editing
+    $(document).on('click', '.btn-select-team', function() {
+        const id = $(this).attr('data-id');
+        const name = $(this).attr('data-name');
+        const desc = $(this).attr('data-desc');
+        const type = $(this).attr('data-type');
+        const leader = $(this).attr('data-leader');
+        const members = JSON.parse($(this).attr('data-members') || '[]');
+        const status = $(this).attr('data-status');
+
+        $('#teamFormTitle').text("Modify: " + name);
+        $('#teamId').val(id);
+        $('#teamName').val(name);
+        $('#teamDescription').val(desc);
+        $('#teamType').val(type);
+        $('#teamLeaderId').val(leader);
+        $('#teamMembers').val(members);
+        $('#teamStatus').val(status);
+        $('#btnDeleteTeam').removeClass('d-none');
+    });
+
+    // Save team form submit handler
+    $('#teamCrudForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#teamFeedback');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        $('#btnSaveTeam').prop('disabled', true).text('Saving team...');
+
+        const tId = $('#teamId').val();
+        const actionName = tId ? 'edit_team' : 'create_team';
+
+        $.ajax({
+            url: '/php/admin_team_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: actionName,
+                id: tId,
+                name: $('#teamName').val(),
+                description: $('#teamDescription').val(),
+                type: $('#teamType').val(),
+                leader_id: $('#teamLeaderId').val(),
+                members: $('#teamMembers').val(),
+                status: $('#teamStatus').val()
+            },
+            success: function(res) {
+                $('#btnSaveTeam').prop('disabled', false).text('Save Team Profile');
+                feedback.removeClass('d-none');
+                if (res.success) {
+                    feedback.addClass('alert-success').text(res.message);
+                    reloadTeamsList();
+                    setTimeout(() => {
+                        feedback.addClass('d-none');
+                    }, 2000);
+                } else {
+                    feedback.addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                $('#btnSaveTeam').prop('disabled', false).text('Save Team Profile');
+                feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Server communication error.');
+            }
+        });
+    });
+
+    // Delete Team handler
+    $('#btnDeleteTeam').on('click', function() {
+        const id = $('#teamId').val();
+        if (!id) return;
+        if (!confirm('Are you sure you want to permanently delete this team?')) return;
+
+        const feedback = $('#teamFeedback');
+        feedback.addClass('d-none');
+
+        $.ajax({
+            url: '/php/admin_team_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'delete_team', id: id },
+            success: function(res) {
+                if (res.success) {
+                    alert(res.message);
+                    $('#btnNewTeamReset').click();
+                    reloadTeamsList();
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            }
+        });
+    });
+
+    // Initialize list load
+    reloadTeamsList();
+
+    // Map Hash tags tab switching support for custom teams, support, and moderation tabs
+    const originalHandleAdminHashes = handleAdminHashes;
+    handleAdminHashes = function() {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        const extraMap = {
+            '#teams-section': 'teams-tab',
+            '#support-section': 'support-tab',
+            '#moderation-section': 'moderation-tab'
+        };
+
+        const targetTabId = extraMap[hash];
+        if (targetTabId) {
+            const tabTriggerEl = document.getElementById(targetTabId);
+            if (tabTriggerEl) {
+                const tab = new bootstrap.Tab(tabTriggerEl);
+                tab.show();
+                $('html, body').animate({
+                    scrollTop: $("#adminTabs").offset().top - 20
+                }, 300);
+                return;
+            }
+        }
+        originalHandleAdminHashes();
+    };
 
     // Select first plan by default
     $('.btn-select-plan').first().click();

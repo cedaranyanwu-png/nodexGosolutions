@@ -157,6 +157,22 @@ foreach ($backupPerms as $perm) {
     }
 }
 
+// Seed additional granular permissions dynamically
+$additionalPerms = [
+    ['role' => 'manager', 'permission' => 'teams.view', 'is_allowed' => 1],
+    ['role' => 'manager', 'permission' => 'teams.manage', 'is_allowed' => 1],
+    ['role' => 'moderator', 'permission' => 'moderation.view', 'is_allowed' => 1],
+    ['role' => 'moderator', 'permission' => 'moderation.manage', 'is_allowed' => 1],
+    ['role' => 'support', 'permission' => 'tickets.view', 'is_allowed' => 1],
+    ['role' => 'support', 'permission' => 'tickets.manage', 'is_allowed' => 1]
+];
+foreach ($additionalPerms as $ap) {
+    $hasAp = $conn->selectOne('permissions', ['role' => $ap['role'], 'permission' => $ap['permission']]);
+    if (!$hasAp) {
+        $conn->insert('permissions', $ap);
+    }
+}
+
 // Require the central BackupManager class module
 require_once __DIR__ . '/BackupManager.php';
 // Instantiate the BackupManager service
@@ -560,5 +576,72 @@ function checkAdminPermission(string $permission): bool {
     }
 
     return false;
+}
+
+/**
+ * Reusable permission checker that works platform-wide for all authenticated users/roles.
+ * Resolves permissions recursively using "role -> permissions -> resources/actions" database mapping.
+ * Supports absolute bypass for administrators and super administrators.
+ */
+function hasPermission(string $permission): bool {
+    global $conn;
+    if (session_status() === PHP_SESSION_NONE) {
+        secureSession();
+    }
+    if (!isset($_SESSION['email']) || !isset($_SESSION['role'])) {
+        return false;
+    }
+    $role = strtolower((string)$_SESSION['role']);
+    // Administrators possess absolute platform capabilities
+    if ($role === 'super admin' || $role === 'admin') {
+        return true;
+    }
+    // Query local permissions mapping dynamically
+    $conn->createTable('permissions');
+    $record = $conn->selectOne('permissions', ['role' => $role, 'permission' => $permission]);
+    return $record && (int)($record['is_allowed'] ?? 0) === 1;
+}
+
+/**
+ * Restricts access to API or page requests strictly based on permissions and role boundaries.
+ */
+function enforcePermission(string $permission, bool $isApi = false): void {
+    if (!hasPermission($permission)) {
+        if ($isApi) {
+            jsonResponse(['success' => false, 'message' => 'Forbidden. Missing permission: ' . $permission], 403);
+        } else {
+            header('Location: /login');
+            exit;
+        }
+    }
+}
+
+/**
+ * Restricts access to authenticated users only.
+ */
+function enforceAuth(bool $isApi = false): void {
+    if (session_status() === PHP_SESSION_NONE) {
+        secureSession();
+    }
+    if (!isset($_SESSION['email'])) {
+        if ($isApi) {
+            jsonResponse(['success' => false, 'message' => 'Unauthorized. Please authenticate first.'], 401);
+        } else {
+            header('Location: /login');
+            exit;
+        }
+    }
+}
+
+/**
+ * Validates if the authenticated role is classified as internal staff.
+ */
+function isStaff(): bool {
+    if (session_status() === PHP_SESSION_NONE) {
+        secureSession();
+    }
+    $role = strtolower((string)($_SESSION['role'] ?? 'tenant'));
+    $staffRoles = ['admin', 'super admin', 'manager', 'moderator', 'support'];
+    return in_array($role, $staffRoles, true);
 }
 ?>
