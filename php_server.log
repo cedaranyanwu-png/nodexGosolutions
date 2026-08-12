@@ -1,0 +1,108 @@
+[Wed Aug 12 14:12:46 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Wed Aug 12 14:12:48 2026] [::1]:58846 Accepted
+[Wed Aug 12 14:12:48 2026] [::1]:58846 Closing
+[Wed Aug 12 14:14:28 2026] [::1]:58930 Accepted
+[Wed Aug 12 14:14:28 2026] [::1]:58930 Closing
+[Wed Aug 12 14:14:28 2026] [::1]:58934 Accepted
+[Wed Aug 12 14:14:28 2026] [::1]:58938 Accepted
+[Wed Aug 12 14:14:28 2026] [::1]:58934 [200]: GET /css/style.css?v=1786541028
+[Wed Aug 12 14:14:28 2026] [::1]:58938 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 14:14:28 2026] [::1]:58934 Closing
+[Wed Aug 12 14:14:28 2026] [::1]:58938 Closing
+[Wed Aug 12 14:16:24 2026] [::1]:33562 Accepted
+[Wed Aug 12 14:16:24 2026] [::1]:33562 Closing
+[Wed Aug 12 14:16:24 2026] [::1]:33568 Accepted
+[Wed Aug 12 14:16:24 2026] [::1]:33570 Accepted
+[Wed Aug 12 14:16:24 2026] [::1]:33568 [200]: GET /css/style.css?v=1786541028
+[Wed Aug 12 14:16:24 2026] [::1]:33570 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 14:16:24 2026] [::1]:33568 Closing
+[Wed Aug 12 14:16:24 2026] [::1]:33570 Closing
+[Wed Aug 12 14:16:27 2026] [::1]:33580 Accepted
+[Wed Aug 12 14:16:27 2026] [::1]:33580 [200]: POST /php/login.php
+[Wed Aug 12 14:16:27 2026] [::1]:33580 Closing
+[Wed Aug 12 14:16:28 2026] [::1]:33590 Accepted
+[Wed Aug 12 14:16:28 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:16:28 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:16:28 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:16:28 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:16:28 2026] [::1]:33590 Closing
+[Wed Aug 12 14:16:29 2026] [::1]:33594 Accepted
+[Wed Aug 12 14:16:29 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 188
+[Wed Aug 12 14:16:29 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 190
+[Wed Aug 12 14:16:29 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 192
+[Wed Aug 12 14:16:29 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 194
+[Wed Aug 12 14:16:29 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 203
+[Wed Aug 12 14:16:29 2026] [::1]:33594 [200]: POST /php/admin_backup_action.php
+[Wed Aug 12 14:16:29 2026] [::1]:33594 Closing
+[Wed Aug 12 14:16:29 2026] [::1]:33602 Accepted
+[Wed Aug 12 14:16:29 2026] [::1]:33602 [200]: POST /php/admin_team_action.php
+[Wed Aug 12 14:16:29 2026] [::1]:33602 Closing
+[Wed Aug 12 14:17:49 2026] [::1]:51136 Accepted
+[Wed Aug 12 14:17:49 2026] [::1]:51136 Closing
+[Wed Aug 12 14:17:49 2026] [::1]:51144 Accepted
+[Wed Aug 12 14:17:49 2026] [::1]:51154 Accepted
+[Wed Aug 12 14:17:49 2026] [::1]:51144 [200]: GET /css/style.css?v=1786541028
+[Wed Aug 12 14:17:49 2026] [::1]:51154 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 14:17:49 2026] [::1]:51144 Closing
+[Wed Aug 12 14:17:49 2026] [::1]:51154 Closing
+[Wed Aug 12 14:17:52 2026] [::1]:51170 Accepted
+[Wed Aug 12 14:17:52 2026] [::1]:51170 [200]: POST /php/login.php
+[Wed Aug 12 14:17:52 2026] [::1]:51170 Closing
+[Wed Aug 12 14:17:53 2026] [::1]:51588 Accepted
+[Wed Aug 12 14:17:53 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:17:53 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:17:53 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:17:53 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:17:53 2026] [::1]:51588 Closing
+[Wed Aug 12 14:17:54 2026] [::1]:51604 Accepted
+[Wed Aug 12 14:17:54 2026] [::1]:51608 Accepted
+[Wed Aug 12 14:17:54 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 188
+[Wed Aug 12 14:17:54 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 190
+[Wed Aug 12 14:17:54 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 192
+[Wed Aug 12 14:17:54 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 194
+[Wed Aug 12 14:17:54 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 203
+[Wed Aug 12 14:17:54 2026] [::1]:51604 [200]: POST /php/admin_backup_action.php
+[Wed Aug 12 14:17:54 2026] [::1]:51604 Closing
+[Wed Aug 12 14:17:54 2026] [::1]:51608 [200]: POST /php/admin_team_action.php
+[Wed Aug 12 14:17:54 2026] [::1]:51608 Closing
+[Wed Aug 12 14:24:23 2026] [::1]:39982 Accepted
+[Wed Aug 12 14:24:23 2026] [::1]:39982 Closing
+[Wed Aug 12 14:24:23 2026] [::1]:39994 Accepted
+[Wed Aug 12 14:24:23 2026] [::1]:40008 Accepted
+[Wed Aug 12 14:24:23 2026] [::1]:39994 [200]: GET /css/style.css?v=1786541028
+[Wed Aug 12 14:24:23 2026] [::1]:39994 Closing
+[Wed Aug 12 14:24:23 2026] [::1]:40008 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 14:24:23 2026] [::1]:40008 Closing
+[Wed Aug 12 14:24:25 2026] [::1]:40012 Accepted
+[Wed Aug 12 14:24:26 2026] [::1]:40012 [200]: POST /php/login.php
+[Wed Aug 12 14:24:26 2026] [::1]:40012 Closing
+[Wed Aug 12 14:24:27 2026] [::1]:40020 Accepted
+[Wed Aug 12 14:24:27 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:24:27 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:24:27 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:24:27 2026] PHP Warning:  Undefined array key "avatar" in /app/main/public/admin/dashboard.php on line 1439
+[Wed Aug 12 14:24:27 2026] [::1]:40020 Closing
+[Wed Aug 12 14:24:27 2026] [::1]:40022 Accepted
+[Wed Aug 12 14:24:27 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 188
+[Wed Aug 12 14:24:27 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 190
+[Wed Aug 12 14:24:27 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 192
+[Wed Aug 12 14:24:27 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 194
+[Wed Aug 12 14:24:27 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 203
+[Wed Aug 12 14:24:27 2026] [::1]:40022 [200]: POST /php/admin_backup_action.php
+[Wed Aug 12 14:24:27 2026] [::1]:40022 Closing
+[Wed Aug 12 14:24:27 2026] [::1]:40030 Accepted
+[Wed Aug 12 14:24:27 2026] [::1]:40030 [200]: POST /php/admin_team_action.php
+[Wed Aug 12 14:24:27 2026] [::1]:40030 Closing
+[Wed Aug 12 14:24:36 2026] [::1]:55914 Accepted
+[Wed Aug 12 14:24:36 2026] [::1]:55914 Closing
+[Wed Aug 12 14:24:37 2026] [::1]:55928 Accepted
+[Wed Aug 12 14:24:37 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 188
+[Wed Aug 12 14:24:37 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 190
+[Wed Aug 12 14:24:37 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 192
+[Wed Aug 12 14:24:37 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 194
+[Wed Aug 12 14:24:37 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 203
+[Wed Aug 12 14:24:37 2026] [::1]:55928 [200]: POST /php/admin_backup_action.php
+[Wed Aug 12 14:24:37 2026] [::1]:55928 Closing
+[Wed Aug 12 14:24:37 2026] [::1]:55936 Accepted
+[Wed Aug 12 14:24:37 2026] [::1]:55936 [200]: POST /php/admin_team_action.php
+[Wed Aug 12 14:24:37 2026] [::1]:55936 Closing
