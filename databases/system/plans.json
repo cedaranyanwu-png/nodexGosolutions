@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "name": "Micro",
+        "price": 3000,
+        "currency": "NGN",
+        "billing_period": "month",
+        "description": "Perfect for launching small custom hosting websites and projects.",
+        "features": "[\"1 Website\",\"Shared SSL\",\"1 GB Bandwidth\"]",
+        "is_active": 1,
+        "display_order": 1,
+        "is_recommended": 0,
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 2,
+        "name": "Growth",
+        "price": 25000,
+        "currency": "NGN",
+        "billing_period": "month",
+        "description": "Ideal for growing developer portals and custom subdomain hosting sites.",
+        "features": "[\"Unlimited Websites\",\"Full database integration\",\"10 GB Bandwidth\",\"Priority SLA support\"]",
+        "is_active": 1,
+        "display_order": 2,
+        "is_recommended": 1,
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 3,
+        "name": "Business Pro",
+        "price": 75000,
+        "currency": "NGN",
+        "billing_period": "month",
+        "description": "High-capacity computational limits with multi-server cloud capabilities.",
+        "features": "[\"Dedicated servers\",\"SLA 99.99% uptime\",\"Unmetered bandwidth\",\"All features included\"]",
+        "is_active": 1,
+        "display_order": 3,
+        "is_recommended": 0,
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    }
+]
