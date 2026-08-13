@@ -29,11 +29,13 @@ require_once __DIR__ . '/../../php/db.php';
         <div class="bg-white border border-slate-100 rounded-2xl p-8 md:p-12 shadow-sm">
             <div class="flex flex-col md:flex-row gap-8 items-center mb-8">
                 <!-- SEO Optimised Profile Container: Displaying the real Cedar Anyanwu photo with descriptive alt tag and cache-busting -->
+                <!-- Change object-cover to custom styles to ensure face is fully visible on the avatar layout -->
                 <div class="w-24 h-24 flex-shrink-0">
                     <img
                         src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/cedar-profile.jpg')) ?>"
                         alt="Cedar Anyanwu - Founder, CEO, and Systems Architect of nodexGosolutions"
-                        class="rounded-full w-24 h-24 object-cover border-4 border-blue-100 shadow-sm"
+                        class="rounded-full w-24 h-24 object-contain object-top bg-slate-100 border-4 border-blue-100 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                        onclick="openImageModal(this.src, this.alt)"
                     />
                 </div>
                 <div>
@@ -56,6 +58,106 @@ require_once __DIR__ . '/../../php/db.php';
     </main>
 
     <?php require_once __DIR__ . '/../modul/footer.html'; ?>
+
+    <!-- Interactive Reusable Image Modal System for SEO Images -->
+    <div
+        id="seoImageModal"
+        class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0"
+        onclick="closeImageModalOnBackdrop(event)"
+    >
+        <div class="relative max-w-3xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+                <h3 id="seoModalTitle" class="text-base font-bold text-slate-900 truncate">Image View</h3>
+                <button
+                    type="button"
+                    class="text-slate-400 hover:text-slate-600 focus:outline-none p-1"
+                    onclick="closeImageModal()"
+                >
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <!-- Modal Body (Image Container) -->
+            <div class="p-6 flex justify-center bg-slate-50">
+                <img
+                    id="seoModalImage"
+                    src=""
+                    alt=""
+                    class="max-h-[70vh] w-auto object-contain rounded-lg shadow-sm border border-slate-200"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to control the image modal behavior dynamically -->
+    <script>
+        /**
+         * Opens the SEO image modal, populates the source/alt attributes, and plays smooth transition.
+         * @param {string} src - The image source URL.
+         * @param {string} alt - The descriptive SEO alt tag text.
+         */
+        function openImageModal(src, alt) {
+            const modal = document.getElementById('seoImageModal');
+            const modalImg = document.getElementById('seoModalImage');
+            const modalTitle = document.getElementById('seoModalTitle');
+
+            if (!modal || !modalImg || !modalTitle) return;
+
+            // Set dynamic attributes
+            modalImg.src = src;
+            modalImg.alt = alt;
+            modalTitle.textContent = alt || "Uncropped Full View";
+
+            // Unhide modal element
+            modal.classList.remove('hidden');
+
+            // Allow layout render, then trigger CSS transitions
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+                modal.querySelector('.transform').classList.add('scale-100');
+            }, 20);
+
+            // Close modal on Escape key down
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        /**
+         * Closes the interactive image modal with smooth fade-out CSS transitions.
+         */
+        function closeImageModal() {
+            const modal = document.getElementById('seoImageModal');
+            if (!modal) return;
+
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-100');
+            modal.querySelector('.transform').classList.add('scale-95');
+
+            // Hide from DOM after transition completes
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+
+            // Clean up global keydown listener
+            document.removeEventListener('keydown', handleEscapeKey);
+        }
+
+        /**
+         * Helper to safely close modal when clicking on the transparent backdrop.
+         */
+        function closeImageModalOnBackdrop(event) {
+            closeImageModal();
+        }
+
+        /**
+         * Handles Escape key press to close modal.
+         */
+        function handleEscapeKey(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        }
+    </script>
 
 </body>
 </html>

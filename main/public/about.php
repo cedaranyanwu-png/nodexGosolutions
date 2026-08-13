@@ -61,10 +61,12 @@ require_once __DIR__ . '/../../php/db.php';
         <!-- Header Showcase featuring corporate banners side-by-side -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
             <div class="rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-white">
+                <!-- Using object-contain and object-top to ensure the main faces/essential areas of banners are completely visible -->
                 <img
                     src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/about-banner-1.jpg')) ?>"
                     alt="nodexGosolutions team collaborating on next-generation tech solutions"
-                    class="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                    class="w-full h-64 object-contain object-top bg-slate-100 hover:scale-105 transition-transform duration-300 cursor-pointer"
+                    onclick="openImageModal(this.src, this.alt)"
                 />
                 <div class="p-4">
                     <span class="text-xs text-blue-600 font-bold uppercase tracking-wide">Dynamic Engineering</span>
@@ -72,10 +74,12 @@ require_once __DIR__ . '/../../php/db.php';
                 </div>
             </div>
             <div class="rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-white">
+                <!-- Using object-contain and object-top to ensure the main faces/essential areas of banners are completely visible -->
                 <img
                     src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/about-banner-2.jpg')) ?>"
                     alt="Space telemetry data visualization and satellite cloud linkage center"
-                    class="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                    class="w-full h-64 object-contain object-top bg-slate-100 hover:scale-105 transition-transform duration-300 cursor-pointer"
+                    onclick="openImageModal(this.src, this.alt)"
                 />
                 <div class="p-4">
                     <span class="text-xs text-blue-600 font-bold uppercase tracking-wide">Orbital Telemetry</span>
@@ -95,10 +99,12 @@ require_once __DIR__ . '/../../php/db.php';
                 <p class="text-slate-500 italic text-sm mb-4">"We are not merely consuming tech; we are designing the modules that navigate cloud computation."</p>
                 <div class="flex items-center">
                     <!-- Dynamic CEO profile photo replaces initials for premium SEO layout structure -->
+                    <!-- object-contain and object-top applied to display Cedar's face perfectly -->
                     <img
                         src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/cedar-profile.jpg')) ?>"
                         alt="Cedar Anyanwu - CEO of nodexGosolutions"
-                        class="rounded-full w-10 h-10 object-cover border border-blue-200"
+                        class="rounded-full w-10 h-10 object-contain object-top bg-slate-100 border border-blue-200 cursor-pointer"
+                        onclick="openImageModal(this.src, this.alt)"
                     />
                     <div class="ml-3">
                         <p class="font-bold text-slate-900 text-sm mb-0">Cedar Anyanwu</p>
@@ -116,10 +122,12 @@ require_once __DIR__ . '/../../php/db.php';
             <div class="grid md:grid-cols-3 gap-6">
                 <!-- Team Member 1 -->
                 <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <!-- Using object-contain and object-top to ensure the faces are fully visible -->
                     <img
                         src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/about-team-1.jpg')) ?>"
                         alt="nodexGosolutions head of system operations engineering"
-                        class="w-full h-48 object-cover"
+                        class="w-full h-48 object-contain object-top bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity"
+                        onclick="openImageModal(this.src, this.alt)"
                     />
                     <div class="p-5">
                         <h4 class="font-bold text-slate-900 mb-1">Software Operations</h4>
@@ -129,10 +137,12 @@ require_once __DIR__ . '/../../php/db.php';
                 </div>
                 <!-- Team Member 2 -->
                 <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <!-- Using object-contain and object-top to ensure the faces are fully visible -->
                     <img
                         src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/about-team-2.jpg')) ?>"
                         alt="nodexGosolutions satellite telemetry data analyst"
-                        class="w-full h-48 object-cover"
+                        class="w-full h-48 object-contain object-top bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity"
+                        onclick="openImageModal(this.src, this.alt)"
                     />
                     <div class="p-5">
                         <h4 class="font-bold text-slate-900 mb-1">Space Data Analyst</h4>
@@ -142,10 +152,12 @@ require_once __DIR__ . '/../../php/db.php';
                 </div>
                 <!-- Team Member 3 -->
                 <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <!-- Using object-contain and object-top to ensure the faces are fully visible -->
                     <img
                         src="<?= htmlspecialchars((string)assetUrl('/main/assets/images/about-team-3.jpg')) ?>"
                         alt="nodexGosolutions lead frontend experience architect"
-                        class="w-full h-48 object-cover"
+                        class="w-full h-48 object-contain object-top bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity"
+                        onclick="openImageModal(this.src, this.alt)"
                     />
                     <div class="p-5">
                         <h4 class="font-bold text-slate-900 mb-1">UI Experience Architect</h4>
@@ -177,6 +189,106 @@ require_once __DIR__ . '/../../php/db.php';
 
     <!-- Modular Footer component -->
     <?php require_once __DIR__ . '/../modul/footer.html'; ?>
+
+    <!-- Interactive Reusable Image Modal System for SEO Images -->
+    <div
+        id="seoImageModal"
+        class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0"
+        onclick="closeImageModalOnBackdrop(event)"
+    >
+        <div class="relative max-w-3xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+                <h3 id="seoModalTitle" class="text-base font-bold text-slate-900 truncate">Image View</h3>
+                <button
+                    type="button"
+                    class="text-slate-400 hover:text-slate-600 focus:outline-none p-1"
+                    onclick="closeImageModal()"
+                >
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <!-- Modal Body (Image Container) -->
+            <div class="p-6 flex justify-center bg-slate-50">
+                <img
+                    id="seoModalImage"
+                    src=""
+                    alt=""
+                    class="max-h-[70vh] w-auto object-contain rounded-lg shadow-sm border border-slate-200"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to control the image modal behavior dynamically -->
+    <script>
+        /**
+         * Opens the SEO image modal, populates the source/alt attributes, and plays smooth transition.
+         * @param {string} src - The image source URL.
+         * @param {string} alt - The descriptive SEO alt tag text.
+         */
+        function openImageModal(src, alt) {
+            const modal = document.getElementById('seoImageModal');
+            const modalImg = document.getElementById('seoModalImage');
+            const modalTitle = document.getElementById('seoModalTitle');
+
+            if (!modal || !modalImg || !modalTitle) return;
+
+            // Set dynamic attributes
+            modalImg.src = src;
+            modalImg.alt = alt;
+            modalTitle.textContent = alt || "Uncropped Full View";
+
+            // Unhide modal element
+            modal.classList.remove('hidden');
+
+            // Allow layout render, then trigger CSS transitions
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+                modal.querySelector('.transform').classList.add('scale-100');
+            }, 20);
+
+            // Close modal on Escape key down
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        /**
+         * Closes the interactive image modal with smooth fade-out CSS transitions.
+         */
+        function closeImageModal() {
+            const modal = document.getElementById('seoImageModal');
+            if (!modal) return;
+
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-100');
+            modal.querySelector('.transform').classList.add('scale-95');
+
+            // Hide from DOM after transition completes
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+
+            // Clean up global keydown listener
+            document.removeEventListener('keydown', handleEscapeKey);
+        }
+
+        /**
+         * Helper to safely close modal when clicking on the transparent backdrop.
+         */
+        function closeImageModalOnBackdrop(event) {
+            closeImageModal();
+        }
+
+        /**
+         * Handles Escape key press to close modal.
+         */
+        function handleEscapeKey(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        }
+    </script>
 
 </body>
 </html>
