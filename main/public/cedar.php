@@ -62,7 +62,7 @@ require_once __DIR__ . '/../../php/db.php';
     <!-- Interactive Reusable Image Modal System for SEO Images -->
     <div
         id="seoImageModal"
-        class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0"
+        class="fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0"
         onclick="closeImageModalOnBackdrop(event)"
     >
         <div class="relative max-w-3xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
