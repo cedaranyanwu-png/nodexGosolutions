@@ -47,7 +47,8 @@ if (strtolower((string)($payment['status'] ?? '')) === 'successful') {
 
 // Load custom Flutterwave configuration credentials securely from system settings
 $conn->createTable('settings');
-$flwSettings = $conn->selectOne('settings', ['id' => 'flutterwave']);
+$allSettings = $conn->select('settings') ?: [];
+$flwSettings = $allSettings[0] ?? null;
 $secretKey = $flwSettings['flw_secret_key'] ?? '';
 
 // Check if verification parameters can be handled

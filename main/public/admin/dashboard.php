@@ -197,7 +197,8 @@ $conn->createTable('payments');
 $paymentsList = $conn->select('payments') ?: [];
 
 $conn->createTable('settings');
-$flwSettings = $conn->selectOne('settings', ['id' => 'flutterwave']);
+$allSettings = $conn->select('settings') ?: [];
+$flwSettings = $allSettings[0] ?? null;
 
 $conn->createTable('activity_logs');
 $activityLogsList = $conn->select('activity_logs') ?: [];

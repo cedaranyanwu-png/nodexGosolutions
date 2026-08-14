@@ -37,7 +37,8 @@ $flwEncryptionKey = cleanInput($_POST['flw_encryption_key'] ?? '');
 $conn->createTable('settings');
 
 // Retrieve existing settings to check for masking overrides
-$existing = $conn->selectOne('settings', ['id' => 'flutterwave']);
+$allSettings = $conn->select('settings') ?: [];
+$existing = $allSettings[0] ?? null;
 
 // Helper to check if a submitted key is masked (meaning no change was made)
 $isMasked = function(string $key): bool {
@@ -71,12 +72,22 @@ if (empty($finalPublicKey) || empty($finalSecretKey)) {
 }
 
 // Persist the updated configuration back inside the system settings table
-$conn->update('settings', [
-    'flw_public_key'     => $finalPublicKey,
-    'flw_secret_key'     => $finalSecretKey,
-    'flw_encryption_key' => $finalEncryptionKey,
-    'updated_at'         => date('Y-m-d H:i:s')
-], ['id' => 'flutterwave']);
+if ($existing) {
+    $conn->update('settings', [
+        'flw_public_key'     => $finalPublicKey,
+        'flw_secret_key'     => $finalSecretKey,
+        'flw_encryption_key' => $finalEncryptionKey,
+        'updated_at'         => date('Y-m-d H:i:s')
+    ], ['id' => $existing['id']]);
+} else {
+    $conn->insert('settings', [
+        'flw_public_key'     => $finalPublicKey,
+        'flw_secret_key'     => $finalSecretKey,
+        'flw_encryption_key' => $finalEncryptionKey,
+        'created_at'         => date('Y-m-d H:i:s'),
+        'updated_at'         => date('Y-m-d H:i:s')
+    ]);
+}
 
 // Log administrative activity audit trace
 $conn->createTable('activity_logs');

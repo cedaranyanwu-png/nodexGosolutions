@@ -49,7 +49,8 @@ if (!$user) {
 
 // Load custom Flutterwave keys securely from server-side database
 $conn->createTable('settings');
-$flwSettings = $conn->selectOne('settings', ['id' => 'flutterwave']);
+$allSettings = $conn->select('settings') ?: [];
+$flwSettings = $allSettings[0] ?? null;
 $secretKey = $flwSettings['flw_secret_key'] ?? '';
 
 if (empty($secretKey)) {
