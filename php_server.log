@@ -1,0 +1,18 @@
+[Sat Aug 15 00:56:50 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41352 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41352 Closing
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 [200]: GET /css/style.css?v=1786696560
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 Closing
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 [200]: GET /main/assets/images/logo.png?v=2
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 Closing
+[Sat Aug 15 00:56:54 2026] 127.0.0.1:41376 Accepted
+[Sat Aug 15 00:56:55 2026] 127.0.0.1:41376 [200]: POST /php/login.php
+[Sat Aug 15 00:56:55 2026] 127.0.0.1:41376 Closing
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41390 Accepted
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41390 Closing
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41394 Accepted
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41394 Closing
+[Sat Aug 15 00:56:58 2026] 127.0.0.1:41400 Accepted
+[Sat Aug 15 00:56:58 2026] 127.0.0.1:41400 Closing
