@@ -881,6 +881,31 @@ $deploymentsCount = $websitesCount + $cmsPagesCount;
           </div>
         <?php endif; ?>
 
+          <!-- DYNAMIC DISCOVERED TOOLS CONTAINERS -->
+          <?php
+          global $toolManager;
+          if (isset($toolManager) && $toolManager instanceof ToolManager):
+              $activeUserRole = strtolower((string)($user['role'] ?? 'tenant'));
+              $accessibleTools = array_filter($toolManager->enabled(), function($t) use ($toolManager, $activeUserRole) {
+                  return $toolManager->canAccess($t['slug'], $activeUserRole);
+              });
+              foreach ($accessibleTools as $aTool):
+                  $dSlug = htmlspecialchars((string)($aTool['slug'] ?? ''));
+          ?>
+              <div class="row mb-4 d-none dynamic-tool-container" id="tool-<?php echo $dSlug; ?>">
+                  <div class="col-12">
+                      <?php
+                      if (is_file($aTool['entry_path'])) {
+                          include $aTool['entry_path'];
+                      }
+                      ?>
+                  </div>
+              </div>
+          <?php
+              endforeach;
+          endif;
+          ?>
+
         <!-- PROFILE SETTINGS TAB PANEL -->
         <div class="row mb-4 d-none" id="profile">
           <div class="col-12">
@@ -1254,6 +1279,12 @@ $(document).ready(function() {
             $('#profile').removeClass('d-none');
             $('html, body').animate({
                 scrollTop: $("#profile").offset().top - 20
+            }, 300);
+        } else if (hash.startsWith('#tool-')) {
+            $('.dynamic-tool-container').addClass('d-none');
+            $(hash).removeClass('d-none');
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top - 20
             }, 300);
         } else if (hash === '#support') {
             // Unhide the support ticket panel dynamically and trigger scroll

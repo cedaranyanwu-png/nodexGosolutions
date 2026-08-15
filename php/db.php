@@ -14,6 +14,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/database.php';
 // Require reusable SEO & JSON-LD schema helper component
 require_once __DIR__ . '/seo_helper.php';
+// Require dynamic Tool Discovery & Integration Manager
+require_once __DIR__ . '/ToolManager.php';
+
+// Instantiate global ToolManager service instance
+$toolManager = new ToolManager();
 
 // Initialize the Database instance targeting the 'system' JSON database directory
 // We store this instance in $conn to maintain compatibility across existing files

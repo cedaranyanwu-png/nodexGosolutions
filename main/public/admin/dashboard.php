@@ -120,6 +120,48 @@ $pendingReportsCount = count($conn->select('reports', ['status' => 'pending']) ?
   </div>
 </div>
 
+<!-- DYNAMIC DISCOVERED TOOLS CONTAINERS -->
+<?php
+global $toolManager;
+if (isset($toolManager) && $toolManager instanceof ToolManager):
+    $accessibleAdminTools = array_filter($toolManager->enabled(), function($t) use ($toolManager, $roleClean) {
+        return $toolManager->canAccess($t['slug'], $roleClean);
+    });
+    foreach ($accessibleAdminTools as $aTool):
+        $dSlug = htmlspecialchars((string)($aTool['slug'] ?? ''));
+?>
+    <div class="row mb-4 d-none dynamic-admin-tool-container" id="tool-<?php echo $dSlug; ?>">
+        <div class="col-12">
+            <?php
+            if (is_file($aTool['entry_path'])) {
+                include $aTool['entry_path'];
+            }
+            ?>
+        </div>
+    </div>
+<?php
+    endforeach;
+endif;
+?>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    function handleAdminToolHashes() {
+        const hash = window.location.hash;
+        if (!hash || !hash.startsWith('#tool-')) return;
+        const containers = document.querySelectorAll('.dynamic-admin-tool-container');
+        containers.forEach(el => el.classList.add('d-none'));
+        const target = document.querySelector(hash);
+        if (target) {
+            target.classList.remove('d-none');
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    handleAdminToolHashes();
+    window.addEventListener("hashchange", handleAdminToolHashes);
+});
+</script>
+
 <!-- QUICK ACCESS LINKS & RECENT ACTIVITY FEED -->
 <div class="row">
   <div class="col-lg-8 mb-4">

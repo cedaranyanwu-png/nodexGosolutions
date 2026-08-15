@@ -29,6 +29,50 @@ if (str_contains($currentHost, ':')) {
 // Parse the raw requested URL path to extract the routing path (slug)
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
+// Intercept direct tool routes /tools/{slug} dynamically with RBAC enforcement
+if (str_starts_with($requestUri, '/tools/')) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_name('NODX_SESSION');
+        @session_start();
+    }
+
+    $toolPathParts = array_values(array_filter(explode('/', trim($requestUri, '/'))));
+    $toolSlug = $toolPathParts[1] ?? '';
+
+    global $toolManager;
+    if (isset($toolManager) && $toolManager instanceof ToolManager && !empty($toolSlug)) {
+        $tool = $toolManager->get($toolSlug);
+        if ($tool !== null) {
+            if (!isset($_SESSION['email'])) {
+                header('Location: /login');
+                exit;
+            }
+
+            $activeUserRole = strtolower((string)($_SESSION['role'] ?? 'tenant'));
+            if (!$toolManager->canAccess($toolSlug, $activeUserRole)) {
+                http_response_code(403);
+                echo "403 Forbidden - Access Denied to tool: " . htmlspecialchars($tool['name']);
+                exit;
+            }
+
+            // If raw parameter or AJAX request, render tool entry directly
+            if (isset($_GET['raw']) || (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
+                require_once $tool['entry_path'];
+                exit;
+            }
+
+            // Otherwise, redirect to dashboard context with tool hash target
+            $roleNormalized = str_replace(' ', '', str_replace('_', '', $activeUserRole));
+            $staffRoles = ['admin', 'superadmin', 'manager', 'moderator', 'support', 'financial', 'marketinghead'];
+            $isAdminContext = in_array($roleNormalized, $staffRoles, true);
+
+            $targetDash = $isAdminContext ? '/admin/dashboard#tool-' . $toolSlug : '/user/dashboard#tool-' . $toolSlug;
+            header("Location: " . $targetDash);
+            exit;
+        }
+    }
+}
+
 // Security Gate: Explicitly block any browser request containing the backup repository string
 // This completely neutralizes any directory traversal or malicious attempts targeting NGS_backups
 if (str_contains(strtolower($requestUri), 'ngs_backups')) {

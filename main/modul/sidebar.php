@@ -218,6 +218,41 @@ $fullname   = $sidebarUser['fullname'] ?? $_SESSION['fullname'] ?? 'System User'
 
                     <?php endif; ?>
 
+                    <?php
+                    // Dynamic Discovered Modular Tools Integration via ToolManager
+                    global $toolManager;
+                    if (isset($toolManager) && $toolManager instanceof ToolManager):
+                        $dynamicTools = $toolManager->getSidebarItems($activeRole);
+                        if (!empty($dynamicTools)):
+                    ?>
+                        <!-- Discovered Tools Dropdown Menu -->
+                        <div class="accordion-item border-0 mt-1">
+                            <div class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark rounded-pill hover-blue shadow-none d-flex align-items-center" type="button" data-bs-toggle="collapse" data-toggle="collapse" data-bs-target="#collapseDynamicTools" data-target="#collapseDynamicTools" aria-expanded="false" aria-controls="collapseDynamicTools" style="background: transparent; font-size: 14px;">
+                                    <i class="fa-solid fa-cubes me-2 text-primary" style="width: 20px;"></i>
+                                    Discovered Tools
+                                </button>
+                            </div>
+                            <div id="collapseDynamicTools" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
+                                <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
+                                    <?php foreach ($dynamicTools as $dTool):
+                                        $dashPath = isStaff() ? '/admin/dashboard' : '/user/dashboard';
+                                        $targetUrl = $dashPath . '#tool-' . htmlspecialchars((string)($dTool['slug'] ?? ''));
+                                        $toolIcon = htmlspecialchars((string)($dTool['sidebar']['icon'] ?? 'fa-solid fa-cube'));
+                                        $toolLabel = htmlspecialchars((string)($dTool['sidebar']['label'] ?? $dTool['name']));
+                                    ?>
+                                        <a href="<?php echo $targetUrl; ?>" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                            <i class="<?php echo $toolIcon; ?> me-2" style="font-size: 11px;"></i> <?php echo $toolLabel; ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php
+                        endif;
+                    endif;
+                    ?>
+
                 </div>
             </li>
 
@@ -424,7 +459,10 @@ document.addEventListener("DOMContentLoaded", function() {
             '#payment-settings-section': 'collapseAdminSystem'
         };
 
-        const targetCollapseId = targetMap[hash];
+        let targetCollapseId = targetMap[hash];
+        if (!targetCollapseId && hash.startsWith('#tool-')) {
+            targetCollapseId = 'collapseDynamicTools';
+        }
         if (targetCollapseId) {
             const collapseEl = document.getElementById(targetCollapseId);
             if (collapseEl && !collapseEl.classList.contains("show")) {

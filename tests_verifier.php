@@ -160,6 +160,34 @@ try {
     assertTest("SEO Helper verification failed: " . $e->getMessage(), false);
 }
 
+// --- TEST 5: Automatic Tool Discovery & RBAC Integration ---
+try {
+    global $toolManager;
+    $tm = $toolManager ?? new ToolManager();
+
+    // 1. Assert Discovery of /tools/calculator
+    $calcTool = $tm->get('calculator');
+    assertTest("ToolManager discovers calculator tool from /tools/", $calcTool !== null);
+    assertTest("Discovered calculator tool name is Calculator", $calcTool && $calcTool['name'] === 'Calculator');
+    assertTest("Discovered calculator tool entry path exists", $calcTool && is_file($calcTool['entry_path']));
+
+    // 2. Assert Role-Based Access Control (RBAC)
+    $canTenantAccess = $tm->canAccess('calculator', 'tenant');
+    $canAdminAccess = $tm->canAccess('calculator', 'admin');
+    $canGuestAccess = $tm->canAccess('calculator', 'guest');
+
+    assertTest("Tenant role can access calculator tool", $canTenantAccess === true);
+    assertTest("Admin role can access calculator tool", $canAdminAccess === true);
+    assertTest("Guest role CANNOT access calculator tool", $canGuestAccess === false);
+
+    // 3. Assert Sidebar Items Generation
+    $sidebarItems = $tm->getSidebarItems('tenant');
+    assertTest("getSidebarItems returns non-empty list for tenant role", count($sidebarItems) > 0);
+    assertTest("First sidebar item is calculator tool", isset($sidebarItems[0]['slug']) && $sidebarItems[0]['slug'] === 'calculator');
+} catch (\Throwable $e) {
+    assertTest("ToolManager verification failed: " . $e->getMessage(), false);
+}
+
 echo "\n========================================================\n";
 echo "TEST RESULTS SUMMARY:\n";
 echo "Total Passed: {$testsPassed}\n";
