@@ -1,42 +1,18 @@
-[Fri Aug 14 19:27:11 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
-[Fri Aug 14 19:27:13 2026] 127.0.0.1:43774 Accepted
-[Fri Aug 14 19:27:13 2026] 127.0.0.1:43774 [200]: HEAD /login
-[Fri Aug 14 19:27:13 2026] 127.0.0.1:43774 Closing
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49006 Accepted
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49006 [200]: GET /login
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49006 Closing
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49022 Accepted
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49024 Accepted
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49022 [200]: GET /css/style.css?v=1786696560
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49024 [200]: GET /main/assets/images/logo.png?v=2
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49022 Closing
-[Fri Aug 14 19:29:54 2026] 127.0.0.1:49024 Closing
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45920 Accepted
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45920 [200]: GET /login
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45920 Closing
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45928 Accepted
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45940 Accepted
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45928 [200]: GET /css/style.css?v=1786696560
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45928 Closing
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45940 [200]: GET /main/assets/images/logo.png?v=2
-[Fri Aug 14 19:32:14 2026] 127.0.0.1:45940 Closing
-[Fri Aug 14 19:32:16 2026] 127.0.0.1:45956 Accepted
-[Fri Aug 14 19:32:16 2026] 127.0.0.1:45956 [200]: POST /php/login.php
-[Fri Aug 14 19:32:16 2026] 127.0.0.1:45956 Closing
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45972 Accepted
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45972 [200]: GET /admin/dashboard
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45972 Closing
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45988 Accepted
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45988 [200]: GET /admin/dashboard
-[Fri Aug 14 19:32:17 2026] 127.0.0.1:45988 Closing
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:45992 Accepted
-[Fri Aug 14 19:32:18 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 188
-[Fri Aug 14 19:32:18 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 190
-[Fri Aug 14 19:32:18 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 192
-[Fri Aug 14 19:32:18 2026] PHP Warning:  ini_set(): Session ini settings cannot be changed when a session is active in /app/php/db.php on line 194
-[Fri Aug 14 19:32:18 2026] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /app/php/db.php on line 203
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:45992 [200]: POST /php/admin_backup_action.php
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:45992 Closing
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:46000 Accepted
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:46000 [200]: POST /php/admin_team_action.php
-[Fri Aug 14 19:32:18 2026] 127.0.0.1:46000 Closing
+[Sat Aug 15 00:56:50 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41352 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41352 Closing
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 Accepted
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 [200]: GET /css/style.css?v=1786696560
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41364 Closing
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 [200]: GET /main/assets/images/logo.png?v=2
+[Sat Aug 15 00:56:53 2026] 127.0.0.1:41368 Closing
+[Sat Aug 15 00:56:54 2026] 127.0.0.1:41376 Accepted
+[Sat Aug 15 00:56:55 2026] 127.0.0.1:41376 [200]: POST /php/login.php
+[Sat Aug 15 00:56:55 2026] 127.0.0.1:41376 Closing
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41390 Accepted
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41390 Closing
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41394 Accepted
+[Sat Aug 15 00:56:56 2026] 127.0.0.1:41394 Closing
+[Sat Aug 15 00:56:58 2026] 127.0.0.1:41400 Accepted
+[Sat Aug 15 00:56:58 2026] 127.0.0.1:41400 Closing

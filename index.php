@@ -40,6 +40,22 @@ if (str_contains(strtolower($requestUri), 'ngs_backups')) {
     exit;
 }
 
+// Intercept uploaded avatar requests to serve static avatar images reliably
+if (str_starts_with($requestUri, '/uploads/avatars/')) {
+    $candidate1 = __DIR__ . $requestUri;
+    $candidate2 = __DIR__ . '/main/public' . $requestUri;
+    $avatarFile = is_file($candidate1) ? $candidate1 : (is_file($candidate2) ? $candidate2 : null);
+
+    if ($avatarFile !== null && is_file($avatarFile)) {
+        $ext = strtolower(pathinfo($avatarFile, PATHINFO_EXTENSION));
+        $mimeTypes = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp'];
+        $contentType = $mimeTypes[$ext] ?? 'image/jpeg';
+        header('Content-Type: ' . $contentType);
+        readfile($avatarFile);
+        exit;
+    }
+}
+
 // Physical Asset Router Bypass: If the requested resource exists on disk as a file, return false so the webserver can serve it directly
 $bypassPath = __DIR__ . $requestUri;
 $realBypassPath = realpath($bypassPath);
@@ -126,32 +142,40 @@ $routeMap = [
     '/admin/dashboard' => __DIR__ . '/main/public/admin/dashboard.php',
     '/admin/dashboard.php' => __DIR__ . '/main/public/admin/dashboard.php',
     // Virtual admin pages mapping to unify single entry templates and access verification
-    '/admin/users' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/users.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/websites' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/websites.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/templates' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/templates.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/categories' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/categories.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/payments' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/payments.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/revenue' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/revenue.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/financial-reports' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/financial-reports.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/analytics' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/analytics.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/marketing' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/marketing.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/support' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/support.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/moderation' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/moderation.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/activity-logs' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/activity-logs.php' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/settings' => __DIR__ . '/main/public/admin/dashboard.php',
-    '/admin/settings.php' => __DIR__ . '/main/public/admin/dashboard.php',
+    '/admin/users' => __DIR__ . '/main/public/admin/users.php',
+    '/admin/users.php' => __DIR__ . '/main/public/admin/users.php',
+    '/admin/websites' => __DIR__ . '/main/public/admin/websites.php',
+    '/admin/websites.php' => __DIR__ . '/main/public/admin/websites.php',
+    '/admin/templates' => __DIR__ . '/main/public/admin/templates.php',
+    '/admin/templates.php' => __DIR__ . '/main/public/admin/templates.php',
+    '/admin/categories' => __DIR__ . '/main/public/admin/categories.php',
+    '/admin/categories.php' => __DIR__ . '/main/public/admin/categories.php',
+    '/admin/payments' => __DIR__ . '/main/public/admin/payments.php',
+    '/admin/payments.php' => __DIR__ . '/main/public/admin/payments.php',
+    '/admin/revenue' => __DIR__ . '/main/public/admin/revenue.php',
+    '/admin/revenue.php' => __DIR__ . '/main/public/admin/revenue.php',
+    '/admin/financial-reports' => __DIR__ . '/main/public/admin/financial-reports.php',
+    '/admin/financial-reports.php' => __DIR__ . '/main/public/admin/financial-reports.php',
+    '/admin/analytics' => __DIR__ . '/main/public/admin/analytics.php',
+    '/admin/analytics.php' => __DIR__ . '/main/public/admin/analytics.php',
+    '/admin/marketing' => __DIR__ . '/main/public/admin/marketing.php',
+    '/admin/marketing.php' => __DIR__ . '/main/public/admin/marketing.php',
+    '/admin/support' => __DIR__ . '/main/public/admin/support.php',
+    '/admin/support.php' => __DIR__ . '/main/public/admin/support.php',
+    '/admin/moderation' => __DIR__ . '/main/public/admin/moderator.php',
+    '/admin/moderation.php' => __DIR__ . '/main/public/admin/moderator.php',
+    '/admin/moderator' => __DIR__ . '/main/public/admin/moderator.php',
+    '/admin/moderator.php' => __DIR__ . '/main/public/admin/moderator.php',
+    '/admin/manager' => __DIR__ . '/main/public/admin/manager.php',
+    '/admin/manager.php' => __DIR__ . '/main/public/admin/manager.php',
+    '/admin/financial' => __DIR__ . '/main/public/admin/financial.php',
+    '/admin/financial.php' => __DIR__ . '/main/public/admin/financial.php',
+    '/admin/teams' => __DIR__ . '/main/public/admin/teams.php',
+    '/admin/teams.php' => __DIR__ . '/main/public/admin/teams.php',
+    '/admin/activity-logs' => __DIR__ . '/main/public/admin/activity-logs.php',
+    '/admin/activity-logs.php' => __DIR__ . '/main/public/admin/activity-logs.php',
+    '/admin/settings' => __DIR__ . '/main/public/admin/settings.php',
+    '/admin/settings.php' => __DIR__ . '/main/public/admin/settings.php',
     '/user/dashboard' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.php' => __DIR__ . '/main/public/user/dashboard.php',
     '/user/dashboard.html' => __DIR__ . '/main/public/user/dashboard.php',
@@ -262,6 +286,20 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title><?php echo htmlspecialchars($cmsPage['title'] ?? 'CMS Page'); ?></title>
+            <?php
+            // Google Analytics Injection
+            $gaId = $cmsPage['ga_id'] ?? 'G-NODEXGO123';
+            if (!empty($gaId)):
+            ?>
+            <!-- Google Analytics Tag -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($gaId); ?>"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '<?php echo htmlspecialchars($gaId); ?>');
+            </script>
+            <?php endif; ?>
             <?php // Render head tags payload with sandboxed logic
             $renderPayload($cmsPage['head_code'] ?? '', $isAdminPage, ['db' => $cmsDb, 'page' => $cmsPage]); ?>
         </head>

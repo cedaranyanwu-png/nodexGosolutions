@@ -74,20 +74,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Verify if uploaded asset is a valid web image
             if (in_array($fileExtension, $allowedExtensions, true)) {
-                // Construct target destination upload folder
-                $uploadDir = __DIR__ . '/../uploads/avatars/';
-                // Create folder dynamically if missing on filesystem
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
+                // Construct target destination upload folders
+                $uploadDir1 = __DIR__ . '/../../../uploads/avatars/';
+                $uploadDir2 = __DIR__ . '/../uploads/avatars/';
+                if (!is_dir($uploadDir1)) { @mkdir($uploadDir1, 0777, true); }
+                if (!is_dir($uploadDir2)) { @mkdir($uploadDir2, 0777, true); }
 
                 // Generate cryptographically isolated destination file name
                 $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-                $destPath = $uploadDir . $newFileName;
+                $destPath1 = $uploadDir1 . $newFileName;
+                $destPath2 = $uploadDir2 . $newFileName;
 
                 // Attempt to transition file resource onto uploads path
-                if (move_uploaded_file($fileTmpPath, $destPath)) {
-                    // Update target database avatar path
+                if (move_uploaded_file($fileTmpPath, $destPath1)) {
+                    @copy($destPath1, $destPath2);
+                    $avatarUrl = '/uploads/avatars/' . $newFileName;
+                } elseif (move_uploaded_file($fileTmpPath, $destPath2)) {
+                    @copy($destPath2, $destPath1);
                     $avatarUrl = '/uploads/avatars/' . $newFileName;
                 } else {
                     $errorMessage = 'Failed to move uploaded avatar file. Check directory permissions.';
