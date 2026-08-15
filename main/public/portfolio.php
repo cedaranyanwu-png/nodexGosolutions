@@ -17,16 +17,11 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'Discover our strategic digital deployments, software engines, and dynamic GIS telemetry platforms.',
         'og_title' => 'Executive Portfolio | nodexGosolutions',
         'og_description' => 'Discover our strategic digital deployments, software engines, and dynamic GIS telemetry platforms.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => ['/main/assets/images/logo.png', '/main/assets/images/cedar-anyanwu.jpg'],
         'og_type' => 'website',
-        'schema_type' => 'ProfilePage',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
+        'schema_type' => 'ItemList',
+        'breadcrumbs' => [
+            ['name' => 'Portfolio', 'url' => '/portfolio']
         ]
     ]) ?>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />

@@ -17,16 +17,15 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'Cedar Anyanwu directs the corporate growth trajectory and system architecture of nodexGosolutions.',
         'og_title' => 'Cedar Anyanwu - Founder, CEO & Systems Architect',
         'og_description' => 'African startups should not be burdened by heavy subscription overhead or complex database administration.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => ['/main/assets/images/cedar-anyanwu.jpg'],
         'og_type' => 'profile',
         'schema_type' => 'Person',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
+        'name' => 'Cedar Anyanwu',
+        'jobTitle' => 'Chief Executive Officer',
+        'organization' => 'Nodexplatform',
+        'sameAs' => ['https://linkedin.com'],
+        'breadcrumbs' => [
+            ['name' => 'Founder Mandate', 'url' => '/cedar']
         ]
     ]) ?>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />

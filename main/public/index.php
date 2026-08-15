@@ -20,17 +20,9 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'nodexGosolutions deploys high-speed modular web frameworks, maps satellite telemetry data, and powers modern creative entertainment platforms.',
         'og_title' => 'nodexGosolutions | Bridging Earth & Space Tech',
         'og_description' => 'nodexGosolutions deploys high-speed modular web frameworks, maps satellite telemetry data, and powers modern creative entertainment platforms.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => ['/main/assets/images/logo.png', '/main/assets/images/cedar-anyanwu.jpg'],
         'og_type' => 'website',
-        'schema_type' => 'Person',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
-        ]
+        'schema_type' => 'WebSite'
     ]) ?>
 
     <!-- Load standard Fonts and Icons -->

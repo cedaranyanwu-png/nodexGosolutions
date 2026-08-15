@@ -112,9 +112,13 @@ try {
     assertTest("Privilege Guard validation failed: " . $e->getMessage(), false);
 }
 
-// --- TEST 4: Reusable SEO Helper & Entity Image Standardization ---
+// --- TEST 4: Dynamic Schema.org & JSON-LD Generator Engine Verification ---
 try {
-    // 1. Assert Person Schema Generation
+    // 1. Assert Absolute URL Canonicalization Helper
+    $absUrl = toAbsoluteUrl('/main/assets/images/cedar-anyanwu.jpg');
+    assertTest("toAbsoluteUrl converts relative path to absolute URL", $absUrl === 'https://nodexplatform.com.ng/main/assets/images/cedar-anyanwu.jpg');
+
+    // 2. Assert Person Schema Generation
     $personSchema = getPersonSchema();
     assertTest("Person Schema contains @context schema.org", $personSchema['@context'] === 'https://schema.org');
     assertTest("Person Schema @type is Person", $personSchema['@type'] === 'Person');
@@ -122,18 +126,32 @@ try {
     assertTest("Person Schema jobTitle is Chief Executive Officer", $personSchema['jobTitle'] === 'Chief Executive Officer');
     assertTest("Person Schema worksFor organization is Nodexplatform", isset($personSchema['worksFor']['name']) && $personSchema['worksFor']['name'] === 'Nodexplatform');
 
-    // 2. Assert SEO Head Rendering
-    $seoHead = renderSeoHead([
-        'title' => 'Founder Mandate',
-        'og_title' => 'Cedar Anyanwu - CEO',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
-        'schema_type' => 'Person'
-    ]);
-    assertTest("renderSeoHead includes Open Graph title tag", str_contains($seoHead, '<meta property="og:title" content="Cedar Anyanwu - CEO">'));
-    assertTest("renderSeoHead includes Open Graph image tag", str_contains($seoHead, 'cedar-anyanwu.jpg'));
-    assertTest("renderSeoHead injects application/ld+json script tag", str_contains($seoHead, '<script type="application/ld+json">'));
+    // 3. Assert Organization Schema Generation
+    $orgSchema = getOrganizationSchema();
+    assertTest("Organization Schema @type is Organization", $orgSchema['@type'] === 'Organization');
+    assertTest("Organization logo is absolute URL", str_starts_with($orgSchema['logo'], 'https://'));
 
-    // 3. Assert Standardized Entity Image HTML
+    // 4. Assert WebSite Schema Generation
+    $webSiteSchema = getWebSiteSchema();
+    assertTest("WebSite Schema @type is WebSite", $webSiteSchema['@type'] === 'WebSite');
+
+    // 5. Assert ImageGallery Schema Generation
+    $gallerySchema = getImageGallerySchema(['image' => ['/main/assets/images/about-banner-1.jpg', '/main/assets/images/about-banner-2.jpg']]);
+    assertTest("ImageGallery Schema @type is ImageGallery", $gallerySchema['@type'] === 'ImageGallery');
+    assertTest("ImageGallery Schema image array is normalized to absolute URLs", is_array($gallerySchema['image']) && count($gallerySchema['image']) === 2 && str_starts_with($gallerySchema['image'][0], 'https://'));
+
+    // 6. Assert BreadcrumbList Schema Generation
+    $crumbsSchema = getBreadcrumbListSchema([['name' => 'About', 'url' => '/about']]);
+    assertTest("BreadcrumbList Schema @type is BreadcrumbList", $crumbsSchema['@type'] === 'BreadcrumbList');
+    assertTest("BreadcrumbList contains 2 items (Home + About)", count($crumbsSchema['itemListElement']) === 2);
+
+    // 7. Assert Private Route Exclusions
+    $isAdminPublic = isPublicSeoAllowed('/admin/dashboard');
+    assertTest("isPublicSeoAllowed returns false for admin routes", $isAdminPublic === false);
+    $adminSeo = renderSeoHead(['request_uri' => '/admin/dashboard']);
+    assertTest("renderSeoHead outputs noindex for admin routes", str_contains($adminSeo, 'noindex, nofollow'));
+
+    // 8. Assert Standardized Entity Image HTML
     $imgHtml = renderEntityImage('Cedar Anyanwu', '/main/assets/images/cedar-anyanwu.jpg', 'CEO of Nodexplatform');
     assertTest("renderEntityImage output contains standardized alt attribute", str_contains($imgHtml, 'alt="Cedar Anyanwu - CEO of Nodexplatform"'));
     assertTest("renderEntityImage output contains standardized title attribute", str_contains($imgHtml, 'title="Cedar Anyanwu"'));

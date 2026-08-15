@@ -20,16 +20,18 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'Providing pure, lightweight architectures designed for maximum speed and simplicity, bridging cloud with orbital research.',
         'og_title' => 'About Corporate | nodexGosolutions',
         'og_description' => 'Providing pure, lightweight architectures designed for maximum speed and simplicity, bridging cloud with orbital research.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => [
+            '/main/assets/images/about-banner-1.jpg',
+            '/main/assets/images/about-banner-2.jpg',
+            '/main/assets/images/about-team-1.jpg',
+            '/main/assets/images/about-team-2.jpg',
+            '/main/assets/images/about-team-3.jpg',
+            '/main/assets/images/cedar-anyanwu.jpg'
+        ],
         'og_type' => 'website',
-        'schema_type' => 'Person',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
+        'schema_type' => 'Organization',
+        'breadcrumbs' => [
+            ['name' => 'About', 'url' => '/about']
         ]
     ]) ?>
 

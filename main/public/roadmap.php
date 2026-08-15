@@ -17,16 +17,11 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'Our structured milestones scaling modular SaaS platforms, media ad yield networks, and agritech telemetry downlinks.',
         'og_title' => 'Roadmap | nodexGosolutions',
         'og_description' => 'Our structured milestones scaling modular SaaS platforms, media ad yield networks, and agritech telemetry downlinks.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => ['/main/assets/images/logo.png'],
         'og_type' => 'website',
-        'schema_type' => 'ProfilePage',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
+        'schema_type' => 'WebPage',
+        'breadcrumbs' => [
+            ['name' => 'Roadmap', 'url' => '/roadmap']
         ]
     ]) ?>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />

@@ -17,16 +17,15 @@ require_once __DIR__ . '/../../php/db.php';
         'description' => 'Visual highlights of our space telemetry downlinks, agritech spatial maps, and platform deployments.',
         'og_title' => 'Gallery | nodexGosolutions',
         'og_description' => 'Visual highlights of our space telemetry downlinks, agritech spatial maps, and platform deployments.',
-        'og_image' => '/main/assets/images/cedar-anyanwu.jpg',
+        'images' => [
+            '/main/assets/images/about-banner-1.jpg',
+            '/main/assets/images/about-banner-2.jpg',
+            '/main/assets/images/cedar-anyanwu.jpg'
+        ],
         'og_type' => 'website',
-        'schema_type' => 'ProfilePage',
-        'person_params' => [
-            'name' => 'Cedar Anyanwu',
-            'url' => 'https://nodexplatform.com.ng',
-            'image' => 'https://nodexplatform.com.ng',
-            'jobTitle' => 'Chief Executive Officer',
-            'organization' => 'Nodexplatform',
-            'sameAs' => ['https://linkedin.com']
+        'schema_type' => 'ImageGallery',
+        'breadcrumbs' => [
+            ['name' => 'Gallery', 'url' => '/gallary']
         ]
     ]) ?>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />

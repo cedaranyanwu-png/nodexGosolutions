@@ -279,13 +279,24 @@ if (in_array(strtolower($currentHost), $landingHosts, true)) {
             }
         };
 
+        // Extract page images from CMS body content if available
+        $cmsBodyImages = extractPageImagesFromHtml($cmsPage['body_code'] ?? '');
+        $cmsPageTitle = $cmsPage['title'] ?? 'CMS Page';
+        $cmsPageSlug = $cmsPage['slug'] ?? 'page';
         ?>
         <!DOCTYPE html>
         <html lang="en">
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title><?php echo htmlspecialchars($cmsPage['title'] ?? 'CMS Page'); ?></title>
+            <?php echo renderSeoHead([
+                'title' => $cmsPageTitle . ' | nodexGosolutions',
+                'description' => substr(strip_tags($cmsPage['body_code'] ?? ''), 0, 160),
+                'url' => '/' . $cmsPageSlug,
+                'images' => $cmsBodyImages,
+                'schema_type' => 'WebPage',
+                'breadcrumbs' => [
+                    ['name' => $cmsPageTitle, 'url' => '/' . $cmsPageSlug]
+                ]
+            ]); ?>
             <?php
             // Google Analytics Injection
             $gaId = $cmsPage['ga_id'] ?? 'G-NODEXGO123';
