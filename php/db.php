@@ -30,6 +30,38 @@ $conn->createTable('roles'); // Custom roles listing
 $conn->createTable('permissions'); // Granular permissions mapped to roles
 $conn->createTable('activity_logs'); // Secure administrative activity audits
 
+// Monetization Infrastructure Tables
+$conn->createTable('monetization_settings');
+$conn->createTable('ad_units');
+$conn->createTable('ad_placements');
+$conn->createTable('user_ad_settings');
+$conn->createTable('ad_statistics');
+$conn->createTable('membership_plans');
+$conn->createTable('memberships');
+$conn->createTable('payment_transactions');
+$conn->createTable('payment_webhooks');
+$conn->createTable('user_earnings');
+$conn->createTable('platform_revenue');
+$conn->createTable('payouts');
+$conn->createTable('payout_transactions');
+
+// Auto-seed default monetization configuration settings if uninitialized
+$monSettingsCount = count($conn->select('monetization_settings'));
+if ($monSettingsCount === 0) {
+    $conn->insert('monetization_settings', [
+        'id' => 1,
+        'ad_revenue_share_percent' => 70.0, // 70% to user, 30% to platform
+        'membership_platform_fee_percent' => 10.0, // 10% platform fee on membership sales
+        'adsterra_publisher_id' => '',
+        'adsterra_api_key' => '',
+        'payout_min_threshold' => 5000.0, // ₦5,000 minimum payout threshold
+        'is_ad_monetization_enabled' => 1,
+        'is_membership_monetization_enabled' => 1,
+        'updated_at' => date('Y-m-d H:i:s'),
+        'created_at' => date('Y-m-d H:i:s')
+    ]);
+}
+
 // Dynamic Auto-Seeder: Seed the main administrator account if users table is empty
 $usersCount = count($conn->select('users'));
 if ($usersCount === 0) {

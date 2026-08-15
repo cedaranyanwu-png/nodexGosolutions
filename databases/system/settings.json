@@ -2,8 +2,8 @@
     {
         "id": 1,
         "flw_public_key": "FLWPUBK_TEST-sandbox-pubkey-123456789",
-        "flw_secret_key": "FLWSECK-7b0b556bc0a88b30bc9289a3ab79735e-1a006196b8evt-X",
-        "flw_encryption_key": "7b0b556bc0a8e931fd005ff2",
+        "flw_secret_key": "FLWSECK_TEST-sandbox-secretkey-123456789",
+        "flw_encryption_key": "FLWENCK_TEST-sandbox-encryptionkey-123456789",
         "updated_at": "2026-08-15 14:15:00",
         "created_at": "2026-08-11 12:13:32"
     }
