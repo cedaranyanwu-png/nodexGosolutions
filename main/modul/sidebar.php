@@ -173,6 +173,7 @@ $fullname   = $sidebarUser['fullname'] ?? $_SESSION['fullname'] ?? 'System User'
                         $adminSidebarItems = [
                             ['label' => 'User Directory', 'icon' => 'fa-solid fa-users', 'url' => '/admin/users'],
                             ['label' => 'Website Manager', 'icon' => 'fa-solid fa-globe', 'url' => '/admin/websites'],
+                            ['label' => 'Page Editor', 'icon' => 'fa-solid fa-file-pen', 'url' => '/admin/pages'],
                             ['label' => 'Templates', 'icon' => 'fa-solid fa-object-group', 'url' => '/admin/templates'],
                             ['label' => 'Categories', 'icon' => 'fa-solid fa-list', 'url' => '/admin/categories'],
                             ['label' => 'Teams Management', 'icon' => 'fa-solid fa-users-gear', 'url' => '/admin/teams'],

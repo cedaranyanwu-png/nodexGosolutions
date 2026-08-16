@@ -665,6 +665,7 @@ function getRolePagePermissions(): array {
             '/admin/dashboard',
             '/admin/users',
             '/admin/websites',
+            '/admin/pages',
             '/admin/templates',
             '/admin/categories',
             '/admin/payments',
@@ -680,6 +681,7 @@ function getRolePagePermissions(): array {
             '/admin/dashboard',
             '/admin/users',
             '/admin/websites',
+            '/admin/pages',
             '/admin/templates',
             '/admin/categories',
             '/admin/analytics',
@@ -873,5 +875,41 @@ function getDiscoveredTemplates(): array {
     }
 
     return $discovered;
+}
+
+/**
+ * Dynamic Whitelist Scanner for Platform Public Pages in main/public/
+ * Returns array of approved public pages that administrators are authorized to edit.
+ */
+function getApprovedPublicPages(): array {
+    $publicDir = realpath(__DIR__ . '/../main/public');
+    if ($publicDir === false || !is_dir($publicDir)) {
+        return [];
+    }
+
+    $excludedFiles = ['login.php', 'register.php', 'profile.php'];
+    $approved = [];
+
+    $files = scandir($publicDir);
+    foreach ($files as $f) {
+        if ($f === '.' || $f === '..' || in_array(strtolower($f), $excludedFiles, true)) {
+            continue;
+        }
+        $fullPath = $publicDir . '/' . $f;
+        if (is_file($fullPath)) {
+            $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+            if ($ext === 'php' || $ext === 'html' || $ext === 'htm') {
+                $approved[] = [
+                    'filename' => $f,
+                    'path' => '/main/public/' . $f,
+                    'full_path' => $fullPath,
+                    'last_modified' => date('Y-m-d H:i:s', filemtime($fullPath)),
+                    'size' => filesize($fullPath)
+                ];
+            }
+        }
+    }
+
+    return $approved;
 }
 ?>

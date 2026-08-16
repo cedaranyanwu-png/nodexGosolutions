@@ -31,11 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $action       = cleanInput($_POST['action'] ?? '');
 $targetUserId = (int)($_POST['user_id'] ?? 0);
 
-// For template or category actions, targetUserId is optional
+// For template, category, or admin page editor actions, targetUserId is optional
 $isTemplateAction = in_array($action, ['add_category', 'upload_template', 'toggle_template_status', 'delete_template', 'edit_template_metadata'], true);
+$isPageAction     = in_array($action, ['admin_load_page', 'admin_save_draft', 'admin_publish_page', 'admin_list_versions', 'admin_restore_version'], true);
 
 $targetUser = null;
-if (!$isTemplateAction) {
+if (!$isTemplateAction && !$isPageAction) {
     // Reject requests with missing targets for user-based actions
     if ($targetUserId <= 0) {
         jsonResponse(['success' => false, 'message' => 'Invalid target user ID.'], 400);
@@ -405,6 +406,257 @@ switch ($action) {
         ]);
 
         jsonResponse(['success' => true, 'message' => "Template '{$name}' uploaded and made available successfully!"]);
+        break;
+
+    // ============================================================
+    // ADMIN-ONLY PLATFORM PAGE EDITOR ACTIONS
+    // ============================================================
+
+    // ACTION 1: Load Page Content & Draft
+    case 'admin_load_page':
+        if (!isStaff() || !hasAdminPagePermission($_SESSION['role'] ?? '', '/admin/pages')) {
+            jsonResponse(['success' => false, 'message' => 'Access Denied: Administrative page editor permissions required.'], 403);
+        }
+
+        $filename = cleanInput($_POST['filename'] ?? $_GET['filename'] ?? '');
+        $approvedPages = getApprovedPublicPages();
+        $approvedMap = array_column($approvedPages, null, 'filename');
+
+        if (empty($filename) || !isset($approvedMap[$filename])) {
+            jsonResponse(['success' => false, 'message' => 'Security Error: Requested page is not in the approved whitelist.'], 403);
+        }
+
+        $pageMeta = $approvedMap[$filename];
+        $fullPath = $pageMeta['full_path'];
+
+        $liveContent = file_exists($fullPath) ? file_get_contents($fullPath) : '';
+
+        $cmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+        $cmsDb->createTable('pages');
+        $draftRecord = $cmsDb->selectOne('pages', ['slug' => $filename, 'user_id' => 0]);
+
+        $draftContent = $draftRecord['body_code'] ?? null;
+        $hasDraft     = (!empty($draftContent) && (int)($draftRecord['is_draft'] ?? 0) === 1);
+
+        jsonResponse([
+            'success'       => true,
+            'filename'      => $filename,
+            'live_content'  => $liveContent,
+            'draft_content' => $draftContent,
+            'has_draft'     => $hasDraft,
+            'last_modified' => $pageMeta['last_modified']
+        ]);
+        break;
+
+    // ACTION 2: Save Draft
+    case 'admin_save_draft':
+        if (!isStaff() || !hasAdminPagePermission($_SESSION['role'] ?? '', '/admin/pages')) {
+            jsonResponse(['success' => false, 'message' => 'Access Denied: Administrative page editor permissions required.'], 403);
+        }
+
+        $filename = cleanInput($_POST['filename'] ?? '');
+        $content  = $_POST['content'] ?? '';
+
+        $approvedPages = getApprovedPublicPages();
+        $approvedMap = array_column($approvedPages, null, 'filename');
+
+        if (empty($filename) || !isset($approvedMap[$filename])) {
+            jsonResponse(['success' => false, 'message' => 'Security Error: Requested page is not in the approved whitelist.'], 403);
+        }
+
+        $cmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+        $cmsDb->createTable('pages');
+
+        $existing = $cmsDb->selectOne('pages', ['slug' => $filename, 'user_id' => 0]);
+        if ($existing) {
+            $cmsDb->update('pages', [
+                'body_code'  => $content,
+                'is_draft'   => 1,
+                'updated_at' => date('Y-m-d H:i:s')
+            ], ['id' => $existing['id']]);
+        } else {
+            $cmsDb->insert('pages', [
+                'title'      => ucwords(str_replace(['-', '_', '.php', '.html'], [' ', ' ', '', ''], $filename)),
+                'slug'       => $filename,
+                'user_id'    => 0,
+                'body_code'  => $content,
+                'is_draft'   => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
+        $conn->insert('activity_logs', [
+            'user_id'    => $_SESSION['user_id'] ?? 0,
+            'email'      => $executingAdminEmail,
+            'action'     => 'page_draft_saved',
+            'details'    => "Saved draft for platform page: {$filename}",
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        jsonResponse(['success' => true, 'message' => "Draft for '{$filename}' saved successfully!"]);
+        break;
+
+    // ACTION 3: Publish Page Live
+    case 'admin_publish_page':
+        if (!isStaff() || !hasAdminPagePermission($_SESSION['role'] ?? '', '/admin/pages')) {
+            jsonResponse(['success' => false, 'message' => 'Access Denied: Administrative page editor permissions required.'], 403);
+        }
+
+        $filename = cleanInput($_POST['filename'] ?? '');
+        $content  = $_POST['content'] ?? '';
+
+        $approvedPages = getApprovedPublicPages();
+        $approvedMap = array_column($approvedPages, null, 'filename');
+
+        if (empty($filename) || !isset($approvedMap[$filename])) {
+            jsonResponse(['success' => false, 'message' => 'Security Error: Requested page is not in the approved whitelist.'], 403);
+        }
+
+        $pageMeta = $approvedMap[$filename];
+        $fullPath = $pageMeta['full_path'];
+
+        // 1. Create a version snapshot before publishing
+        $oldContent = file_exists($fullPath) ? file_get_contents($fullPath) : '';
+
+        $cmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+        $cmsDb->createTable('page_versions');
+
+        $existingVersions = $cmsDb->select('page_versions', ['filename' => $filename]) ?: [];
+        $versionNum = count($existingVersions) + 1;
+
+        $cmsDb->insert('page_versions', [
+            'filename'    => $filename,
+            'version_num' => $versionNum,
+            'content'     => $oldContent,
+            'admin_email' => $executingAdminEmail,
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
+
+        // 2. Write new content to live file
+        if (file_put_contents($fullPath, $content, LOCK_EX) !== false) {
+            // 3. Mark draft as published in site_cms
+            $cmsDb->createTable('pages');
+            $existingDraft = $cmsDb->selectOne('pages', ['slug' => $filename, 'user_id' => 0]);
+            if ($existingDraft) {
+                $cmsDb->update('pages', [
+                    'body_code'  => $content,
+                    'is_draft'   => 0,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ], ['id' => $existingDraft['id']]);
+            }
+
+            // 4. Log audit trace
+            $conn->insert('activity_logs', [
+                'user_id'    => $_SESSION['user_id'] ?? 0,
+                'email'      => $executingAdminEmail,
+                'action'     => 'page_published',
+                'details'    => "Published live page: {$filename} (Version v{$versionNum} backed up)",
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            jsonResponse(['success' => true, 'message' => "Page '{$filename}' published live successfully! Version v{$versionNum} backed up."]);
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to write updated page content to disk.'], 500);
+        }
+        break;
+
+    // ACTION 4: List Page Backup Versions
+    case 'admin_list_versions':
+        if (!isStaff() || !hasAdminPagePermission($_SESSION['role'] ?? '', '/admin/pages')) {
+            jsonResponse(['success' => false, 'message' => 'Access Denied: Administrative page editor permissions required.'], 403);
+        }
+
+        $filename = cleanInput($_POST['filename'] ?? $_GET['filename'] ?? '');
+
+        $approvedPages = getApprovedPublicPages();
+        $approvedMap = array_column($approvedPages, null, 'filename');
+
+        if (empty($filename) || !isset($approvedMap[$filename])) {
+            jsonResponse(['success' => false, 'message' => 'Security Error: Requested page is not in the approved whitelist.'], 403);
+        }
+
+        $cmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+        $cmsDb->createTable('page_versions');
+
+        $versions = $cmsDb->select('page_versions', ['filename' => $filename]) ?: [];
+
+        jsonResponse([
+            'success'  => true,
+            'filename' => $filename,
+            'versions' => array_reverse($versions)
+        ]);
+        break;
+
+    // ACTION 5: Restore Version Snapshot
+    case 'admin_restore_version':
+        if (!isStaff() || !hasAdminPagePermission($_SESSION['role'] ?? '', '/admin/pages')) {
+            jsonResponse(['success' => false, 'message' => 'Access Denied: Administrative page editor permissions required.'], 403);
+        }
+
+        $versionId = (int)($_POST['version_id'] ?? 0);
+        if ($versionId <= 0) {
+            jsonResponse(['success' => false, 'message' => 'Invalid version ID.'], 400);
+        }
+
+        $cmsDb = new Database(__DIR__ . '/../databases', 'site_cms');
+        $cmsDb->createTable('page_versions');
+
+        $vRecord = $cmsDb->selectOne('page_versions', ['id' => $versionId]);
+        if (!$vRecord) {
+            jsonResponse(['success' => false, 'message' => 'Version snapshot record not found.'], 404);
+        }
+
+        $filename = $vRecord['filename'] ?? '';
+
+        $approvedPages = getApprovedPublicPages();
+        $approvedMap = array_column($approvedPages, null, 'filename');
+
+        if (empty($filename) || !isset($approvedMap[$filename])) {
+            jsonResponse(['success' => false, 'message' => 'Security Error: Requested page is not in the approved whitelist.'], 403);
+        }
+
+        $pageMeta = $approvedMap[$filename];
+        $fullPath = $pageMeta['full_path'];
+
+        // Backup current live before restoring
+        $currentLive = file_exists($fullPath) ? file_get_contents($fullPath) : '';
+        $existingVersions = $cmsDb->select('page_versions', ['filename' => $filename]) ?: [];
+        $newVNum = count($existingVersions) + 1;
+
+        $cmsDb->insert('page_versions', [
+            'filename'    => $filename,
+            'version_num' => $newVNum,
+            'content'     => $currentLive,
+            'admin_email' => $executingAdminEmail,
+            'created_at'  => date('Y-m-d H:i:s')
+        ]);
+
+        // Restore version content
+        if (file_put_contents($fullPath, $vRecord['content'], LOCK_EX) !== false) {
+            // Sync CMS draft status
+            $cmsDb->createTable('pages');
+            $existingDraft = $cmsDb->selectOne('pages', ['slug' => $filename, 'user_id' => 0]);
+            if ($existingDraft) {
+                $cmsDb->update('pages', [
+                    'body_code'  => $vRecord['content'],
+                    'is_draft'   => 0,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ], ['id' => $existingDraft['id']]);
+            }
+
+            $conn->insert('activity_logs', [
+                'user_id'    => $_SESSION['user_id'] ?? 0,
+                'email'      => $executingAdminEmail,
+                'action'     => 'page_restored',
+                'details'    => "Restored version v{$vRecord['version_num']} for platform page: {$filename}",
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            jsonResponse(['success' => true, 'message' => "Version v{$vRecord['version_num']} restored to live page '{$filename}' successfully!"]);
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to write restored version content to disk.'], 500);
+        }
         break;
 
     // DEFAULT Scenario: Return invalid action warning
