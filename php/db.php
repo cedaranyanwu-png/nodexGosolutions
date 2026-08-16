@@ -36,6 +36,8 @@ $conn->createTable('subscriptions'); // Active/expired hosting subscriptions
 $conn->createTable('roles'); // Custom roles listing
 $conn->createTable('permissions'); // Granular permissions mapped to roles
 $conn->createTable('activity_logs'); // Secure administrative activity audits
+$conn->createTable('workspaces'); // Workspace environments
+$conn->createTable('workspace_members'); // Workspace team members & roles
 
 // Dynamic Auto-Seeder: Seed the main administrator account if users table is empty
 $usersCount = count($conn->select('users'));
@@ -259,6 +261,116 @@ function secureSession(): void {
 function generateSecureToken(int $length = 32): string {
     // Generate secure bytes and return hex encoded string
     return bin2hex(random_bytes($length));
+}
+
+/**
+ * Helper function to retrieve all workspaces accessible to a user (as owner or team member).
+ * Auto-creates a default personal workspace for the user if none exists and migrates unassigned resources.
+ */
+function getUserWorkspaces(int $userId): array {
+    global $conn;
+    $conn->createTable('workspaces');
+    $conn->createTable('workspace_members');
+
+    // Get user details
+    $user = $conn->selectOne('users', ['id' => $userId]);
+    $userEmail = strtolower((string)($user['email'] ?? ''));
+
+    // Owned workspaces
+    $owned = $conn->select('workspaces', ['user_id' => $userId]) ?: [];
+
+    // Workspaces where user is a team member
+    $membershipRecords = $conn->select('workspace_members', ['email' => $userEmail]) ?: [];
+    $joinedIds = [];
+    foreach ($membershipRecords as $mem) {
+        $wId = (int)($mem['workspace_id'] ?? 0);
+        if ($wId > 0 && !in_array($wId, $joinedIds, true)) {
+            $joinedIds[] = $wId;
+        }
+    }
+
+    $joined = [];
+    foreach ($joinedIds as $wId) {
+        $ws = $conn->selectOne('workspaces', ['id' => $wId]);
+        if ($ws && (int)($ws['user_id'] ?? 0) !== $userId) {
+            $joined[] = $ws;
+        }
+    }
+
+    $allWorkspaces = array_merge($owned, $joined);
+
+    // If no workspace exists yet for this user, create a default personal workspace
+    if (empty($allWorkspaces) && $user) {
+        $ownerName = $user['fullname'] ?? 'Personal';
+        $defaultWs = $conn->insert('workspaces', [
+            'user_id' => $userId,
+            'name' => "{$ownerName}'s Workspace",
+            'description' => 'Default primary workspace environment.',
+            'type' => 'Personal',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if ($defaultWs) {
+            // Register owner in workspace_members
+            $conn->insert('workspace_members', [
+                'workspace_id' => $defaultWs['id'],
+                'user_id' => $userId,
+                'fullname' => $user['fullname'] ?? 'Owner',
+                'email' => $userEmail,
+                'role' => 'owner',
+                'status' => 'active',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            $allWorkspaces = [$defaultWs];
+        }
+    }
+
+    // Auto-migrate existing unassigned user websites to default workspace
+    if (!empty($allWorkspaces)) {
+        $defaultWsId = $allWorkspaces[0]['id'];
+        $conn->createTable('websites');
+        $userWebsites = $conn->select('websites', ['user_id' => $userId]) ?: [];
+        foreach ($userWebsites as $web) {
+            if (!isset($web['workspace_id']) || empty($web['workspace_id'])) {
+                $conn->update('websites', ['workspace_id' => $defaultWsId], ['id' => $web['id']]);
+            }
+        }
+    }
+
+    return $allWorkspaces;
+}
+
+/**
+ * Helper to retrieve the active selected workspace for a given user array.
+ */
+function getActiveWorkspace(array $user): array {
+    global $conn;
+    $userId = (int)($user['id'] ?? 0);
+    $workspaces = getUserWorkspaces($userId);
+
+    secureSession();
+
+    if (isset($_SESSION['active_workspace_id'])) {
+        $activeId = (int)$_SESSION['active_workspace_id'];
+        foreach ($workspaces as $ws) {
+            if ((int)($ws['id'] ?? 0) === $activeId) {
+                return $ws;
+            }
+        }
+    }
+
+    // Default to first available workspace
+    $activeWs = $workspaces[0] ?? [
+        'id' => 1,
+        'user_id' => $userId,
+        'name' => 'Default Workspace',
+        'description' => 'Primary workspace',
+        'type' => 'Personal'
+    ];
+
+    $_SESSION['active_workspace_id'] = $activeWs['id'];
+    return $activeWs;
 }
 
 /**

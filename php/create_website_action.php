@@ -348,14 +348,19 @@ if (!$zipUploaded) {
     }
 }
 
+// Resolve active workspace context
+$activeWs = getActiveWorkspace($user);
+$workspaceId = (int)($activeWs['id'] ?? 0);
+
 // Insert metadata tracking parameters inside system JSON table
 $newSite = $conn->insert('websites', [
-    'user_id'    => $user['id'],
-    'name'       => $websiteName,
-    'subdomain'  => $websiteSubdomain,
-    'url'        => $siteUrl,
-    'folder'     => $websiteSubdomain,
-    'created_at' => date('Y-m-d H:i:s')
+    'user_id'      => $user['id'],
+    'workspace_id' => $workspaceId,
+    'name'         => $websiteName,
+    'subdomain'    => $websiteSubdomain,
+    'url'          => $siteUrl,
+    'folder'       => $websiteSubdomain,
+    'created_at'   => date('Y-m-d H:i:s')
 ]);
 
 if ($newSite !== false) {

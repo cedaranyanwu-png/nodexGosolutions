@@ -135,6 +135,13 @@ $fullname   = $sidebarUser['fullname'] ?? $_SESSION['fullname'] ?? 'System User'
                                     <a href="/user/dashboard#profile" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
                                         <i class="fa-solid fa-user-gear me-2" style="font-size: 11px;"></i> My Profile
                                     </a>
+                                    <!-- Workspace Team & Settings -->
+                                    <a href="/user/dashboard#team" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-users-gear me-2" style="font-size: 11px;"></i> Workspace Team
+                                    </a>
+                                    <a href="/user/dashboard#workspace-settings" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-sliders me-2" style="font-size: 11px;"></i> Workspace Settings
+                                    </a>
                                     <!-- Client Support Tickets -->
                                     <a href="/user/dashboard#support" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
                                         <i class="fa-solid fa-headset me-2" style="font-size: 11px;"></i> Support Tickets

@@ -175,9 +175,25 @@ if ($subscriptionStatus === 'trial') {
     }
 }
 
-// Retrieve custom website projects created by current tenant
+// Retrieve workspaces and active workspace context
+$userWorkspaces = getUserWorkspaces((int)$user['id']);
+$activeWorkspace = getActiveWorkspace($user);
+$activeWorkspaceId = (int)$activeWorkspace['id'];
+
+// Retrieve workspace members
+$conn->createTable('workspace_members');
+$workspaceMembers = $conn->select('workspace_members', ['workspace_id' => $activeWorkspaceId]) ?: [];
+
+// Retrieve custom website projects created by current tenant for active workspace
 $conn->createTable('websites');
-$myWebsites = $conn->select('websites', ['user_id' => $user['id']]) ?: [];
+$allUserWebsites = $conn->select('websites', ['user_id' => $user['id']]) ?: [];
+
+$myWebsites = array_values(array_filter($allUserWebsites, function($web) use ($activeWorkspaceId) {
+    if (!isset($web['workspace_id']) || empty($web['workspace_id'])) {
+        return true; // Keep legacy unassigned records visible
+    }
+    return (int)$web['workspace_id'] === $activeWorkspaceId;
+}));
 $websitesCount = count($myWebsites);
 
 // Dynamic storage directory calculator helper
@@ -373,6 +389,57 @@ $userCategoriesList = $conn->select('categories') ?: [];
             <i class="fas fa-exclamation-triangle mr-1"></i> ● SUBSCRIPTION REQUIRED (Your trial has expired. [ Subscribe Now ])
           </span>
         <?php endif; ?>
+      </div>
+    </div>
+
+    <!-- WORKSPACE SELECTOR & PLATFORM ENVIRONMENT BAR -->
+    <div class="bg-white border border-gray-100 shadow-sm rounded-2xl p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="font-size: 16px;">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <div>
+          <div class="text-2xs font-bold text-gray-400 uppercase tracking-wider" style="font-size: 10px;">Active Workspace</div>
+          <div class="dropdown">
+            <button class="btn btn-link p-0 fw-bold text-dark text-decoration-none dropdown-toggle text-sm d-flex align-items-center gap-2 border-0 bg-transparent shadow-none" type="button" id="workspaceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <span><?php echo htmlspecialchars((string)($activeWorkspace['name'] ?? 'Personal Workspace')); ?></span>
+              <span class="badge bg-blue-50 text-blue-700 text-2xs px-2 py-0.5 rounded-pill border border-blue-100"><?php echo htmlspecialchars((string)($activeWorkspace['type'] ?? 'Personal')); ?></span>
+            </button>
+            <ul class="dropdown-menu shadow-xl border-0 rounded-xl p-2" aria-labelledby="workspaceDropdown" style="min-width: 260px;">
+              <li class="dropdown-header text-2xs font-bold text-gray-400 uppercase px-3 py-1">Switch Workspace</li>
+              <?php foreach ($userWorkspaces as $wsItem):
+                $isCurrent = ((int)$wsItem['id'] === $activeWorkspaceId);
+              ?>
+                <li>
+                  <a class="dropdown-item rounded-lg px-3 py-2 d-flex justify-content-between align-items-center text-xs font-semibold btn-switch-ws <?php echo $isCurrent ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-700'; ?>" href="#" data-id="<?php echo (int)$wsItem['id']; ?>">
+                    <span><i class="fa-solid fa-folder me-2 text-gray-400"></i><?php echo htmlspecialchars((string)$wsItem['name']); ?></span>
+                    <?php if ($isCurrent): ?>
+                      <i class="fa-solid fa-circle-check text-blue-600"></i>
+                    <?php endif; ?>
+                  </a>
+                </li>
+              <?php endforeach; ?>
+              <li><hr class="dropdown-divider my-2"></li>
+              <li>
+                <a class="dropdown-item rounded-lg px-3 py-2 text-xs font-bold text-blue-600 d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal">
+                  <i class="fa-solid fa-circle-plus me-2"></i> + Create New Workspace
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-xs font-semibold text-gray-500 d-none d-sm-inline me-2">
+          <i class="fa-solid fa-users me-1 text-primary"></i> Team: <strong><?php echo count($workspaceMembers); ?> Member(s)</strong>
+        </span>
+        <a href="#team" class="btn btn-sm btn-outline-primary rounded-lg text-xs font-bold py-1.5 px-3">
+          <i class="fa-solid fa-users-gear me-1"></i> Workspace Team
+        </a>
+        <button class="btn btn-sm btn-primary bg-blue-600 text-white font-bold border-0 rounded-lg text-xs py-1.5 px-3 shadow-sm hover:bg-blue-700 transition" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal">
+          <i class="fa-solid fa-plus me-1"></i> New Workspace
+        </button>
       </div>
     </div>
 
@@ -1065,6 +1132,128 @@ $userCategoriesList = $conn->select('categories') ?: [];
           endif;
           ?>
 
+        <!-- WORKSPACE TEAM COLLABORATION TAB PANEL -->
+        <div class="row mb-4 d-none" id="team">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-xl">
+              <div class="card-header bg-white border-b border-gray-100 py-3.5 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                  <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                    <i class="fa-solid fa-users-gear text-primary me-2"></i> Workspace Team & Collaboration
+                  </h3>
+                  <p class="text-2xs text-gray-400 m-0 mt-0.5" style="font-size: 11px;">Manage team access, invite collaborators, and assign roles for '<?php echo htmlspecialchars((string)($activeWorkspace['name'] ?? 'Personal Workspace')); ?>'.</p>
+                </div>
+                <button class="btn btn-primary btn-sm bg-blue-600 text-white border-0 font-bold px-3 py-2 rounded-lg text-xs" data-bs-toggle="modal" data-bs-target="#inviteMemberModal">
+                  <i class="fa-solid fa-user-plus me-1"></i> Invite Member
+                </button>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0 text-xs">
+                    <thead class="bg-gray-50 text-gray-500 font-bold">
+                      <tr>
+                        <th class="p-3.5">Member Name</th>
+                        <th class="p-3.5">Email Address</th>
+                        <th class="p-3.5">Workspace Role</th>
+                        <th class="p-3.5">Joined Date</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                      <?php if (!empty($workspaceMembers)): ?>
+                        <?php foreach ($workspaceMembers as $mem):
+                          $memRole = strtolower((string)($mem['role'] ?? 'member'));
+                          $roleBadgeClass = 'bg-secondary bg-opacity-10 text-secondary';
+                          if ($memRole === 'owner') $roleBadgeClass = 'bg-blue-600 text-white font-bold';
+                          elseif ($memRole === 'admin') $roleBadgeClass = 'bg-indigo-50 text-indigo-700 font-bold';
+                          elseif ($memRole === 'developer') $roleBadgeClass = 'bg-emerald-50 text-emerald-700 font-bold';
+                        ?>
+                          <tr>
+                            <td class="p-3.5 font-bold text-gray-800">
+                              <div class="d-flex align-items-center gap-2">
+                                <div class="w-8 h-8 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center font-bold" style="font-size: 12px;">
+                                  <?php echo strtoupper(substr((string)($mem['fullname'] ?? 'U'), 0, 1)); ?>
+                                </div>
+                                <span><?php echo htmlspecialchars((string)($mem['fullname'] ?? $mem['email'])); ?></span>
+                              </div>
+                            </td>
+                            <td class="p-3.5 font-mono text-gray-600"><?php echo htmlspecialchars((string)($mem['email'] ?? '')); ?></td>
+                            <td class="p-3.5">
+                              <span class="badge <?php echo $roleBadgeClass; ?> text-2xs px-2.5 py-1 rounded-full uppercase">
+                                <?php echo htmlspecialchars(ucfirst($memRole)); ?>
+                              </span>
+                            </td>
+                            <td class="p-3.5 text-gray-400"><?php echo date('M d, Y', strtotime($mem['created_at'] ?? 'now')); ?></td>
+                            <td class="p-3.5 text-right">
+                              <?php if ($memRole !== 'owner'): ?>
+                                <button class="btn btn-xs btn-outline-primary rounded-md me-1 btn-edit-mem-role" data-id="<?php echo (int)($mem['id'] ?? 0); ?>" data-role="<?php echo htmlspecialchars($memRole); ?>" data-email="<?php echo htmlspecialchars((string)$mem['email']); ?>">
+                                  <i class="fa-solid fa-user-pen me-1"></i> Edit Role
+                                </button>
+                                <button class="btn btn-xs btn-outline-danger rounded-md btn-remove-mem" data-id="<?php echo (int)($mem['id'] ?? 0); ?>">
+                                  <i class="fa-solid fa-trash me-1"></i> Remove
+                                </button>
+                              <?php else: ?>
+                                <span class="text-2xs text-gray-400 italic">Workspace Owner</span>
+                              <?php endif; ?>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      <?php else: ?>
+                        <tr>
+                          <td colspan="5" class="text-center text-gray-400 py-5">No team members in this workspace yet. Click 'Invite Member' to collaborate!</td>
+                        </tr>
+                      <?php endif; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WORKSPACE SETTINGS TAB PANEL -->
+        <div class="row mb-4 d-none" id="workspace-settings">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-xl">
+              <div class="card-header bg-white border-b border-gray-100 py-3.5 px-4">
+                <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                  <i class="fa-solid fa-sliders text-primary me-2"></i> Workspace Settings
+                </h3>
+                <p class="text-2xs text-gray-400 m-0 mt-0.5" style="font-size: 11px;">Update environment configuration and workspace details.</p>
+              </div>
+              <div class="card-body p-4">
+                <form id="updateWorkspaceForm" class="max-w-2xl">
+                  <div id="wsSettingsFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+                  <div class="mb-3">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Name</label>
+                    <input type="text" id="wsSettingName" class="form-control text-xs rounded-lg p-2.5 border-gray-200" value="<?php echo htmlspecialchars((string)($activeWorkspace['name'] ?? '')); ?>" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Description</label>
+                    <textarea id="wsSettingDesc" class="form-control text-xs rounded-lg p-2.5 border-gray-200" rows="3"><?php echo htmlspecialchars((string)($activeWorkspace['description'] ?? '')); ?></textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Type</label>
+                    <select id="wsSettingType" class="form-control text-xs rounded-lg p-2.5 border-gray-200">
+                      <option value="Personal" <?php echo (($activeWorkspace['type'] ?? '') === 'Personal') ? 'selected' : ''; ?>>Personal</option>
+                      <option value="Startup" <?php echo (($activeWorkspace['type'] ?? '') === 'Startup') ? 'selected' : ''; ?>>Startup</option>
+                      <option value="Client Project" <?php echo (($activeWorkspace['type'] ?? '') === 'Client Project') ? 'selected' : ''; ?>>Client Project</option>
+                      <option value="Enterprise" <?php echo (($activeWorkspace['type'] ?? '') === 'Enterprise') ? 'selected' : ''; ?>>Enterprise</option>
+                    </select>
+                  </div>
+
+                  <button type="submit" id="btnUpdateWsSubmit" class="btn btn-primary bg-blue-600 text-white font-bold text-xs py-2.5 px-4 rounded-lg border-0 shadow-sm">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Save Workspace Changes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- PROFILE SETTINGS TAB PANEL -->
         <div class="row mb-4 d-none" id="profile">
           <div class="col-12">
@@ -1365,6 +1554,135 @@ $userCategoriesList = $conn->select('categories') ?: [];
     </div>
   </div>
 
+  <!-- CREATE WORKSPACE MODAL -->
+  <div class="modal fade" id="createWorkspaceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-2xl">
+        <div class="modal-header bg-blue-600 text-white py-3 px-4 rounded-t-2xl">
+          <h5 class="modal-title font-bold text-sm d-flex align-items-center">
+            <i class="fa-solid fa-briefcase me-2"></i> Create New Workspace
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="createWorkspaceForm">
+            <div id="createWsFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Name</label>
+              <input type="text" id="newWsName" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="e.g. My Startup or Client Project" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Description</label>
+              <textarea id="newWsDesc" class="form-control text-xs rounded-lg p-2.5 border-gray-200" rows="2" placeholder="Brief workspace description..."></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Environment Type</label>
+              <select id="newWsType" class="form-control text-xs rounded-lg p-2.5 border-gray-200">
+                <option value="Personal">Personal Environment</option>
+                <option value="Startup">Startup Organization</option>
+                <option value="Client Project">Client Project</option>
+                <option value="Enterprise">Enterprise Workspace</option>
+              </select>
+            </div>
+
+            <button type="submit" id="btnCreateWsSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full transition border-0 shadow-sm">
+              <i class="fa-solid fa-rocket me-1"></i> Create Workspace
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVITE TEAM MEMBER MODAL -->
+  <div class="modal fade" id="inviteMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-2xl">
+        <div class="modal-header bg-blue-600 text-white py-3 px-4 rounded-t-2xl">
+          <h5 class="modal-title font-bold text-sm d-flex align-items-center">
+            <i class="fa-solid fa-user-plus me-2"></i> Invite Team Member
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="inviteMemberForm">
+            <div id="inviteMemFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Full Name (Optional)</label>
+              <input type="text" id="inviteMemName" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="John Doe" />
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Email Address</label>
+              <input type="email" id="inviteMemEmail" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="colleague@domain.com" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Workspace Role</label>
+              <select id="inviteMemRole" class="form-control text-xs rounded-lg p-2.5 border-gray-200">
+                <option value="admin">Admin (Full Workspace Management)</option>
+                <option value="developer">Developer (Websites, Code & Files)</option>
+                <option value="designer">Designer (GrapesJS Builder & Layouts)</option>
+                <option value="editor">Editor (Content & Pages)</option>
+                <option value="member" selected>Member (Standard Collaborator)</option>
+                <option value="viewer">Viewer (Read-Only Access)</option>
+              </select>
+            </div>
+
+            <button type="submit" id="btnInviteMemSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full transition border-0 shadow-sm">
+              <i class="fa-solid fa-paper-plane me-1"></i> Send Workspace Invitation
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MEMBER ROLE MODAL -->
+  <div class="modal fade" id="editMemberRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-2xl">
+        <div class="modal-header bg-blue-600 text-white py-3 px-4 rounded-t-2xl">
+          <h5 class="modal-title font-bold text-sm d-flex align-items-center">
+            <i class="fa-solid fa-user-pen me-2"></i> Change Workspace Member Role
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="editMemberRoleForm">
+            <input type="hidden" id="editMemId" value="0">
+            <div id="editMemRoleFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Member Email</label>
+              <input type="text" id="editMemEmail" class="form-control text-xs rounded-lg p-2.5 border-gray-200 bg-gray-50" readonly />
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">New Workspace Role</label>
+              <select id="editMemRoleSelect" class="form-control text-xs rounded-lg p-2.5 border-gray-200">
+                <option value="admin">Admin (Full Workspace Management)</option>
+                <option value="developer">Developer (Websites, Code & Files)</option>
+                <option value="designer">Designer (GrapesJS Builder & Layouts)</option>
+                <option value="editor">Editor (Content & Pages)</option>
+                <option value="member">Member (Standard Collaborator)</option>
+                <option value="viewer">Viewer (Read-Only Access)</option>
+              </select>
+            </div>
+
+            <button type="submit" id="btnEditMemRoleSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full transition border-0 shadow-sm">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Update Member Role
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- UPLOAD / CREATE SUBDOMAIN WEBSITE MODAL -->
   <div class="modal fade" id="uploadWebsiteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1626,6 +1944,187 @@ $(document).ready(function() {
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
     }
+
+    // Switch active workspace
+    $(document).on('click', '.btn-switch-ws', function(e) {
+        e.preventDefault();
+        const wsId = $(this).data('id');
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: { action: 'switch_workspace', workspace_id: wsId },
+            dataType: 'json',
+            success: function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    });
+
+    // Create Workspace Form Submit
+    $('#createWorkspaceForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#createWsFeedback');
+        const btn = $('#btnCreateWsSubmit');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Creating Workspace...');
+
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: {
+                action: 'create_workspace',
+                name: $('#newWsName').val().trim(),
+                description: $('#newWsDesc').val().trim(),
+                type: $('#newWsType').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-rocket me-1"></i> Create Workspace');
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-rocket me-1"></i> Create Workspace');
+                feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Creation failed.');
+            }
+        });
+    });
+
+    // Invite Member Form Submit
+    $('#inviteMemberForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#inviteMemFeedback');
+        const btn = $('#btnInviteMemSubmit');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Sending Invitation...');
+
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: {
+                action: 'invite_member',
+                fullname: $('#inviteMemName').val().trim(),
+                email: $('#inviteMemEmail').val().trim(),
+                role: $('#inviteMemRole').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Send Workspace Invitation');
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Send Workspace Invitation');
+                feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Invitation failed.');
+            }
+        });
+    });
+
+    // Open Edit Member Role Modal
+    $(document).on('click', '.btn-edit-mem-role', function() {
+        const id = $(this).data('id');
+        const role = $(this).data('role');
+        const email = $(this).data('email');
+
+        $('#editMemId').val(id);
+        $('#editMemEmail').val(email);
+        $('#editMemRoleSelect').val(role);
+        $('#editMemRoleFeedback').addClass('d-none');
+
+        const modalEl = document.getElementById('editMemberRoleModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    });
+
+    // Edit Member Role Form Submit
+    $('#editMemberRoleForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#editMemRoleFeedback');
+        const btn = $('#btnEditMemRoleSubmit');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Updating Role...');
+
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: {
+                action: 'update_member_role',
+                member_id: $('#editMemId').val(),
+                role: $('#editMemRoleSelect').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-floppy-disk me-1"></i> Update Member Role');
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            }
+        });
+    });
+
+    // Remove Team Member
+    $(document).on('click', '.btn-remove-mem', function() {
+        if (!confirm('Are you sure you want to remove this member from the workspace?')) return;
+        const id = $(this).data('id');
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: { action: 'remove_member', member_id: id },
+            dataType: 'json',
+            success: function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    });
+
+    // Update Workspace Settings Form Submit
+    $('#updateWorkspaceForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#wsSettingsFeedback');
+        const btn = $('#btnUpdateWsSubmit');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving Changes...');
+
+        $.ajax({
+            url: '/php/workspace_action.php',
+            type: 'POST',
+            data: {
+                action: 'update_workspace_settings',
+                name: $('#wsSettingName').val().trim(),
+                description: $('#wsSettingDesc').val().trim(),
+                type: $('#wsSettingType').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-floppy-disk me-1"></i> Save Workspace Changes');
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            }
+        });
+    });
 
     // Submit Upload / Create Subdomain Website Form
     $('#uploadWebsiteForm').on('submit', function(e) {
@@ -1964,6 +2463,16 @@ $(document).ready(function() {
             $(hash).removeClass('d-none');
             $('html, body').animate({
                 scrollTop: $(hash).offset().top - 20
+            }, 300);
+        } else if (hash === '#team') {
+            $('#team').removeClass('d-none');
+            $('html, body').animate({
+                scrollTop: $("#team").offset().top - 20
+            }, 300);
+        } else if (hash === '#workspace-settings') {
+            $('#workspace-settings').removeClass('d-none');
+            $('html, body').animate({
+                scrollTop: $("#workspace-settings").offset().top - 20
             }, 300);
         } else if (hash === '#support') {
             // Unhide the support ticket panel dynamically and trigger scroll
