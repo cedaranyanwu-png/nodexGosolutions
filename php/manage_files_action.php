@@ -319,6 +319,52 @@ switch ($action) {
         ]);
         break;
 
+    // Action 9: Upload custom files or ZIP packages directly into workspace
+    case 'upload_file':
+        if (!isset($_FILES['upload_file']) || $_FILES['upload_file']['error'] !== UPLOAD_ERR_OK) {
+            jsonResponse(['success' => false, 'message' => 'Please choose a valid file to upload.'], 400);
+        }
+
+        $fileTmp = $_FILES['upload_file']['tmp_name'];
+        $fileName = cleanInput($_FILES['upload_file']['name']);
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if ($ext === 'zip' && class_exists('ZipArchive')) {
+            $zip = new ZipArchive();
+            if ($zip->open($fileTmp) === true) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $entryName = $zip->getNameIndex($i);
+                    if (str_contains($entryName, '..') || str_starts_with($entryName, '/') || str_starts_with($entryName, '\\')) {
+                        continue;
+                    }
+                    $destPath = $realTenantDir . '/' . ltrim(str_replace('\\', '/', $entryName), '/');
+                    if (str_ends_with($entryName, '/') || str_ends_with($entryName, '\\')) {
+                        if (!is_dir($destPath)) {
+                            @mkdir($destPath, 0755, true);
+                        }
+                    } else {
+                        $parentFolder = dirname($destPath);
+                        if (!is_dir($parentFolder)) {
+                            @mkdir($parentFolder, 0755, true);
+                        }
+                        copy("zip://{$fileTmp}#{$entryName}", $destPath);
+                    }
+                }
+                $zip->close();
+                jsonResponse(['success' => true, 'message' => 'ZIP package uploaded and extracted successfully!']);
+            } else {
+                jsonResponse(['success' => false, 'message' => 'Failed to extract uploaded ZIP file.'], 400);
+            }
+        } else {
+            $destFile = $realTenantDir . '/' . basename($fileName);
+            if (move_uploaded_file($fileTmp, $destFile)) {
+                jsonResponse(['success' => true, 'message' => "File '{$fileName}' uploaded successfully!"]);
+            } else {
+                jsonResponse(['success' => false, 'message' => 'Failed to save uploaded file in website workspace.'], 500);
+            }
+        }
+        break;
+
     default:
         jsonResponse(['success' => false, 'message' => 'Unrecognized File Manager action request.'], 400);
         break;

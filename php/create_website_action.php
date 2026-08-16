@@ -257,45 +257,95 @@ if (!function_exists('copyTemplateDirectory')) {
     }
 }
 
-// Check if a template selection was supplied
+// Check if custom ZIP website package was uploaded
+$zipUploaded = false;
+if (isset($_FILES['website_zip']) && $_FILES['website_zip']['error'] === UPLOAD_ERR_OK) {
+    $tmpZipPath = $_FILES['website_zip']['tmp_name'];
+    $zipFileName = $_FILES['website_zip']['name'];
+    $ext = strtolower(pathinfo($zipFileName, PATHINFO_EXTENSION));
+
+    if ($ext !== 'zip') {
+        jsonResponse(['success' => false, 'message' => 'Invalid file format. Please upload a valid .zip website package.'], 400);
+    }
+
+    if (class_exists('ZipArchive')) {
+        $zip = new ZipArchive();
+        if ($zip->open($tmpZipPath) === true) {
+            // Safely extract ZIP entries preventing path traversal attacks
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $filename = $zip->getNameIndex($i);
+                if (str_contains($filename, '..') || str_starts_with($filename, '/') || str_starts_with($filename, '\\')) {
+                    continue;
+                }
+                $targetPath = $tenantDir . '/' . ltrim(str_replace('\\', '/', $filename), '/');
+                if (str_ends_with($filename, '/') || str_ends_with($filename, '\\')) {
+                    if (!is_dir($targetPath)) {
+                        @mkdir($targetPath, 0755, true);
+                    }
+                } else {
+                    $parentDir = dirname($targetPath);
+                    if (!is_dir($parentDir)) {
+                        @mkdir($parentDir, 0755, true);
+                    }
+                    copy("zip://{$tmpZipPath}#{$filename}", $targetPath);
+                }
+            }
+            $zip->close();
+            $zipUploaded = true;
+        } else {
+            jsonResponse(['success' => false, 'message' => 'Failed to unpack uploaded ZIP website package.'], 400);
+        }
+    } else {
+        jsonResponse(['success' => false, 'message' => 'Server Error: ZipArchive extension is required to extract ZIP website packages.'], 500);
+    }
+}
+
+// Check if a template selection was supplied (if no ZIP uploaded)
 $templateUsed = false;
 $masterTemplateDir = null;
 
-if (!empty($templateCategory) && !empty($templateFolder)) {
-    $candidateMaster = realpath(__DIR__ . '/../templates/' . $templateCategory . '/' . $templateFolder);
-    $rootTemplatesDir = realpath(__DIR__ . '/../templates');
-    if ($candidateMaster !== false && $rootTemplatesDir !== false && str_starts_with($candidateMaster, $rootTemplatesDir) && is_dir($candidateMaster)) {
-        $masterTemplateDir = $candidateMaster;
-    }
-} elseif ($templateId > 0) {
-    $tplRecord = $conn->selectOne('templates', ['id' => $templateId]);
-    if ($tplRecord && !empty($tplRecord['category']) && !empty($tplRecord['folder'])) {
-        $candidateMaster = realpath(__DIR__ . '/../templates/' . $tplRecord['category'] . '/' . $tplRecord['folder']);
+if (!$zipUploaded) {
+    if (!empty($templateCategory) && !empty($templateFolder)) {
+        $candidateMaster = realpath(__DIR__ . '/../templates/' . $templateCategory . '/' . $templateFolder);
         $rootTemplatesDir = realpath(__DIR__ . '/../templates');
         if ($candidateMaster !== false && $rootTemplatesDir !== false && str_starts_with($candidateMaster, $rootTemplatesDir) && is_dir($candidateMaster)) {
             $masterTemplateDir = $candidateMaster;
         }
-    }
-}
-
-if ($masterTemplateDir !== null && is_dir($masterTemplateDir)) {
-    // Copy master template files into user's public/{subdomain}/ directory
-    // Master template in /templates/ remains 100% unchanged!
-    copyTemplateDirectory($masterTemplateDir, $tenantDir);
-    $templateUsed = true;
-
-    // Increment downloads count on template record if applicable
-    if ($templateId > 0) {
+    } elseif ($templateId > 0) {
         $tplRecord = $conn->selectOne('templates', ['id' => $templateId]);
-        if ($tplRecord) {
-            $conn->update('templates', ['downloads' => (int)($tplRecord['downloads'] ?? 0) + 1], ['id' => $templateId]);
+        if ($tplRecord && !empty($tplRecord['category']) && !empty($tplRecord['folder'])) {
+            $candidateMaster = realpath(__DIR__ . '/../templates/' . $tplRecord['category'] . '/' . $tplRecord['folder']);
+            $rootTemplatesDir = realpath(__DIR__ . '/../templates');
+            if ($candidateMaster !== false && $rootTemplatesDir !== false && str_starts_with($candidateMaster, $rootTemplatesDir) && is_dir($candidateMaster)) {
+                $masterTemplateDir = $candidateMaster;
+            }
         }
     }
+
+    if ($masterTemplateDir !== null && is_dir($masterTemplateDir)) {
+        // Copy master template files into user's public/{subdomain}/ directory
+        // Master template in /templates/ remains 100% unchanged!
+        copyTemplateDirectory($masterTemplateDir, $tenantDir);
+        $templateUsed = true;
+
+        // Increment downloads count on template record if applicable
+        if ($templateId > 0) {
+            $tplRecord = $conn->selectOne('templates', ['id' => $templateId]);
+            if ($tplRecord) {
+                $conn->update('templates', ['downloads' => (int)($tplRecord['downloads'] ?? 0) + 1], ['id' => $templateId]);
+            }
+        }
+    } else {
+        // Write provisioned default fallback templates onto tenant directory
+        file_put_contents($tenantDir . '/index.html', $indexHtml, LOCK_EX);
+        file_put_contents($tenantDir . '/css/style.css', $styleCss, LOCK_EX);
+        file_put_contents($tenantDir . '/js/main.js', $mainJs, LOCK_EX);
+    }
 } else {
-    // Write provisioned default fallback templates onto tenant directory
-    file_put_contents($tenantDir . '/index.html', $indexHtml, LOCK_EX);
-    file_put_contents($tenantDir . '/css/style.css', $styleCss, LOCK_EX);
-    file_put_contents($tenantDir . '/js/main.js', $mainJs, LOCK_EX);
+    // If ZIP was uploaded, ensure an index.html exists
+    if (!file_exists($tenantDir . '/index.html')) {
+        file_put_contents($tenantDir . '/index.html', $indexHtml, LOCK_EX);
+    }
 }
 
 // Insert metadata tracking parameters inside system JSON table

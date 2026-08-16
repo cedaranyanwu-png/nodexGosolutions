@@ -655,11 +655,19 @@ $userCategoriesList = $conn->select('categories') ?: [];
           <div class="row mb-4">
             <div class="col-12">
               <div class="card border-0 shadow-sm rounded-xl">
-                <div class="card-header bg-white border-b border-gray-100 py-3 d-flex justify-content-between align-items-center">
-                  <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
-                    <i class="fas fa-globe text-primary mr-2"></i> My Active Subdomains Directory
-                  </h3>
-                  <span class="badge bg-primary bg-opacity-10 text-primary text-xs px-2.5 py-1 rounded-full font-bold">Wildcard Mapping Enabled</span>
+                <div class="card-header bg-white border-b border-gray-100 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                      <i class="fas fa-globe text-primary mr-2"></i> My Active Subdomains Directory
+                    </h3>
+                    <p class="text-2xs text-gray-400 m-0 mt-0.5" style="font-size: 11px;">Create website under your subdomain by uploading files/ZIP or selecting a template.</p>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-primary bg-blue-600 text-white font-bold border-0 rounded-lg text-xs py-2 px-3 shadow-sm hover:bg-blue-700 transition" data-bs-toggle="modal" data-bs-target="#uploadWebsiteModal">
+                      <i class="fas fa-cloud-arrow-up me-1"></i> Upload / Create Website
+                    </button>
+                    <span class="badge bg-primary bg-opacity-10 text-primary text-xs px-2.5 py-1.5 rounded-full font-bold">Wildcard Subdomains Active</span>
+                  </div>
                 </div>
                 <div class="card-body p-0">
                   <div class="table-responsive">
@@ -1357,6 +1365,53 @@ $userCategoriesList = $conn->select('categories') ?: [];
     </div>
   </div>
 
+  <!-- UPLOAD / CREATE SUBDOMAIN WEBSITE MODAL -->
+  <div class="modal fade" id="uploadWebsiteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-2xl">
+        <div class="modal-header bg-blue-600 text-white py-3 px-4 rounded-t-2xl">
+          <h5 class="modal-title font-bold text-sm d-flex align-items-center">
+            <i class="fas fa-cloud-arrow-up me-2"></i> Create or Upload Subdomain Website
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="uploadWebsiteForm" enctype="multipart/form-data">
+            <div id="uploadWebModalFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Website Name</label>
+              <input type="text" id="uploadWebName" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="e.g. My Custom Business" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Subdomain Prefix</label>
+              <div class="input-group">
+                <input type="text" id="uploadWebSubdomain" class="form-control text-xs rounded-l-lg p-2.5 border-gray-200" placeholder="mybusiness" required />
+                <span class="input-group-text text-xs bg-gray-50 text-gray-500 font-bold border-gray-200 rounded-r-lg">.nodexplatform.com.ng</span>
+              </div>
+              <span class="text-2xs text-gray-400 mt-1 block">Your website will be provisioned directly under your custom subdomain URL.</span>
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Upload Website Package (.zip optional)</label>
+              <input type="file" id="uploadWebZip" name="website_zip" accept=".zip" class="form-control text-xs rounded-lg p-2 border-gray-200" />
+              <span class="text-2xs text-gray-400 mt-1 block">Upload a custom website ZIP package (containing index.html, CSS, JS, assets) or leave blank to initialize a customizable website.</span>
+            </div>
+
+            <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-800 mb-3">
+              <i class="fas fa-info-circle me-1"></i> Your physical folder <code>/public/subdomain/</code> will be provisioned automatically on your custom subdomain.
+            </div>
+
+            <button type="submit" id="btnUploadWebSubmit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full transition border-0 shadow-sm">
+              <i class="fas fa-rocket me-1"></i> Provision Subdomain Website
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- USE TEMPLATE PROVISIONING MODAL -->
   <div class="modal fade" id="useTemplateModal" tabindex="-1" aria-labelledby="useTemplateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1571,6 +1626,54 @@ $(document).ready(function() {
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
     }
+
+    // Submit Upload / Create Subdomain Website Form
+    $('#uploadWebsiteForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#uploadWebModalFeedback');
+        const btn = $('#btnUploadWebSubmit');
+
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Provisioning Subdomain Website...');
+
+        const sub = $('#uploadWebSubdomain').val().trim().toLowerCase();
+        const formData = new FormData();
+        formData.append('website_name', $('#uploadWebName').val().trim());
+        formData.append('website_subdomain', sub);
+
+        const fileInput = document.getElementById('uploadWebZip');
+        if (fileInput && fileInput.files.length > 0) {
+            formData.append('website_zip', fileInput.files[0]);
+        }
+
+        $.ajax({
+            url: '/php/create_website_action.php',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fas fa-rocket me-1"></i> Provision Subdomain Website');
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    const modalEl = document.getElementById('uploadWebsiteModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fas fa-rocket me-1"></i> Provision Subdomain Website');
+                feedback.removeClass('d-none').addClass('alert-danger').text(xhr.responseJSON ? xhr.responseJSON.message : 'Provisioning failed.');
+            }
+        });
+    });
 
     // Submit Template Provisioning Form
     $('#useTemplateForm').on('submit', function(e) {
