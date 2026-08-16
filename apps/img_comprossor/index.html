@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Image Compressor | nodexGosolutions</title>
+
+    <!-- Load standard Google fonts and fontawesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandBlue: '#3b82f6',
+              brandLightBlue: '#eff6ff',
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header Navigation Bar -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <a href="/user/dashboard" class="flex items-center text-xl font-bold text-blue-600 tracking-wide hover:opacity-90 transition duration-150">
+            <i class="fa-solid fa-server mr-2"></i>nodex<span class="text-slate-800 font-semibold">Go</span>
+        </a>
+        <a href="/user/dashboard" class="text-xs font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-100 transition duration-150">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Return Dashboard
+        </a>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-8 max-w-xl w-full text-center">
+
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-4">
+                <i class="fa-solid fa-file-image text-2xl animate-pulse"></i>
+            </div>
+
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">Interactive JS Image Compressor</h1>
+            <p class="text-xs text-gray-500 mb-6">Compress PNG, JPG, or WebP graphic files in-browser via secure HTML5 canvas routines.</p>
+
+            <!-- File Drag & Drop Sandbox -->
+            <div id="dropzone" class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50/80 rounded-xl p-8 cursor-pointer transition duration-150 mb-6 flex flex-col items-center">
+                <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-3 animate-bounce"></i>
+                <h3 class="text-sm font-bold text-gray-700 mb-1">Drag & Drop Image Here</h3>
+                <p class="text-2xs text-gray-400">or click to browse local files</p>
+                <input type="file" id="fileInput" accept="image/*" class="hidden" />
+            </div>
+
+            <!-- Quality Configuration Slider -->
+            <div id="configArea" class="hidden mb-6 text-left">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-gray-600 uppercase">Compression Factor Ratio:</label>
+                    <span id="qualityVal" class="text-sm font-extrabold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">80%</span>
+                </div>
+                <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" id="qualityRange" min="10" max="100" value="80" />
+            </div>
+
+            <!-- Instant Savings Visual Statistics Cards -->
+            <div id="savingsPanel" class="hidden grid grid-cols-2 gap-3 mb-6 text-left animate-fade-in">
+                <div class="p-4 bg-slate-50 border border-gray-100 rounded-xl">
+                    <span class="text-2xs font-bold uppercase text-gray-400 block mb-1">Original Size</span>
+                    <strong class="text-gray-700 text-base font-bold" id="origSize">0 KB</strong>
+                </div>
+                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                    <span class="text-2xs font-bold uppercase text-emerald-600 block mb-1">Optimized Size</span>
+                    <strong class="text-emerald-700 text-base font-bold" id="compSize">0 KB</strong>
+                </div>
+                <div class="col-span-2 text-center py-2 bg-emerald-100/50 rounded-lg text-emerald-800 font-bold text-xs" id="ratioSavings">
+                    Size Saved: 0%
+                </div>
+            </div>
+
+            <!-- Action Executions -->
+            <div class="space-y-2">
+                <button class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg hover:shadow-blue-200 transition duration-150 flex items-center justify-center gap-2" id="btnCompress">
+                    <i class="fa-solid fa-compress-arrows-alt"></i> Compress Image Asset
+                </button>
+                <a class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg hover:shadow-emerald-200 transition duration-150 flex items-center justify-center gap-2" id="btnDownload" download="optimized_graphic.jpg">
+                    <i class="fa-solid fa-circle-down"></i> Download Compressed Asset
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-3 text-center text-2xs text-gray-400">
+        &copy; 2026 nodexGosolutions. Browser Canvas Compression Standard.
+    </footer>
+
+    <!-- Browser Compression Canvas Logic -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const configArea = document.getElementById('configArea');
+        const qualityRange = document.getElementById('qualityRange');
+        const qualityVal = document.getElementById('qualityVal');
+        const btnCompress = document.getElementById('btnCompress');
+        const btnDownload = document.getElementById('btnDownload');
+        const savingsPanel = document.getElementById('savingsPanel');
+        const origSize = document.getElementById('origSize');
+        const compSize = document.getElementById('compSize');
+        const ratioSavings = document.getElementById('ratioSavings');
+
+        let loadedImage = null;
+        let originalFile = null;
+
+        // Click to browse triggers
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // File Drag & Drop Handlers
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('bg-blue-100/80');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('bg-blue-100/80');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('bg-blue-100/80');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        qualityRange.addEventListener('input', (e) => {
+            qualityVal.textContent = e.target.value + '%';
+        });
+
+        // Initialize file load details
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please supply an active graphic file.');
+                return;
+            }
+            originalFile = file;
+            origSize.textContent = formatBytes(file.size);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                loadedImage = new Image();
+                loadedImage.onload = function() {
+                    configArea.classList.remove('hidden');
+                    btnCompress.classList.remove('hidden');
+                    btnDownload.classList.add('hidden');
+                    savingsPanel.classList.add('hidden');
+                };
+                loadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Draw on canvas and compress
+        btnCompress.addEventListener('click', () => {
+            if (!loadedImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = loadedImage.width;
+            canvas.height = loadedImage.height;
+            ctx.drawImage(loadedImage, 0, 0);
+
+            const quality = parseFloat(qualityRange.value) / 100;
+
+            // Standard Jpeg compression routine
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+
+                compSize.textContent = formatBytes(blob.size);
+                const percentSaved = Math.round(((originalFile.size - blob.size) / originalFile.size) * 100);
+                ratioSavings.textContent = `Physical Storage Savings: ${percentSaved > 0 ? percentSaved : 0}% Space Saved`;
+
+                const compressedUrl = URL.createObjectURL(blob);
+                btnDownload.href = compressedUrl;
+                btnDownload.download = `optimized_${originalFile.name}`;
+
+                savingsPanel.classList.remove('hidden');
+                btnDownload.classList.remove('hidden');
+            }, 'image/jpeg', quality);
+        });
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    });
+    </script>
+</body>
+</html>
