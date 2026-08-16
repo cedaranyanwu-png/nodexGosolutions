@@ -124,6 +124,9 @@ $fullname   = $sidebarUser['fullname'] ?? $_SESSION['fullname'] ?? 'System User'
                                     <a href="/user/dashboard#manage-files" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
                                         <i class="fa-solid fa-folder-open me-2" style="font-size: 11px;"></i> Manage Files
                                     </a>
+                                    <a href="/user/dashboard#monetization" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
+                                        <i class="fa-solid fa-rectangle-ad me-2" style="font-size: 11px;"></i> Monetization
+                                    </a>
                                     <!-- Added dynamic real-time traffic statistics and metrics page loading inside dashboard -->
                                     <a href="/user/dashboard#analytics" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold">
                                         <i class="fa-solid fa-chart-simple me-2" style="font-size: 11px;"></i> Analytics
@@ -450,6 +453,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const targetMap = {
             '#build-website': 'collapseWebsiteTools',
             '#manage-files': 'collapseWebsiteTools',
+            '#monetization': 'collapseWebsiteTools',
             '#analytics': isAdmin ? 'collapseAdminWebsites' : 'collapseWebsiteTools',
             '#profile': isAdmin ? 'collapseAdminWebsites' : 'collapseWebsiteTools',
             '#support': 'collapseWebsiteTools',

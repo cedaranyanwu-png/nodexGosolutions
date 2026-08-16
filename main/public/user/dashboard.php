@@ -823,6 +823,64 @@ $userCategoriesList = $conn->select('categories') ?: [];
             </div>
           </div>
 
+          <!-- UNIVERSAL MONETIZATION ENGINE SECTION -->
+          <div class="row mb-4" id="monetization">
+            <div class="col-12">
+              <div class="card border-0 shadow-sm rounded-xl">
+                <div class="card-header bg-white border-b border-gray-100 py-3.5 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <h3 class="text-base font-bold text-gray-800 m-0 d-flex align-items-center">
+                      <i class="fa-solid fa-rectangle-ad text-primary me-2"></i> Universal Website Monetization Engine
+                    </h3>
+                    <p class="text-2xs text-gray-400 m-0 mt-0.5" style="font-size: 11px;">Connect Nodex Monetization and ad slots to both uploaded sites and GrapesJS builder websites.</p>
+                  </div>
+                  <span class="badge bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-pill text-2xs">Ad Engine Connected</span>
+                </div>
+                <div class="card-body p-4">
+                  <div class="row g-4">
+                    <?php if ($websitesCount > 0): ?>
+                      <?php foreach ($myWebsites as $web):
+                        $wSub = htmlspecialchars((string)($web['subdomain'] ?? ''));
+                        $wName = htmlspecialchars((string)($web['name'] ?? ''));
+                        $mStatus = strtolower((string)($web['monetization_status'] ?? 'active'));
+                        $isMonActive = ($mStatus !== 'disabled');
+                      ?>
+                        <div class="col-md-6 col-lg-4">
+                          <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover-translate">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div>
+                                <h4 class="text-sm font-bold text-gray-800 m-0 mb-1"><?php echo $wName; ?></h4>
+                                <span class="font-mono text-blue-600 text-2xs block" style="font-size: 11px;"><?php echo $wSub . '.' . $hostDomain; ?></span>
+                              </div>
+                              <?php if ($isMonActive): ?>
+                                <span class="badge bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-2xs">● Monetization Active</span>
+                              <?php else: ?>
+                                <span class="badge bg-gray-100 text-gray-600 font-bold px-2.5 py-1 rounded-full text-2xs">Not Connected</span>
+                              <?php endif; ?>
+                            </div>
+                            <p class="text-2xs text-gray-500 mb-4" style="font-size: 11px;">
+                              Universal ad placement runtime is enabled for this website instance.
+                            </p>
+                            <div class="d-flex gap-2">
+                              <button class="btn btn-primary btn-xs font-bold bg-blue-600 text-white rounded-md w-100 py-1.5 border-0 btn-manage-ads" data-subdomain="<?php echo $wSub; ?>" data-title="<?php echo $wName; ?>">
+                                <i class="fa-solid fa-sliders me-1"></i> Manage Ads
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                    <?php else: ?>
+                      <div class="col-12 text-center text-gray-400 py-5">
+                        <i class="fa-solid fa-rectangle-ad text-3xl text-gray-300 mb-2 block"></i>
+                        No websites provisioned yet. Launch a website to connect monetization!
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- DYNAMIC WEBSITE-SPECIFIC ANALYTICS SECTION -->
           <div class="row mb-4" id="analytics">
             <div class="col-12">
@@ -1214,6 +1272,67 @@ $userCategoriesList = $conn->select('categories') ?: [];
     </div>
   </div>
 
+  <!-- MANAGE WEBSITE ADS MODAL -->
+  <div class="modal fade" id="manageAdsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-2xl border-0 shadow-2xl">
+        <div class="modal-header bg-slate-900 text-white py-3 px-4 rounded-t-2xl">
+          <h5 class="modal-title font-bold text-sm d-flex align-items-center"><i class="fa-solid fa-sliders me-2 text-blue-400"></i> Website Monetization & Ad Placements</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-xs">
+          <div id="manageAdsFeedback" class="alert d-none text-xs rounded-lg p-2.5 mb-3" role="alert"></div>
+
+          <form id="manageAdsForm">
+            <input type="hidden" id="adsModalSubdomain" value="">
+
+            <div class="mb-3">
+              <label class="form-label text-2xs uppercase font-bold text-gray-500">Website</label>
+              <input type="text" id="adsModalSiteTitle" class="form-control text-xs font-bold text-gray-700 bg-gray-50 rounded-md" readonly>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-2xs uppercase font-bold text-gray-500">Monetization Status</label>
+              <select id="adsModalMonStatus" class="form-control text-xs rounded-md font-semibold">
+                <option value="active">● Active (Enabled)</option>
+                <option value="disabled">Disabled (Not Connected)</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label text-2xs uppercase font-bold text-gray-500 mb-2 block">Active Ad Placements</label>
+
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="placeHeader" value="1" checked>
+                <label class="form-check-label font-bold text-gray-700" for="placeHeader">Header Ad Banner</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="placeTopContent" value="1" checked>
+                <label class="form-check-label font-bold text-gray-700" for="placeTopContent">Top Content Ad</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="placeInContent" value="1" checked>
+                <label class="form-check-label font-bold text-gray-700" for="placeInContent">In-Content Ad</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="placeSidebar" value="1" checked>
+                <label class="form-check-label font-bold text-gray-700" for="placeSidebar">Sidebar Ad Placement</label>
+              </div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="placeFooter" value="1" checked>
+                <label class="form-check-label font-bold text-gray-700" for="placeFooter">Footer Ad Banner</label>
+              </div>
+            </div>
+
+            <button type="submit" id="btnSaveAdsSettings" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-lg w-full border-0 transition">
+              <i class="fa-solid fa-save me-1"></i> Save Monetization Settings
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TEMPLATE PREVIEW MODAL -->
   <div class="modal fade" id="previewTemplateModal" tabindex="-1" aria-labelledby="previewTemplateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -1557,11 +1676,8 @@ $(document).ready(function() {
             height: '680px',
             width: 'auto',
             storageManager: false, // We handle save/load explicitly via PHP API
-            components: projectData ? projectData.components : initialHtml,
-            style: projectData ? projectData.styles : initialCss,
-            blockManager: {
-                appendTo: '#gjs-blocks'
-            }
+            components: projectData ? (projectData.components || projectData.pages) : initialHtml,
+            style: projectData ? projectData.styles : initialCss
         });
 
         // Add Predefined Monetization Blocks to GrapesJS Block Manager
@@ -1653,10 +1769,7 @@ $(document).ready(function() {
 
         const html = grapesjsEditor.getHtml();
         const css  = grapesjsEditor.getCss();
-        const projectData = {
-            components: grapesjsEditor.getComponents(),
-            styles: grapesjsEditor.getStyle()
-        };
+        const projectData = grapesjsEditor.getProjectData();
 
         $.ajax({
             url: '/php/manage_files_action.php',
@@ -1848,6 +1961,76 @@ $(document).ready(function() {
                 } else {
                     alert(res.message || 'Failed to send reply.');
                 }
+            }
+        });
+    });
+
+    // Manage Ads Modal Handler
+    $(document).on('click', '.btn-manage-ads', function() {
+        const sub = $(this).attr('data-subdomain');
+        const title = $(this).attr('data-title');
+
+        $('#adsModalSubdomain').val(sub);
+        $('#adsModalSiteTitle').val(title + ' (' + sub + '.<?php echo $hostDomain; ?>)');
+        $('#manageAdsFeedback').addClass('d-none');
+
+        $.ajax({
+            url: '/php/manage_files_action.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { action: 'get_monetization', subdomain: sub },
+            success: function(res) {
+                if (res.success) {
+                    $('#adsModalMonStatus').val(res.monetization_status || 'active');
+                    const p = res.ad_placements || {};
+                    $('#placeHeader').prop('checked', !!p.header);
+                    $('#placeTopContent').prop('checked', !!p.top_content);
+                    $('#placeInContent').prop('checked', !!p.in_content);
+                    $('#placeSidebar').prop('checked', !!p.sidebar);
+                    $('#placeFooter').prop('checked', !!p.footer);
+
+                    const modal = new bootstrap.Modal(document.getElementById('manageAdsModal'));
+                    modal.show();
+                }
+            }
+        });
+    });
+
+    $('#manageAdsForm').on('submit', function(e) {
+        e.preventDefault();
+        const feedback = $('#manageAdsFeedback');
+        const btn = $('#btnSaveAdsSettings');
+        feedback.addClass('d-none').removeClass('alert-success alert-danger');
+        btn.prop('disabled', true);
+
+        const sub = $('#adsModalSubdomain').val();
+
+        $.ajax({
+            url: '/php/manage_files_action.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'save_monetization',
+                subdomain: sub,
+                monetization_status: $('#adsModalMonStatus').val(),
+                place_header: $('#placeHeader').is(':checked') ? 1 : 0,
+                place_top_content: $('#placeTopContent').is(':checked') ? 1 : 0,
+                place_in_content: $('#placeInContent').is(':checked') ? 1 : 0,
+                place_sidebar: $('#placeSidebar').is(':checked') ? 1 : 0,
+                place_footer: $('#placeFooter').is(':checked') ? 1 : 0
+            },
+            success: function(res) {
+                btn.prop('disabled', false);
+                if (res.success) {
+                    feedback.removeClass('d-none').addClass('alert-success').text(res.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    feedback.removeClass('d-none').addClass('alert-danger').text(res.message);
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false);
+                feedback.removeClass('d-none').addClass('alert-danger').text('Failed to save settings.');
             }
         });
     });

@@ -407,7 +407,14 @@ if (!in_array(strtolower($currentHost), $landingHosts, true)) {
     // If a valid tenant public directory is found on disk, resolve and serve the requested resource
     if ($tenantPublicDir !== null) {
         // Enforce website suspension & subscription expiration checks
-        $websiteRecord = $conn->selectOne('websites', ['subdomain' => $folder]);
+        $subPrefix = $folder;
+        if (str_contains($subPrefix, '.')) {
+            $subPrefix = explode('.', $subPrefix)[0];
+        }
+        $websiteRecord = $conn->selectOne('websites', ['subdomain' => $subPrefix]);
+        if ($websiteRecord === null) {
+            $websiteRecord = $conn->selectOne('websites', ['subdomain' => $folder]);
+        }
         if ($websiteRecord !== null) {
             // Check suspension status
             if ((int)($websiteRecord['is_suspended'] ?? 0) === 1) {
@@ -505,11 +512,60 @@ if (!in_array(strtolower($currentHost), $landingHosts, true)) {
                 require_once $realTargetPath;
                 // Halt further routing processes
                 exit;
+            } elseif ($extension === 'html' || $extension === 'htm') {
+                header("Content-Type: text/html; charset=utf-8");
+                $rawHtml = file_get_contents($realTargetPath);
+
+                $monStatus = 'active';
+                $placements = ['header' => 1, 'top_content' => 1, 'in_content' => 1, 'sidebar' => 1, 'footer' => 1];
+
+                if (isset($websiteRecord) && $websiteRecord !== null) {
+                    $monStatus = strtolower((string)($websiteRecord['monetization_status'] ?? 'active'));
+                    if (!empty($websiteRecord['ad_placements'])) {
+                        $pRaw = is_array($websiteRecord['ad_placements']) ? $websiteRecord['ad_placements'] : json_decode((string)$websiteRecord['ad_placements'], true);
+                        if (is_array($pRaw)) {
+                            $placements = array_merge($placements, $pRaw);
+                        }
+                    }
+                }
+
+                if ($monStatus !== 'disabled') {
+                    $adInject = "\n<!-- Nodex Universal Monetization Engine -->\n";
+                    $subSafe = htmlspecialchars($folder);
+
+                    if (!empty($placements['header']) && !str_contains($rawHtml, 'data-nodex-ad="header"')) {
+                        $adInject .= '<div class="nodex-ad-slot" data-nodex-ad="header" style="text-align:center;margin:15px auto;max-width:728px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;"><span style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;">Sponsored</span><div class="ad-content" style="margin-top:4px;font-size:13px;color:#334155;">[ Header Banner Placement ]</div></div>' . "\n";
+                    }
+                    if (!empty($placements['footer']) && !str_contains($rawHtml, 'data-nodex-ad="footer"')) {
+                        $adInject .= '<div class="nodex-ad-slot" data-nodex-ad="footer" style="text-align:center;margin:20px auto;max-width:728px;padding:12px;background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:8px;"><span style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;">Partner Ads</span><div class="ad-content" style="margin-top:4px;font-size:13px;color:#334155;">[ Footer Banner Placement ]</div></div>' . "\n";
+                    }
+
+                    $adInject .= "<script>
+                    (function(){
+                        const track = function(e){
+                            fetch('/php/track_metrics.php?subdomain={$subSafe}&event='+e, {method:'POST', mode:'cors'}).catch(err => console.error(err));
+                        };
+                        track('page_view');
+                        document.addEventListener('click', function(e){
+                            if(e.target && e.target.closest && e.target.closest('.nodex-ad-slot')) {
+                                track('click');
+                            }
+                        });
+                    })();
+                    </script>\n";
+
+                    if (str_contains($rawHtml, '</body>')) {
+                        $rawHtml = str_replace('</body>', $adInject . '</body>', $rawHtml);
+                    } else {
+                        $rawHtml .= $adInject;
+                    }
+                }
+
+                echo $rawHtml;
+                exit;
             } else {
                 // Define common web content MIME-types list
                 $mimeTypes = [
-                    'html' => 'text/html',
-                    'htm'  => 'text/html',
                     'css'  => 'text/css',
                     'js'   => 'application/javascript',
                     'png'  => 'image/png',

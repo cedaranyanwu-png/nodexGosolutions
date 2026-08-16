@@ -263,6 +263,62 @@ switch ($action) {
         ]);
         break;
 
+    // Action 7: Fetch website monetization status and placement settings
+    case 'get_monetization':
+        $conn->createTable('websites');
+        $webRec = $conn->selectOne('websites', ['subdomain' => $subdomain]);
+
+        $monStatus = $webRec['monetization_status'] ?? 'active';
+        $placementsRaw = $webRec['ad_placements'] ?? null;
+        $placements = is_array($placementsRaw) ? $placementsRaw : (json_decode((string)$placementsRaw, true) ?: [
+            'header' => 1,
+            'top_content' => 1,
+            'in_content' => 1,
+            'sidebar' => 1,
+            'footer' => 1
+        ]);
+
+        jsonResponse([
+            'success' => true,
+            'subdomain' => $subdomain,
+            'monetization_status' => $monStatus,
+            'ad_placements' => $placements
+        ]);
+        break;
+
+    // Action 8: Update website monetization status and ad placements
+    case 'save_monetization':
+        $conn->createTable('websites');
+        $webRec = $conn->selectOne('websites', ['subdomain' => $subdomain]);
+        if (!$webRec) {
+            jsonResponse(['success' => false, 'message' => 'Website workspace record not found.'], 404);
+        }
+
+        $monStatus = strtolower(cleanInput($_POST['monetization_status'] ?? 'active'));
+        if ($monStatus !== 'disabled') {
+            $monStatus = 'active';
+        }
+
+        $placements = [
+            'header' => (int)($_POST['place_header'] ?? 0),
+            'top_content' => (int)($_POST['place_top_content'] ?? 0),
+            'in_content' => (int)($_POST['place_in_content'] ?? 0),
+            'sidebar' => (int)($_POST['place_sidebar'] ?? 0),
+            'footer' => (int)($_POST['place_footer'] ?? 0)
+        ];
+
+        $conn->update('websites', [
+            'monetization_status' => $monStatus,
+            'ad_placements' => json_encode($placements),
+            'updated_at' => date('Y-m-d H:i:s')
+        ], ['id' => $webRec['id']]);
+
+        jsonResponse([
+            'success' => true,
+            'message' => 'Monetization settings saved successfully!'
+        ]);
+        break;
+
     default:
         jsonResponse(['success' => false, 'message' => 'Unrecognized File Manager action request.'], 400);
         break;
