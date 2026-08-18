@@ -1,0 +1,5 @@
+databases/
+php_server.log
+*.log
+flutterwave-keys.txt
+.env
