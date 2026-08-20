@@ -1,0 +1,14 @@
+/* assets/css/user.css - Tenant Workspace Dashboard Styles */
+.user-stat-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.user-nav-tab {
+  transition: all 0.2s ease;
+  font-weight: 700;
+  border-radius: 0.75rem;
+}

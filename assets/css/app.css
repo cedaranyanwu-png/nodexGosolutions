@@ -1,0 +1,60 @@
+/* assets/css/app.css - Global Application Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.hover-translate {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-translate:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 114, 255, 0.08);
+}
+
+.tab-section {
+  display: none;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+.tab-section.active-tab {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-page-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.full-page-card .card-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}

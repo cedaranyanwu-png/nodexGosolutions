@@ -1,0 +1,27 @@
+/* assets/css/file-manager.css - File Manager Styling */
+.code-editor-textarea {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  background-color: #0f172a;
+  color: #38bdf8;
+  border-radius: 12px;
+  padding: 16px;
+  resize: none;
+  line-height: 1.6;
+}
+
+.file-item-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.file-item-row:hover {
+  background-color: #f1f5f9;
+}
+
+.file-item-row.active {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
