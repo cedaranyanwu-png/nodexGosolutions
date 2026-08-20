@@ -14,9 +14,10 @@ $user = $auth->getCurrentUser();
 
 $name = (string)($_POST['name'] ?? '');
 $subdomain = (string)($_POST['subdomain'] ?? '');
+$customDomain = (string)($_POST['custom_domain'] ?? '');
 $template = $_POST['template_folder'] ?? null;
 
 $service = new WebsiteService();
-$res = $service->createWebsite($user, $name, $subdomain, $template ? (string)$template : null);
+$res = $service->createWebsite($user, $name, $subdomain, $template ? (string)$template : null, $customDomain !== '' ? $customDomain : null);
 
 jsonResponse($res, $res['success'] ? 200 : 400);

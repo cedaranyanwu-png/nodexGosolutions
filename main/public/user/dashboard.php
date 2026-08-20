@@ -331,18 +331,33 @@ $tabs = [
 <div class="modal fade" id="uploadWebsiteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-2xl border-0 shadow-2xl">
-      <div class="modal-header bg-blue-600 text-white py-3 px-4"><h5 class="modal-title font-bold text-sm">Create New Website Subdomain</h5></div>
+      <div class="modal-header bg-blue-600 text-white py-3 px-4"><h5 class="modal-title font-bold text-sm">Create New Website Workspace</h5></div>
       <div class="modal-body p-4">
         <form id="uploadWebsiteForm">
           <div class="mb-3">
             <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Website Name</label>
             <input type="text" id="newWebName" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="My Business Site" required />
           </div>
+
           <div class="mb-3">
-            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Subdomain Prefix</label>
-            <input type="text" id="newWebSubdomain" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="mysite" required />
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Platform Subdomain</label>
+            <div class="input-group">
+              <input type="text" id="newWebSubdomain" class="form-control text-xs rounded-l-lg p-2.5 border-gray-200" placeholder="mysite" required />
+              <span class="input-group-text bg-gray-100 text-gray-500 font-mono text-xs border-gray-200">.nodexplatform.com.ng</span>
+            </div>
+            <p class="text-2xs text-gray-400 mt-1 mb-0">Free trial & Micro plans include platform subdomains.</p>
           </div>
-          <button type="submit" class="bg-blue-600 text-white font-bold text-xs py-2.5 px-4 rounded-lg w-full border-0">Provision Subdomain</button>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-0">Custom Domain (Optional)</label>
+              <span class="badge bg-indigo-100 text-indigo-700 text-2xs uppercase font-bold px-2 py-0.5 rounded">Growth / Pro</span>
+            </div>
+            <input type="text" id="newWebCustomDomain" class="form-control text-xs rounded-lg p-2.5 border-gray-200" placeholder="e.g. mycompany.com" />
+            <p class="text-2xs text-indigo-600 mt-1 mb-0"><i class="fas fa-lock me-1"></i> Custom domains require a Growth or Business Pro plan upgrade.</p>
+          </div>
+
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl w-full border-0 shadow-md">Provision Website</button>
         </form>
       </div>
     </div>

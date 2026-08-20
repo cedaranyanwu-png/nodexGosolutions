@@ -42,6 +42,14 @@
       activateTab('overview');
     }
 
+    // Listen for hashchange events (e.g. from sidebar clicks)
+    $(window).on('hashchange', function() {
+      const newHash = window.location.hash.replace('#', '');
+      if (newHash && $('#' + newHash).length) {
+        activateTab(newHash);
+      }
+    });
+
     // --- 2. FILE MANAGER CONTROLLER ---
     let fmActiveSubdomain = '';
     let fmCurrentPath = '';
@@ -350,16 +358,17 @@
       e.preventDefault();
       const name = $('#newWebName').val().trim();
       const subdomain = $('#newWebSubdomain').val().trim();
+      const customDomain = $('#newWebCustomDomain').val() ? $('#newWebCustomDomain').val().trim() : '';
 
       if (!name || !subdomain) return;
 
       $.ajax({
         url: '/api/websites/create',
         type: 'POST',
-        data: { name: name, subdomain: subdomain },
+        data: { name: name, subdomain: subdomain, custom_domain: customDomain },
         success: function(res) {
           if (res.success) {
-            alert('Website space provisioned successfully!');
+            alert(res.message || 'Website space provisioned successfully!');
             location.reload();
           } else {
             alert('Creation Error: ' + res.message);

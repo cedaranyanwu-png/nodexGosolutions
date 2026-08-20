@@ -26,7 +26,7 @@ class WebsiteService {
         $this->db->createTable('websites');
     }
 
-    public function createWebsite(array $user, string $name, string $subdomain, ?string $templateFolder = null): array {
+    public function createWebsite(array $user, string $name, string $subdomain, ?string $templateFolder = null, ?string $customDomain = null): array {
         $name = cleanInput($name);
         $subdomain = strtolower(trim($subdomain));
         $subdomain = preg_replace('/[^a-z0-9\-]/', '', $subdomain);
@@ -73,13 +73,32 @@ class WebsiteService {
             @file_put_contents($targetDir . '/index.html', $defaultHtml);
         }
 
+        // Handle custom domain if requested
+        $assignedCustomDomain = null;
+        $domainStatus = 'subdomain_only';
+        $customDomainMsg = '';
+
+        if (!empty($customDomain)) {
+            $customDomainClean = strtolower(trim($customDomain));
+            $customDomainClean = preg_replace('/^https?:\/\//', '', $customDomainClean);
+            $customDomainClean = rtrim($customDomainClean, '/');
+
+            if ($this->subscriptionService->canConnectCustomDomain($user)) {
+                $assignedCustomDomain = $customDomainClean;
+                $domainStatus = 'active';
+                $this->cpanelService->addCustomDomain($customDomainClean, $targetDir);
+            } else {
+                $customDomainMsg = ' Note: Custom domain requires a Growth (₦25,000) or Business Pro (₦75,000) plan upgrade.';
+            }
+        }
+
         $website = $this->db->insert('websites', [
             'user_id' => $user['id'],
             'workspace_id' => $workspaceId,
             'name' => $name,
             'subdomain' => $subdomain,
-            'custom_domain' => null,
-            'domain_status' => 'subdomain_only',
+            'custom_domain' => $assignedCustomDomain,
+            'domain_status' => $domainStatus,
             'template' => $templateFolder,
             'is_suspended' => 0,
             'monetization_status' => 'active',
@@ -88,9 +107,22 @@ class WebsiteService {
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
+        if ($assignedCustomDomain) {
+            $this->db->createTable('domains');
+            $this->db->insert('domains', [
+                'website_id' => $website['id'],
+                'user_id' => $user['id'],
+                'domain_name' => $assignedCustomDomain,
+                'domain_type' => 'custom',
+                'cpanel_status' => 'mapped',
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
         return [
             'success' => true,
-            'message' => 'Website workspace created successfully.',
+            'message' => 'Website workspace created successfully.' . $customDomainMsg,
             'website' => $website,
             'cpanel' => $cpRes
         ];

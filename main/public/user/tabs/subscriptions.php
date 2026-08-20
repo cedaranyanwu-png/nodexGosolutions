@@ -9,6 +9,13 @@
 
 declare(strict_types=1);
 
+$tabId = 'subscriptions';
+if (!isset($dashboardContext)) {
+    $requestedTab = $tabId;
+    require_once __DIR__ . '/../dashboard.php';
+    exit;
+}
+
 require_once __DIR__ . '/../../../../backend/database/db.php';
 require_once __DIR__ . '/../../../../backend/services/SubscriptionService.php';
 require_once __DIR__ . '/../../../../backend/services/PaymentService.php';

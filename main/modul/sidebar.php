@@ -118,6 +118,9 @@ $currentTab = $activeTab ?? $requestedTab ?? '';
                             </div>
                             <div id="collapseWebsiteTools" class="accordion-collapse collapse" data-bs-parent="#sidebarToolsAccordion">
                                 <div class="accordion-body py-1 ps-4 pe-2 d-flex flex-column gap-1">
+                                    <a href="/user/dashboard#subscriptions" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold <?php echo ($currentTab === 'subscriptions') ? 'active text-white bg-primary' : ''; ?>">
+                                        <i class="fa-solid fa-credit-card me-2" style="font-size: 11px;"></i> Subscriptions & Plans
+                                    </a>
                                     <a href="/user/dashboard#build-website" class="nav-link d-flex align-items-center py-1.5 px-3 rounded-pill text-muted hover-blue text-xs fw-semibold <?php echo ($currentTab === 'build-website') ? 'active text-white bg-primary' : ''; ?>">
                                         <i class="fa-solid fa-screwdriver-wrench me-2" style="font-size: 11px;"></i> Build Website
                                     </a>
