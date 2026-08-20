@@ -54,6 +54,52 @@
     let fmActiveSubdomain = '';
     let fmCurrentPath = '';
     let fmActiveFile = '';
+    let gjsEditor = null;
+    let fmActiveMode = 'code';
+
+    function initGrapesJsIfNeeded() {
+      if (!gjsEditor && typeof grapesjs !== 'undefined' && $('#gjs-file-container').length) {
+        gjsEditor = grapesjs.init({
+          container: '#gjs-file-container',
+          height: '500px',
+          width: 'auto',
+          storageManager: false,
+          panels: { defaults: [] }
+        });
+      }
+    }
+
+    $(document).on('click', '#fmBtnModeCode', function() {
+      fmActiveMode = 'code';
+      $('#fmBtnModeCode').removeClass('text-slate-400 bg-transparent').addClass('text-white bg-blue-600');
+      $('#fmBtnModeVisual').removeClass('text-white bg-blue-600').addClass('text-slate-400 bg-transparent');
+
+      if (gjsEditor) {
+        const hCode = gjsEditor.getHtml();
+        const cCode = gjsEditor.getCss();
+        if (hCode) {
+          const combined = cCode ? `<style>\n${cCode}\n</style>\n${hCode}` : hCode;
+          $('#fmCodeArea').val(combined);
+        }
+      }
+      $('#gjs-file-container').addClass('d-none');
+      $('#fmCodeArea').removeClass('d-none');
+    });
+
+    $(document).on('click', '#fmBtnModeVisual', function() {
+      fmActiveMode = 'visual';
+      $('#fmBtnModeVisual').removeClass('text-slate-400 bg-transparent').addClass('text-white bg-blue-600');
+      $('#fmBtnModeCode').removeClass('text-white bg-blue-600').addClass('text-slate-400 bg-transparent');
+
+      $('#fmCodeArea').addClass('d-none');
+      $('#gjs-file-container').removeClass('d-none');
+
+      initGrapesJsIfNeeded();
+      if (gjsEditor) {
+        const rawCode = $('#fmCodeArea').val() || '';
+        gjsEditor.setComponents(rawCode);
+      }
+    });
 
     function getSelectedSubdomain() {
       return $('#fmWebsiteSelect').val() || fmActiveSubdomain;
@@ -185,7 +231,12 @@
 
     // Save File Changes
     $('#fmBtnSaveFile').on('click', function() {
-      const content = $('#fmCodeArea').val();
+      let content = $('#fmCodeArea').val();
+      if (fmActiveMode === 'visual' && gjsEditor) {
+        const hCode = gjsEditor.getHtml();
+        const cCode = gjsEditor.getCss();
+        content = cCode ? `<style>\n${cCode}\n</style>\n${hCode}` : hCode;
+      }
       if (!fmActiveFile) return;
 
       $.ajax({

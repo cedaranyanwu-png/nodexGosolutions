@@ -58,8 +58,7 @@ class WebsiteService {
 
         $targetDir = TENANT_PUBLIC_DIR . '/' . $subdomain;
 
-        // Create subdomain directory structure
-        $cpRes = $this->cpanelService->createSubdomain($subdomain, $targetDir);
+        // Create workspace directory natively using PHP
         if (!is_dir($targetDir)) {
             @mkdir($targetDir, 0755, true);
         }
@@ -123,8 +122,7 @@ class WebsiteService {
         return [
             'success' => true,
             'message' => 'Website workspace created successfully.' . $customDomainMsg,
-            'website' => $website,
-            'cpanel' => $cpRes
+            'website' => $website
         ];
     }
 

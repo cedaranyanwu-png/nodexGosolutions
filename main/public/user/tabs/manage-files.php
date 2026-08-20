@@ -77,11 +77,18 @@ if (!isset($dashboardContext)) {
         <!-- Right: Code / Text Editor Panel -->
         <div class="col-md-7 col-lg-8 bg-slate-900 text-slate-100 d-flex flex-column h-100 min-h-0">
           <div id="fmEditorActivePanel" class="d-none flex-column h-100 p-4 min-h-0">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-b border-slate-800 flex-shrink-0">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-b border-slate-800 flex-shrink-0 flex-wrap gap-2">
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-file-code text-blue-400 text-sm"></i>
                 <span class="font-mono text-xs font-bold text-blue-200" id="fmActiveFileName">index.html</span>
               </div>
+
+              <!-- Mode Switcher -->
+              <div class="btn-group btn-group-sm bg-slate-800 p-0.5 rounded-lg border border-slate-700" role="group">
+                <button type="button" class="btn btn-xs text-2xs font-bold text-white bg-blue-600 rounded-md border-0 py-1 px-2.5" id="fmBtnModeCode"><i class="fas fa-code me-1"></i> Code</button>
+                <button type="button" class="btn btn-xs text-2xs font-bold text-slate-400 hover:text-white rounded-md border-0 py-1 px-2.5" id="fmBtnModeVisual"><i class="fas fa-wand-magic-sparkles me-1"></i> Visual (GrapesJS)</button>
+              </div>
+
               <div class="d-flex align-items-center gap-2">
                 <button type="button" class="btn btn-xs btn-danger text-2xs py-1 px-2.5 rounded-lg border-0" id="fmBtnDeleteActive"><i class="fas fa-trash me-1"></i> Delete</button>
                 <button type="button" class="btn btn-xs btn-primary bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-1.5 px-3 rounded-xl border-0" id="fmBtnSaveFile"><i class="fas fa-floppy-disk me-1"></i> Save Changes</button>
@@ -89,6 +96,7 @@ if (!isset($dashboardContext)) {
             </div>
 
             <textarea id="fmCodeArea" class="form-control code-editor-textarea flex-grow w-100 border-0 mb-3" placeholder="// Edit HTML, CSS, JS, or text content here..."></textarea>
+            <div id="gjs-file-container" class="flex-grow w-100 bg-white text-slate-900 rounded-xl overflow-hidden mb-3 d-none" style="min-height:400px;"></div>
           </div>
 
           <div id="fmEditorEmptyState" class="d-flex flex-column align-items-center justify-content-center text-slate-500 my-auto py-20">
