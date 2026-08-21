@@ -1,0 +1,78 @@
+<?php
+/**
+ * backend/config/config.php
+ *
+ * Centralized Configuration System
+ * Manages database parameters, cPanel integration variables, Flutterwave credentials,
+ * and platform domain defaults securely without hardcoded secrets.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Load a local .env file when the host has not injected an environment value.
+ * The file is intentionally ignored by source control; production secrets must
+ * never be committed to the project archive.
+ */
+function loadLocalEnvironment(string $root): void
+{
+    $envFile = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '.env';
+    if (!is_file($envFile) || !is_readable($envFile)) return;
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+        [$key, $value] = array_map('trim', explode('=', $line, 2));
+        $value = trim($value, " \\t\\\"'");
+        if ($key !== '' && getenv($key) === false) { putenv($key . '=' . $value); $_ENV[$key] = $value; }
+    }
+}
+loadLocalEnvironment(__DIR__ . '/../..');
+
+// Platform base domain configuration
+define('APP_NAME', 'nodexGosolutions');
+define('MAIN_DOMAIN', getenv('MAIN_DOMAIN') ?: 'nodexplatform.com.ng');
+define('WEBSITE_SUBDOMAIN', getenv('WEBSITE_SUBDOMAIN') ?: 'nodexplatform.com.ng');
+define('APP_BASE_URL', getenv('APP_BASE_URL') ?: 'https://' . MAIN_DOMAIN);
+
+// System database base directory
+define('DB_BASE_DIR', __DIR__ . '/../../databases');
+
+// Public tenant websites base directory
+define('TENANT_PUBLIC_DIR', __DIR__ . '/../../public');
+
+// cPanel API Configuration
+define('CPANEL_HOST', getenv('CPANEL_HOST') ?: 'localhost');
+define('CPANEL_USERNAME', getenv('CPANEL_USERNAME') ?: '');
+define('CPANEL_API_TOKEN', getenv('CPANEL_API_TOKEN') ?: '');
+define('CPANEL_PORT', (int)(getenv('CPANEL_PORT') ?: 2083));
+
+// Flutterwave Payment Credentials
+define('FLW_PUBLIC_KEY', getenv('FLW_PUBLIC_KEY') ?: '');
+define('FLW_SECRET_KEY', getenv('FLW_SECRET_KEY') ?: '');
+define('FLW_ENCRYPTION_KEY', getenv('FLW_ENCRYPTION_KEY') ?: '');
+define('FLW_WEBHOOK_HASH', getenv('FLW_WEBHOOK_HASH') ?: '');
+
+/**
+ * Returns configuration settings array.
+ */
+function getConfig(): array {
+    return [
+        'app' => [
+            'name' => APP_NAME,
+            'main_domain' => MAIN_DOMAIN,
+            'subdomain_suffix' => WEBSITE_SUBDOMAIN,
+            'base_url' => APP_BASE_URL,
+        ],
+        'cpanel' => [
+            'host' => CPANEL_HOST,
+            'username' => CPANEL_USERNAME,
+            'api_token' => CPANEL_API_TOKEN,
+            'port' => CPANEL_PORT,
+        ],
+        'flutterwave' => [
+            'public_key' => FLW_PUBLIC_KEY,
+            'secret_key' => FLW_SECRET_KEY,
+            'encryption_key' => FLW_ENCRYPTION_KEY,
+        ]
+    ];
+}
