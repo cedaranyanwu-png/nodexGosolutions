@@ -1,0 +1,81 @@
+:root{--nx-ink:#07152f;--nx-navy:#0b1e43;--nx-blue:#0d6efd;--nx-cyan:#42e8ff;--nx-line:#e1e9f2;--nx-muted:#6c7a90}body{background:#f5f8fc!important;color:var(--nx-ink)}.card,.material-shell{border-radius:1.25rem!important;border-color:var(--nx-line)!important;box-shadow:0 1rem 2.5rem rgba(7,21,47,.06)!important}.btn-primary{background:var(--nx-blue);border-color:var(--nx-blue)}.btn-primary,.btn-info,.btn-outline-primary{border-radius:999px}.form-control,.form-select{border-radius:.8rem;border-color:#d7e1ec;padding:.7rem .85rem}.form-control:focus,.form-select:focus{border-color:var(--nx-cyan);box-shadow:0 0 0 .2rem rgba(66,232,255,.18)}.table{--bs-table-hover-bg:#f4faff}.badge{letter-spacing:.02em}.main-content{background:linear-gradient(180deg,#f8fbff,#f5f8fc)}.dashboard-layout .sidebar-container{background:linear-gradient(180deg,#fff,#f4f9ff)!important}.sidebar-container .nav-link.active{box-shadow:0 .4rem 1rem rgba(13,110,253,.17)}.editor-shell,.file-manager-shell{border-radius:1.25rem;overflow:hidden;box-shadow:0 1.4rem 3rem rgba(7,21,47,.1)}@media(max-width:767.98px){.main-content{padding:1rem!important}.card-body{padding:1rem!important}.btn{white-space:normal}}
+
+
+/*
+ * NodeXGo secure rebuild layer.
+ * This layer is presentation-only. Existing PHP guards, form names, API
+ * endpoints, DataTables selectors, upload targets, and editor hooks remain
+ * untouched so the secure application keeps its original behavior.
+ */
+:root {
+  --nx-space-950: #050914;
+  --nx-space-900: #081126;
+  --nx-space-850: #0b1833;
+  --nx-space-800: #0e2144;
+  --nx-space-line: rgba(125, 211, 252, .16);
+  --nx-space-cyan: #63e6ff;
+  --nx-space-blue: #4f8cff;
+  --nx-space-text: #eef7ff;
+  --nx-space-muted: #95abc5;
+}
+
+body {
+  background: radial-gradient(circle at 12% 0%, rgba(42, 98, 183, .18), transparent 32rem),
+              linear-gradient(135deg, var(--nx-space-950), var(--nx-space-900)) !important;
+  color: var(--nx-space-text) !important;
+}
+
+.dashboard-layout { background: transparent; }
+.main-content {
+  background: transparent !important;
+  color: var(--nx-space-text);
+  position: relative;
+}
+.main-content::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .25;
+  background-image: linear-gradient(rgba(99, 230, 255, .04) 1px, transparent 1px), linear-gradient(90deg, rgba(99, 230, 255, .04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
+}
+
+.dashboard-layout .sidebar-container {
+  background: linear-gradient(180deg, rgba(8, 17, 38, .98), rgba(5, 9, 20, .98)) !important;
+  border-right: 1px solid var(--nx-space-line) !important;
+  box-shadow: 1rem 0 3rem rgba(0, 0, 0, .18);
+}
+.sidebar-container .nav-link { color: #a9bfdc !important; border-radius: .85rem; transition: .2s ease; }
+.sidebar-container .nav-link:hover,
+.sidebar-container .nav-link.active { color: #fff !important; background: linear-gradient(90deg, rgba(79, 140, 255, .22), rgba(99, 230, 255, .08)) !important; box-shadow: inset 3px 0 0 var(--nx-space-cyan), 0 .5rem 1.3rem rgba(0, 0, 0, .12); }
+.sidebar-container .text-dark, .sidebar-container .text-muted { color: #e7f3ff !important; }
+
+.main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5 { color: #f4fbff !important; }
+.main-content p, .main-content .text-muted, .main-content .text-secondary { color: var(--nx-space-muted) !important; }
+.main-content .card, .main-content .material-shell, .main-content .analytic-card, .main-content .editor-shell, .main-content .file-manager-shell {
+  background: linear-gradient(145deg, rgba(14, 33, 68, .88), rgba(7, 16, 35, .94)) !important;
+  color: var(--nx-space-text) !important;
+  border: 1px solid var(--nx-space-line) !important;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, .2) !important;
+  backdrop-filter: blur(14px);
+}
+.main-content .table { --bs-table-bg: transparent; --bs-table-color: #e7f3ff; --bs-table-border-color: rgba(125, 211, 252, .12); }
+.main-content .table thead th { color: var(--nx-space-cyan); border-bottom-color: var(--nx-space-line); }
+.main-content .table tbody tr:hover { --bs-table-hover-bg: rgba(79, 140, 255, .10); }
+.main-content .form-control, .main-content .form-select, .main-content textarea { background: rgba(2, 7, 18, .45) !important; color: #f4fbff !important; border-color: var(--nx-space-line) !important; }
+.main-content .form-control::placeholder, .main-content textarea::placeholder { color: #7890ae !important; }
+.main-content .form-control:focus, .main-content .form-select:focus, .main-content textarea:focus { border-color: var(--nx-space-cyan) !important; box-shadow: 0 0 0 .2rem rgba(99, 230, 255, .14) !important; }
+.main-content .btn-primary, .main-content .btn-info { background: linear-gradient(100deg, var(--nx-space-blue), var(--nx-space-cyan)); border-color: transparent; color: #03101f !important; }
+.main-content .btn-outline-primary { color: var(--nx-space-cyan); border-color: var(--nx-space-cyan); }
+.main-content .badge.bg-primary { background: linear-gradient(100deg, #2959c8, #22b7da) !important; color: #fff !important; }
+.main-content .border-b, .main-content hr { border-color: var(--nx-space-line) !important; }
+.main-content .modal-content { background: linear-gradient(145deg, #0e2144, #071126); color: var(--nx-space-text); border: 1px solid var(--nx-space-line); }
+.main-content .modal-header, .main-content .modal-footer { border-color: var(--nx-space-line); }
+
+@media (max-width: 767.98px) {
+  .main-content { padding: 1rem !important; }
+  .main-content .card-body { padding: 1rem !important; }
+  .main-content .table-responsive { border-radius: .9rem; }
+}

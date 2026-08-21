@@ -4,6 +4,14 @@ RewriteEngine On
 # Ensure the base for rewrite rules is the root directory
 RewriteBase /
 
+# Never expose deployment secrets or internal persistence directories.
+RewriteRule ^(?:\.env|\.git(?:/|$)|databases(?:/|$)|uploads(?:/|$)|NGS_backups(?:/|$)|tmp(?:/|$)|.*\.log$) - [F,L]
+
+# Deny common secret/config files even when they exist as physical files.
+<FilesMatch "(^|\.)env|(^|\.)git|\.(log|sql|sqlite|bak|backup|json)$">
+    Require all denied
+</FilesMatch>
+
 # Check if the requested filename is NOT an actual file on the server
 RewriteCond %{REQUEST_FILENAME} !-f
 

@@ -1,0 +1,21 @@
+{
+  "name": "Calculator",
+  "slug": "calculator",
+  "description": "Smart interactive client-side calculator tool",
+  "version": "1.0.0",
+  "entry": "index.php",
+  "enabled": true,
+  "access": {
+    "roles": ["user", "tenant", "admin", "superadmin", "super admin"]
+  },
+  "visibility": {
+    "sidebar": true,
+    "dashboard": true
+  },
+  "sidebar": {
+    "section": "Tools",
+    "label": "Calculator",
+    "icon": "fa-solid fa-calculator",
+    "order": 10
+  }
+}

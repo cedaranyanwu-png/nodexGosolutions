@@ -1,0 +1,27 @@
+<?php
+/**
+ * Deep-space public Login presentation.
+ * The authentication contract remains unchanged: #loginForm submits to
+ * /php/login.php and follows the server-provided redirect.
+ */
+declare(strict_types=1);
+require_once __DIR__ . '/../../php/db.php';
+secureSession();
+?><!doctype html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sign In | NodeXGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/assets/css/public-space.css?v=20260820"><link rel="stylesheet" href="/assets/css/nx-secure.css?v=20260820">
+</head><body class="nx-public-space">
+<div class="nx-space-stars"></div>
+<?php require_once __DIR__ . '/../modul/nav.html'; ?>
+<main class="nx-auth-shell"><div class="container"><div class="nx-auth-panel row g-0 align-items-stretch mx-auto" style="max-width:1120px">
+<section class="nx-auth-copy col-lg-6 d-flex flex-column justify-content-center"><span class="eyebrow text-info fw-bold small"><i class="fa-solid fa-satellite me-2"></i>SECURE NODEXGO ACCESS</span><h1 class="mt-3">Return to your<br><span class="text-info">workspace orbit.</span></h1><p class="mt-4">Sign in to manage tenant websites, files, subscriptions, profiles, and the tools that turn your ideas into working systems.</p><div class="d-flex flex-wrap gap-2 mt-3"><span class="badge rounded-pill bg-dark border border-secondary-subtle p-2 px-3"><i class="fa-solid fa-shield-halved text-info me-2"></i>Protected sessions</span><span class="badge rounded-pill bg-dark border border-secondary-subtle p-2 px-3"><i class="fa-solid fa-globe text-info me-2"></i>Tenant-ready</span></div><img class="nx-auth-visual" src="/assets/images/generated/nodexgo-profile-orbit-final.png" alt="3D NodeXGo profile orbit visual"></section>
+<section class="nx-auth-form col-lg-6"><div class="text-center mb-4"><img src="/main/assets/images/logo.png?v=production" alt="NodeXGo logo" style="height:48px;width:auto" class="mb-3"><h2>Workspace access</h2><p class="text-secondary mb-0">Tenant and administrator single sign-on</p></div><div id="alertBox" class="alert d-none" role="alert"></div><form id="loginForm" novalidate><div class="mb-3 text-start"><label class="form-label" for="loginEmail">EMAIL ADDRESS / TENANT ID</label><div class="input-group"><span class="input-group-text"><i class="fa-solid fa-envelope"></i></span><input type="email" id="loginEmail" class="form-control" placeholder="admin@nodexplatform.com.ng" autocomplete="email" required></div></div><div class="mb-4 text-start"><label class="form-label" for="loginPassword">PASSWORD</label><div class="input-group"><span class="input-group-text"><i class="fa-solid fa-key"></i></span><input type="password" id="loginPassword" class="form-control" placeholder="Your secure password" autocomplete="current-password" required></div></div><button type="submit" id="btnLogin" class="btn btn-premium w-100"><i class="fa-solid fa-rocket me-2"></i>Authenticate session</button></form><div class="text-center border-top mt-4 pt-4"><p class="small text-secondary mb-0">Need a custom workspace? <a href="/register" class="fw-bold text-decoration-none">Deploy a tenant instance</a></p></div></section>
+</div></div></main>
+<?php require_once __DIR__ . '/../modul/footer.html'; ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="/assets/js/nx-feedback.js"></script>
+<script>
+$(function(){
+  $('#loginForm').on('submit',function(e){e.preventDefault();const alertBox=$('#alertBox'),btn=$('#btnLogin');if(!this.checkValidity()){this.classList.add('was-validated');return;}btn.prop('disabled',true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Authenticating...');alertBox.addClass('d-none').removeClass('alert-success alert-warning alert-danger');$.ajax({url:'/php/login.php',type:'POST',dataType:'json',data:{email:$('#loginEmail').val(),password:$('#loginPassword').val()},success:function(r){btn.prop('disabled',false).html('<i class="fa-solid fa-rocket me-2"></i>Authenticate session');alertBox.removeClass('d-none');if(r.success===true){alertBox.addClass('alert-success').html('<i class="fa-solid fa-circle-check me-1"></i> '+r.message);setTimeout(function(){window.location.href=r.redirect;},900);}else{alertBox.addClass(r.status==='unverified'?'alert-warning':'alert-danger').html('<i class="fa-solid fa-triangle-exclamation me-1"></i> '+r.message);}},error:function(xhr){btn.prop('disabled',false).html('<i class="fa-solid fa-rocket me-2"></i>Authenticate session');const r=xhr.responseJSON||{};alertBox.removeClass('d-none').addClass(r.status==='unverified'?'alert-warning':'alert-danger').html('<i class="fa-solid fa-circle-xmark me-1"></i> '+(r.message||'Network connection error. Please try again.'));}});});
+});
+</script></body></html>
