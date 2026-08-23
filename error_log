@@ -1,0 +1,5 @@
+[21-Aug-2026 20:26:12 UTC] PHP Fatal error:  Uncaught TypeError: preg_match(): Argument #2 ($subject) must be of type string, false given in /home/nodexpla/public_html/index.php:35
+Stack trace:
+#0 /home/nodexpla/public_html/index.php(35): preg_match()
+#1 {main}
+  thrown in /home/nodexpla/public_html/index.php on line 35
