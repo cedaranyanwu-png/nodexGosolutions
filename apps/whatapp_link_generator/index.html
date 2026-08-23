@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Link Generator | nodexGo</title>
+    <!-- Load FontAwesome and Tailwind -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <a href="/user/dashboard" class="flex items-center text-xl font-bold text-blue-600 tracking-wide hover:opacity-90 transition duration-150">
+            <i class="fa-solid fa-server mr-2"></i>nodex<span class="text-slate-800 font-semibold">Go</span>
+        </a>
+        <a href="/user/dashboard" class="text-xs font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-100 transition duration-150">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Return Dashboard
+        </a>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl p-6 md:p-8 max-w-md w-full text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mb-4">
+                <i class="fab fa-whatsapp text-2xl animate-pulse"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">WhatsApp Link Generator</h1>
+            <p class="text-xs text-gray-500 mb-6">Create instant WhatsApp chat links with pre-filled message texts.</p>
+
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Phone Number (with country code)</label>
+                    <input type="text" id="waPhone" class="w-full text-sm rounded-md px-3.5 py-2.5 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="234812345678" value="234800000000" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Pre-filled Custom Message</label>
+                    <textarea id="waMessage" rows="2" class="w-full text-xs rounded-md px-3 py-2 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="Hello! I am interested in your services.">Hello Cedar, I would love to deploy a new tenant workspace!</textarea>
+                </div>
+
+                <button id="btnGenerate" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg transition duration-150 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-link"></i> Generate WhatsApp Link
+                </button>
+            </div>
+
+            <!-- Result Box -->
+            <div id="waResult" class="hidden mt-6 p-4 border border-gray-100 rounded-xl bg-slate-50 text-left">
+                <span class="text-2xs font-bold uppercase text-gray-400 block mb-1">Generated WhatsApp URL</span>
+                <a id="waUrl" href="#" target="_blank" class="text-xs font-bold text-emerald-600 underline block break-all mb-3"></a>
+
+                <div class="flex gap-2">
+                    <button id="btnCopy" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-lg flex-grow transition duration-150">
+                        <i class="fa-solid fa-copy"></i> Copy Link
+                    </button>
+                    <a id="btnChat" href="#" target="_blank" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg flex-grow text-center transition duration-150">
+                        <i class="fab fa-whatsapp"></i> Chat Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-3 text-center text-2xs text-gray-400">
+        &copy; 2026 nodexGo. WhatsApp Engagement Suite.
+    </footer>
+
+    <script>
+        const btnGenerate = document.getElementById('btnGenerate');
+        const waPhone = document.getElementById('waPhone');
+        const waMessage = document.getElementById('waMessage');
+        const waResult = document.getElementById('waResult');
+        const waUrl = document.getElementById('waUrl');
+        const btnCopy = document.getElementById('btnCopy');
+        const btnChat = document.getElementById('btnChat');
+
+        btnGenerate.addEventListener('click', function() {
+            const phone = waPhone.value.trim().replace(/\+/g, '');
+            const msg = waMessage.value.trim();
+            if (!phone) {
+                alert('Please provide a phone number with country code.');
+                return;
+            }
+
+            const encodedMsg = encodeURIComponent(msg);
+            const finalUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMsg}`;
+
+            waUrl.href = finalUrl;
+            waUrl.textContent = finalUrl;
+            btnChat.href = finalUrl;
+
+            waResult.classList.remove('hidden');
+        });
+
+        btnCopy.addEventListener('click', function() {
+            navigator.clipboard.writeText(waUrl.textContent);
+            btnCopy.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i> Copied!';
+            setTimeout(() => {
+                btnCopy.innerHTML = '<i class="fa-solid fa-copy"></i> Copy Link';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
