@@ -1,0 +1,10 @@
+{
+    "domains": {
+        "main": "nodexgosolutions.com",
+        "subdomain_suffix": ".nodexgosolutions.com",
+        "connected": [
+            "about.nodexgosolutions.com",
+            "about"
+        ]
+    }
+}

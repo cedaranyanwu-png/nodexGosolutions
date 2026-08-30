@@ -1,0 +1,6 @@
+{
+    "security": {
+        "tenant_isolation_strict": true,
+        "allow_main_connected_access": true
+    }
+}

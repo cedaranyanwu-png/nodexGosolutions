@@ -1,0 +1,8 @@
+{
+    "app": {
+        "name": "NodeX Go Solutions",
+        "version": "2.0.0",
+        "description": "Central Website and OS Control Center Platform",
+        "environment": "production"
+    }
+}
