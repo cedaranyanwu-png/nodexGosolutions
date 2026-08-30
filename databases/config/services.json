@@ -1,0 +1,14 @@
+{
+    "services": {
+        "auth": {
+            "enabled": true,
+            "session_lifetime": 86400
+        },
+        "tenant_manager": {
+            "enabled": true
+        },
+        "domain_manager": {
+            "enabled": true
+        }
+    }
+}

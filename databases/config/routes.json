@@ -1,0 +1,7 @@
+{
+    "routes": {
+        "main_path": "/main",
+        "public_path": "/public",
+        "default_fallback": "main"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "features": {
+        "multi_tenancy": true,
+        "main_connected_apps": true,
+        "dynamic_configuration": true
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "tenants": [
+        {
+            "id": 1,
+            "identifier": "nodexgosolutions.com",
+            "name": "NodeX Go Solutions HQ",
+            "type": "MAIN",
+            "path": "main",
+            "theme_color": "#2c3e50",
+            "logo_url": "https://placehold.co/200x50/2c3e50/ffffff?text=NodeX+HQ",
+            "content": "Welcome to the central hub of NodeX Go Solutions."
+        },
+        {
+            "id": 2,
+            "identifier": "about.nodexgosolutions.com",
+            "name": "About NodeX Platform",
+            "type": "MAIN-CONNECTED",
+            "path": "public/about",
+            "theme_color": "#2980b9",
+            "logo_url": "https://placehold.co/200x50/2980b9/ffffff?text=About+NodeX",
+            "content": "Learn about NodeX Platform - A main-connected portal leveraging central OS services."
+        },
+        {
+            "id": 3,
+            "identifier": "tenant1.nodexgosolutions.com",
+            "name": "Acme Corp Portal",
+            "type": "TENANT",
+            "path": "public/customer1",
+            "theme_color": "#27ae60",
+            "logo_url": "https://placehold.co/200x50/27ae60/ffffff?text=Acme+Corp",
+            "content": "This is the isolated private portal for Acme Corp."
+        },
+        {
+            "id": 4,
+            "identifier": "localhost",
+            "name": "Local Development",
+            "type": "MAIN",
+            "path": "main",
+            "theme_color": "#9b59b6",
+            "logo_url": "https://placehold.co/200x50/9b59b6/ffffff?text=Local+Dev",
+            "content": "You are viewing the local development environment."
+        }
+    ]
+}
