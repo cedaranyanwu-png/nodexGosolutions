@@ -1,0 +1,10 @@
+{
+    "main_domain": "nodexplatform.com.ng",
+    "main_subdomains": {
+        "admin": "admin.nodexplatform.com.ng",
+        "api": "api.nodexplatform.com.ng",
+        "www": "www.nodexplatform.com.ng"
+    },
+    "environment": "production",
+    "https": true
+}

@@ -1,0 +1,7 @@
+{
+    "slug": "analytics",
+    "name": "Platform Analytics & Telemetry",
+    "version": "1.0.0",
+    "description": "Monitors requests, domain routing, and platform events.",
+    "enabled": true
+}
