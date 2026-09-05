@@ -1,0 +1,7 @@
+{
+    "slug": "tools",
+    "name": "Platform Management Tools",
+    "version": "1.0.0",
+    "description": "System diagnostic and domain scanner toolset.",
+    "enabled": true
+}

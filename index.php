@@ -1,60 +1,134 @@
 <?php
+
 /**
- * index.php
+ * NodeX Platform - Universal Single Entry Point
  *
- * This is the single entry point for the entire nodexGosolutions project.
- * Every request is routed here via the .htaccess rules.
- *
- * Its primary responsibilities are:
- * 1. Initialize the environment.
- * 2. Instantiate the TenantManager.
- * 3. Detect the current tenant based on the HTTP_HOST.
- * 4. Pass the tenant data to the template for rendering.
+ * All HTTP requests route through /index.php.
  */
 
-// Enable strict typing for better code quality and fewer bugs
 declare(strict_types=1);
 
-// Include the TenantManager class file
-// We use require_once to ensure the class is loaded exactly once
-require_once __DIR__ . '/TenantManager.php';
+// Standard PSR-4 style autoloader supporting case-insensitive directory mapping
+spl_autoload_register(function ($class) {
+    $prefix = 'Main\\';
+    $baseDir = __DIR__ . '/main/';
 
-/**
- * Main Application Logic
- */
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
 
-// 1. Capture the incoming host from the global $_SERVER array
-// If the key is not set (e.g. CLI usage without mock), we default to an empty string
-$currentHost = $_SERVER['HTTP_HOST'] ?? '';
+    $relativeClass = substr($class, $len);
+    $parts = explode('\\', $relativeClass);
 
-// We strip the port number if it exists (e.g., localhost:8000 -> localhost)
-// to ensure we match the identifier correctly regardless of the port.
-if (str_contains($currentHost, ':')) {
-    $currentHost = explode(':', $currentHost)[0];
+    // The class name (last element) keeps exact casing, directory parts map to lower-case
+    $className = array_pop($parts);
+    $subDir = !empty($parts) ? strtolower(implode('/', $parts)) . '/' : '';
+
+    $file = $baseDir . $subDir . $className . '.php';
+
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
+use Main\Config\DomainConfig;
+use Main\Database\JsonDatabase;
+use Main\Discovery\MainDiscovery;
+use Main\Services\DomainResolver;
+use Main\Services\ProjectResolver;
+use Main\Session\Session;
+
+// Initialize Universal Session
+Session::start();
+
+// Load Domain Configuration
+DomainConfig::load();
+
+// Capture Host (fallback dynamically to main domain from DomainConfig)
+$currentHost = $_SERVER['HTTP_HOST'] ?? DomainConfig::mainDomain();
+
+// 1. Resolve Domain
+$db = new JsonDatabase(__DIR__ . '/main/storage/db');
+$domainResolver = new DomainResolver($db);
+$resolution = $domainResolver->resolve($currentHost);
+
+// 2. Dispatch based on domain ownership
+if ($resolution['type'] === 'MAIN') {
+    // Route MAIN platform request
+    $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+    if ($resolution['target'] === 'main_subdomain' && $resolution['subdomain_key'] === 'admin') {
+        require_once __DIR__ . '/main/modules/admin/index.php';
+        exit;
+    }
+
+    if ($resolution['target'] === 'main_subdomain' && $resolution['subdomain_key'] === 'api') {
+        require_once __DIR__ . '/main/api/router.php';
+        exit;
+    }
+
+    // Default MAIN router handling
+    if (str_starts_with($requestUri, '/api/')) {
+        require_once __DIR__ . '/main/api/router.php';
+        exit;
+    }
+
+    if (str_starts_with($requestUri, '/admin')) {
+        require_once __DIR__ . '/main/modules/admin/index.php';
+        exit;
+    }
+
+    // Render MAIN platform homepage
+    echo "<!DOCTYPE html><html><head><title>NodeX Main Platform</title>";
+    echo "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'></head>";
+    echo "<body class='bg-light'><div class='container py-5'>";
+    echo "<h1 class='text-primary fw-bold'>NodeX Platform Core</h1>";
+    echo "<p class='lead'>Welcome to the central platform controller.</p>";
+    echo "<p>Host: <code>" . htmlspecialchars($currentHost) . "</code></p>";
+    echo "<div class='mt-4'><a href='/admin' class='btn btn-primary'>Admin Portal</a></div>";
+    echo "</div></body></html>";
+    exit;
 }
 
-// 2. Initialize the TenantManager
-$tenantManager = new TenantManager();
+if ($resolution['type'] === 'TENANT') {
+    $projectId = $resolution['project_id'];
+    $projectResolver = new ProjectResolver($db, __DIR__ . '/public');
+    $projectResult = $projectResolver->resolveProject($projectId);
 
-// 3. Attempt to fetch the tenant configuration based on the current host
-$tenant = $tenantManager->getTenantByHost($currentHost);
+    if (!$projectResult['success']) {
+        http_response_code(403);
+        echo "<!DOCTYPE html><html><head><title>Tenant Unavailable</title>";
+        echo "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'></head>";
+        echo "<body class='bg-light text-center py-5'><div class='container'>";
+        echo "<h2 class='text-danger'>Project Access Unavailable</h2>";
+        echo "<p>" . htmlspecialchars($projectResult['message']) . "</p>";
+        echo "</div></body></html>";
+        exit;
+    }
 
-// 4. If no tenant is found (e.g., accessed via IP or unknown domain), fallback to default
-if ($tenant === null) {
-    $tenant = $tenantManager->getDefaultTenant();
+    // Isolate tenant execution scope
+    $tenantProject = $projectResult['project'];
+    $tenantFolder = $projectResult['folder_path'];
+
+    if ($projectResult['entry_file'] && file_exists($projectResult['entry_file'])) {
+        require_once $projectResult['entry_file'];
+        exit;
+    } else {
+        echo "<!DOCTYPE html><html><head><title>" . htmlspecialchars($tenantProject['id']) . "</title></head>";
+        echo "<body><h1>Tenant Project: " . htmlspecialchars($tenantProject['id']) . "</h1>";
+        echo "<p>Project is active but contains no entry index.php.</p></body></html>";
+        exit;
+    }
 }
 
-/**
- * Rendering Phase
- */
-
-// We include the template file.
-// Because the template is included here, it has access to the $tenant variable defined above.
-require_once __DIR__ . '/template.php';
-
-/**
- * Note on future scalability:
- * In a more complex architecture, we would replace the simple include above with
- * a Controller or View class, but for this pure PHP boilerplate, a clean include
- * is efficient and highly readable.
- */
+// 3. Unknown Domain or Unregistered Target
+http_response_code(404);
+echo "<!DOCTYPE html><html><head><title>404 Not Found</title>";
+echo "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'></head>";
+echo "<body class='bg-light text-center py-5'><div class='container'>";
+echo "<h1 class='display-1 text-secondary fw-bold'>404</h1>";
+echo "<h2>Domain / Project Not Found</h2>";
+echo "<p>The domain <code>" . htmlspecialchars($currentHost) . "</code> is not registered on this platform.</p>";
+echo "</div></body></html>";
+exit;

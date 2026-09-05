@@ -1,0 +1,22 @@
+[
+    {
+        "id": "dom_01",
+        "domain": "cedar.com",
+        "project_id": "cedar",
+        "tenant_id": "tenant_123",
+        "type": "custom_domain",
+        "status": "active",
+        "created_at": "2026-01-01 00:00:00",
+        "updated_at": "2026-01-01 00:00:00"
+    },
+    {
+        "id": "dom_02",
+        "domain": "customer1.nodexplatform.com.ng",
+        "project_id": "customer1",
+        "tenant_id": "tenant_456",
+        "type": "tenant_subdomain",
+        "status": "active",
+        "created_at": "2026-01-01 00:00:00",
+        "updated_at": "2026-01-01 00:00:00"
+    }
+]

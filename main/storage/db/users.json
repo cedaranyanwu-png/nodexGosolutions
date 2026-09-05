@@ -1,0 +1,12 @@
+[
+    {
+        "id": "usr_admin_01",
+        "username": "admin",
+        "email": "admin@nodexplatform.com.ng",
+        "password": "$2y$10$eA0E4XzU/9y8Z5mE.d.I.e/w.8i0rU1O/0w1Y/2X3Y4Z5A6B7C8D9",
+        "role": "superadmin",
+        "status": "active",
+        "created_at": "2026-01-01 00:00:00",
+        "updated_at": "2026-01-01 00:00:00"
+    }
+]

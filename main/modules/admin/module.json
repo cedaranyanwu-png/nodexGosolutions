@@ -1,0 +1,7 @@
+{
+    "slug": "admin",
+    "name": "Administrative Controller Module",
+    "version": "1.0.0",
+    "description": "Central management console for tenant provisioning and domain registry.",
+    "enabled": true
+}
