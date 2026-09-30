@@ -1,0 +1,30 @@
+{
+    "project_name": "nodexplatform",
+    "domain": "nodexplatform.com.ng",
+    "environment": "development",
+    "debug": true,
+    "allowed_hosts": [
+        "nodexplatform.com.ng",
+        "www.nodexplatform.com.ng",
+        "localhost",
+        "127.0.0.1",
+        "[::1]"
+    ],
+    "ports": {
+        "django_main": 8000,
+        "nodejs_app": 3000,
+        "php_public": 8080
+    },
+    "paths": {
+        "main": "Main",
+        "php_public": "Php_public",
+        "python_public": "Python_public",
+        "nodexjs": "Nodexjs",
+        "cgi_bin": "Cgi_bin",
+        "databases": "databases"
+    },
+    "database": {
+        "engine": "django.db.backends.sqlite3",
+        "name": "databases/db.sqlite3"
+    }
+}

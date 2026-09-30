@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NodexPlatform — Move work forward</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/nodex.css">
+</head>
+<body>
+  {% include "modul/nav.html" %}
+  <main class="container nx-page py-4">
+    <section class="nx-hero mb-4" id="home">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <div class="eyebrow mb-2">Work, talent, and delivery in one place</div>
+          <h1 class="display-3 fw-bold mb-3">Build better work with the right people.</h1>
+          <p class="lead opacity-75 mb-4">NodexPlatform keeps your team, clients, and trusted creators aligned from first request to final delivery.</p>
+          <div class="d-flex flex-wrap gap-2"><a href="/signup/" class="btn btn-light">Create free account</a><a href="/quick-request/" class="btn btn-outline-light">Find talent</a></div>
+        </div>
+        <div class="col-lg-5"><div class="bg-white bg-opacity-10 rounded-3 p-3"><div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-25 pb-2 mb-2"><span class="small opacity-75">Workspace pulse</span><span class="badge text-bg-success">Live</span></div><div class="d-flex gap-2 align-items-center mb-3"><span class="nx-feature-icon"><i class="bi bi-check2"></i></span><div><strong>3 requests</strong><div class="small opacity-75">ready for review</div></div></div><div class="d-flex gap-2 align-items-center"><span class="nx-feature-icon"><i class="bi bi-people"></i></span><div><strong>12 collaborators</strong><div class="small opacity-75">working across projects</div></div></div></div></div>
+      </div>
+    </section>
+    <section class="nx-section" id="services"><div class="row g-3">
+      <div class="col-md-4"><article class="card h-100 border-0"><div class="card-body"><span class="nx-feature-icon mb-3"><i class="bi bi-search"></i></span><h3 class="h5">Find the right talent</h3><p class="text-muted small mb-0">Search personal creators and agencies by capability, then send a focused request.</p></div></article></div>
+      <div class="col-md-4"><article class="card h-100 border-0"><div class="card-body"><span class="nx-feature-icon mb-3"><i class="bi bi-kanban"></i></span><h3 class="h5">Keep work moving</h3><p class="text-muted small mb-0">Create a workspace, invite collaborators, and keep delivery context together.</p></div></article></div>
+      <div class="col-md-4"><article class="card h-100 border-0"><div class="card-body"><span class="nx-feature-icon mb-3"><i class="bi bi-shield-check"></i></span><h3 class="h5">Stay in control</h3><p class="text-muted small mb-0">Use session-based access, profile controls, and a clear audit-friendly API boundary.</p></div></article></div>
+    </div></section>
+    <section class="row align-items-center g-4 py-4" id="about"><div class="col-lg-6"><div class="eyebrow text-primary small fw-bold">Simple by design</div><h2 class="h2 fw-bold mt-2">A smaller interface for bigger outcomes.</h2><p class="text-muted">The refreshed NodexPlatform focuses on the actions that matter: create an account, find talent, start a workspace, and manage your profile. Everything else stays out of the way.</p></div><div class="col-lg-6"><div class="row g-2"><div class="col-6"><div class="nx-stat"><strong class="h4 d-block">1</strong><span class="small text-muted">connected workspace flow</span></div></div><div class="col-6"><div class="nx-stat"><strong class="h4 d-block">4</strong><span class="small text-muted">core user journeys</span></div></div></div></div></section>
+    <section class="text-center py-4" id="contact"><h2 class="h3 fw-bold">Ready to move a project forward?</h2><p class="text-muted small">Start with a free account or send a quick request.</p><a class="btn btn-primary" href="/signup/">Get started</a></section>
+  </main>
+  {% include "modul/footer.html" %}
+  <script src="/static/js/nodex.js"></script>
+</body>
+</html>

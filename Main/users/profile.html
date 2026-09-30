@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - NodexPlatform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="/static/css/animations.css" rel="stylesheet">
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .profile-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #6c757d;
+            overflow: hidden;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: white;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .avatar-upload-btn:hover {
+            background: #0b5ed7;
+            transform: scale(1.1);
+        }
+        .image-preview-container {
+            display: none;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .image-preview-container.show {
+            display: block;
+        }
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #0d6efd;
+            margin: 0 auto;
+        }
+        .password-strength {
+            height: 5px;
+            border-radius: 3px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+        .nav-pills .nav-link {
+            color: #495057;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            color: white;
+        }
+        .nav-pills .nav-link:hover:not(.active) {
+            background: #f8f9fa;
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/nodex.css">
+</head>
+<body class="protected-page">
+
+    {% include "modul/user_nav.html" %}
+
+    <div class="container py-4">
+<!-- Profile Header -->
+        <div class="profile-header fade-in-up mb-4">
+            <div class="row align-items-center position-relative">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold mb-2">
+                        <i class="bi bi-person-circle me-2"></i>My Profile
+                    </h1>
+                    <p class="lead mb-0 opacity-75">Manage your account settings and preferences</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% include "modul/profile_sidebar.html" %}
+
+            <div class="col-lg-8 fade-in-up">
+                <div class="tab-content">
+                    {% include "modul/profile_information_card.html" %}
+                    {% include "modul/profile_password_card.html" %}
+                    {% include "modul/profile_security_card.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "modul/footer.html" %}
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/animations.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/nav.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        let selectedImageFile = null;
+
+        // Helper: Get CSRF token
+        function getCSRFToken() {
+            const cookieValue = document.cookie.match(/csrftoken=([^;]+)/);
+            return cookieValue ? cookieValue[1] : '';
+        }
+
+        // ============================================
+        // LOAD USER DATA FROM DATABASE
+        // ============================================
+        function loadUserData() {
+            $.ajax({
+                url: '/python/api/auth/me/',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.user) {
+                        const user = response.user;
+                        const firstName = user.first_name || 'User';
+                        const lastName = user.last_name || '';
+                        const email = user.email || '';
+                        const fullName = (firstName + ' ' + lastName).trim();
+                        const initials = (firstName.charAt(0) + (lastName ? lastName.charAt(0) : '')).toUpperCase();
+
+                        // Update nav
+                        $('#userName').text(fullName);
+                        $('#userNameLarge').text(fullName);
+                        $('#userEmail').text(email);
+                        $('#userEmailLarge').text(email);
+                        $('#userAvatar').html(initials);
+                        $('#userAvatarLarge').html(initials);
+
+                        // Update profile page
+                        $('#profileName').text(fullName);
+                        $('#profileEmail').text(email);
+                        $('#profileAvatar').html(initials);
+
+                        // Fill form
+                        $('#profileFirstName').val(firstName);
+                        $('#profileLastName').val(lastName);
+                        $('#profileEmailInput').val(email);
+
+                        // FIXED: Set Account Type Radio Button (Handle 'unspecified' by defaulting to 'personal')
+                        let accType = user.account_type;
+                        if (!accType || accType === 'unspecified') {
+                            accType = 'personal';
+                        }
+                        $(`input[name="profileAccountType"][value="${accType}"]`).prop('checked', true);
+
+                        // Load profile image if exists
+                        if (user.profile_image) {
+                            const imgTag = '<img src="' + user.profile_image + '" alt="Profile">';
+                            $('#profileAvatar').html(imgTag);
+                            $('#userAvatar').html('<img src="' + user.profile_image + '" class="rounded-circle" style="width:100%;height:100%;object-fit:cover;">');
+                            $('#userAvatarLarge').html('<img src="' + user.profile_image + '" class="rounded-circle" style="width:100%;height:100%;object-fit:cover;">');
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 401) window.location.href = '/login/';
+                }
+            });
+        }
+
+        loadUserData();
+
+        // ============================================
+        // SHOW ALERT HELPER
+        // ============================================
+        function showAlert(container, type, message) {
+            const alertId = 'alert-' + Date.now();
+            const html = `
+                <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            $(container).html(html);
+            setTimeout(() => $(`#${alertId}`).alert('close'), 5000);
+        }
+
+        // ============================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ============================================
+        $(document).on('click', '.toggle-password', function() {
+            const targetId = $(this).data('target');
+            const $input = $('#' + targetId);
+            const $icon = $(this).find('i');
+
+            if ($input.attr('type') === 'password') {
+                $input.attr('type', 'text');
+                $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+            } else {
+                $input.attr('type', 'password');
+                $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            }
+        });
+
+        // ============================================
+        // PASSWORD STRENGTH METER
+        // ============================================
+        $('#newPassword').on('input', function() {
+            const password = $(this).val();
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            const $bar = $('#passwordStrengthBar');
+            const $text = $('#passwordStrengthText');
+
+            if (password.length === 0) {
+                $bar.css({width: '0', background: '#e9ecef'});
+                $text.text('Min. 8 characters with 1 uppercase letter and 1 number').removeClass().addClass('text-muted small');
+                return;
+            }
+
+            if (strength <= 1) {
+                $bar.css({width: '20%', background: '#dc3545'});
+                $text.text('Weak').removeClass().addClass('text-danger small');
+            } else if (strength <= 2) {
+                $bar.css({width: '40%', background: '#fd7e14'});
+                $text.text('Fair').removeClass().addClass('text-warning small');
+            } else if (strength <= 3) {
+                $bar.css({width: '60%', background: '#ffc107'});
+                $text.text('Good').removeClass().addClass('text-info small');
+            } else if (strength <= 4) {
+                $bar.css({width: '80%', background: '#198754'});
+                $text.text('Strong').removeClass().addClass('text-success small');
+            } else {
+                $bar.css({width: '100%', background: '#0d6efd'});
+                $text.text('Very Strong').removeClass().addClass('text-primary small fw-bold');
+            }
+        });
+
+        // ============================================
+        // IMAGE UPLOAD WITH PREVIEW
+        // ============================================
+        $('#profileImageInput').on('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image.*')) {
+                showAlert('#profileAlert', 'danger', 'Please select an image file (JPG, PNG, GIF, WEBP)');
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('#profileAlert', 'danger', 'File too large. Maximum size is 2MB.');
+                return;
+            }
+
+            selectedImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#imagePreview').attr('src', e.target.result);
+                $('#imagePreviewContainer').addClass('show');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        $('#cancelImageBtn').on('click', function() {
+            selectedImageFile = null;
+            $('#profileImageInput').val('');
+            $('#imagePreviewContainer').removeClass('show');
+        });
+
+        $('#uploadImageBtn').on('click', function() {
+            if (!selectedImageFile) return;
+
+            const $btn = $(this);
+            const originalHtml = $btn.html();
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Uploading...');
+
+            const formData = new FormData();
+            formData.append('image', selectedImageFile);
+
+            $.ajax({
+                url: '/python/api/profile/image/',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {'X-CSRFToken': getCSRFToken()},
+                success: function(response) {
+                    showAlert('#profileAlert', 'success', response.message);
+                    const imgTag = '<img src="' + response.image_url + '" alt="Profile">';
+                    $('#profileAvatar').html(imgTag);
+                    const navImg = '<img src="' + response.image_url + '" class="rounded-circle" style="width:100%;height:100%;object-fit:cover;">';
+                    $('#userAvatar').html(navImg);
+                    $('#userAvatarLarge').html(navImg);
+
+                    selectedImageFile = null;
+                    $('#profileImageInput').val('');
+                    $('#imagePreviewContainer').removeClass('show');
+                },
+                error: function(xhr) {
+                    showAlert('#profileAlert', 'danger', xhr.responseJSON?.message || 'Upload failed');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html(originalHtml);
+                }
+            });
+        });
+
+        // ============================================
+        // UPDATE PROFILE FORM (Includes Account Type)
+        // ============================================
+        $('#profileForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const $btn = $(this).find('button[type="submit"]');
+            const originalHtml = $btn.html();
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+
+            $.ajax({
+                url: '/python/api/profile/update/',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    first_name: $('#profileFirstName').val().trim(),
+                    last_name: $('#profileLastName').val().trim(),
+                    email: $('#profileEmailInput').val().trim(),
+                    account_type: $('input[name="profileAccountType"]:checked').val() // Sends correctly
+                }),
+                headers: {'X-CSRFToken': getCSRFToken()},
+                success: function(response) {
+                    showAlert('#profileAlert', 'success', response.message);
+                    setTimeout(loadUserData, 500); // Reloads data to reflect changes
+                },
+                error: function(xhr) {
+                    showAlert('#profileAlert', 'danger', xhr.responseJSON?.message || 'Update failed');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html(originalHtml);
+                }
+            });
+        });
+
+        // ============================================
+        // CHANGE PASSWORD FORM
+        // ============================================
+        $('#passwordForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const currentPassword = $('#currentPassword').val();
+            const newPassword = $('#newPassword').val();
+            const confirmPassword = $('#confirmPassword').val();
+
+            if (newPassword !== confirmPassword) {
+                showAlert('#passwordAlert', 'danger', 'New passwords do not match');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                showAlert('#passwordAlert', 'danger', 'Password must be at least 8 characters');
+                return;
+            }
+
+            const $btn = $(this).find('button[type="submit"]');
+            const originalHtml = $btn.html();
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Updating...');
+
+            $.ajax({
+                url: '/python/api/profile/password/',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                    confirm_password: confirmPassword
+                }),
+                headers: {'X-CSRFToken': getCSRFToken()},
+                success: function(response) {
+                    showAlert('#passwordAlert', 'success', response.message);
+                    $('#passwordForm')[0].reset();
+                    $('#passwordStrengthBar').css({width: '0', background: '#e9ecef'});
+                    $('#passwordStrengthText').text('Min. 8 characters with 1 uppercase letter and 1 number').removeClass().addClass('text-muted small');
+                },
+                error: function(xhr) {
+                    showAlert('#passwordAlert', 'danger', xhr.responseJSON?.message || 'Password change failed');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html(originalHtml);
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

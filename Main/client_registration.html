@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Client - NodexPlatform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="/static/css/animations.css" rel="stylesheet">
+    <style>
+        .client-register-hero {
+            background: linear-gradient(135deg, #6610f2 0%, #d63384 100%);
+            color: white;
+            border-radius: 25px;
+            padding: 4rem 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .client-register-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .benefit-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .register-form-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/nodex.css">
+</head>
+<body>
+
+    <!-- Public Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-rocket-takeoff-fill text-primary me-2"></i>NodexPlatform
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/quick-request/">Quick Request</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/client-register/">Become a Client</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="/login/" class="btn btn-outline-primary px-4">Login</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="/signup/" class="btn btn-primary px-4">Sign Up</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+
+        <!-- Hero Section -->
+        <div class="client-register-hero text-center fade-in-up position-relative">
+            <h1 class="display-3 fw-bold mb-3">Become a Client</h1>
+            <p class="lead mb-4 opacity-90">Join thousands of businesses and individuals who trust NodexPlatform to find and hire top talent.</p>
+            <div class="row justify-content-center g-4 mt-4">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <i class="bi bi-search fs-1 mb-2"></i>
+                        <h6 class="fw-bold">Find Talent</h6>
+                        <small class="opacity-75">Search verified creators & agencies</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <i class="bi bi-chat-dots fs-1 mb-2"></i>
+                        <h6 class="fw-bold">Direct Communication</h6>
+                        <small class="opacity-75">Chat, share files, collaborate</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <i class="bi bi-shield-check fs-1 mb-2"></i>
+                        <h6 class="fw-bold">Secure Platform</h6>
+                        <small class="opacity-75">Verified profiles, safe transactions</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4 fade-in-up">
+                <div class="card benefit-card p-4 h-100">
+                    <div class="mb-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person-check-fill fs-3"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-2">Follow Your Favorites</h5>
+                    <p class="text-muted mb-0">Follow personal creators and business profiles to stay updated on their latest work and availability.</p>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up">
+                <div class="card benefit-card p-4 h-100">
+                    <div class="mb-3">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="bi bi-folder-fill fs-3"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-2">Organized File Sharing</h5>
+                    <p class="text-muted mb-0">Share project files, images, and documents securely. Everything is saved and remembered for future reference.</p>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up">
+                <div class="card benefit-card p-4 h-100">
+                    <div class="mb-3">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="bi bi-chat-left-text-fill fs-3"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-2">Direct Messaging</h5>
+                    <p class="text-muted mb-0">Communicate directly with creators and businesses. Discuss projects, negotiate terms, and track progress.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8 fade-in-up">
+                <div class="card register-form-card p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold mb-2">Create Your Client Account</h2>
+                        <p class="text-muted">Get started in less than 2 minutes. No credit card required.</p>
+                    </div>
+
+                    <form id="clientRegisterForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">First Name</label>
+                                <input type="text" class="form-control form-control-lg" id="clientFirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Last Name</label>
+                                <input type="text" class="form-control form-control-lg" id="clientLastName" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control form-control-lg" id="clientEmail" placeholder="you@company.com" required>
+                            <small class="text-muted">We'll send a verification link to this email.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-lg" id="clientPassword" required minlength="8">
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="clientPassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Minimum 8 characters with 1 uppercase letter and 1 number.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Confirm Password</label>
+                            <input type="password" class="form-control form-control-lg" id="clientPasswordConfirm" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Account Type</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="clientAccountType" id="typePersonal" value="personal" checked>
+                                    <label class="btn btn-outline-primary w-100 py-3" for="typePersonal">
+                                        <i class="bi bi-person-fill d-block fs-4 mb-1"></i>
+                                        <span class="fw-bold">Personal</span>
+                                        <small class="d-block text-muted mt-1">Individual projects</small>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="clientAccountType" id="typeBusiness" value="business">
+                                    <label class="btn btn-outline-primary w-100 py-3" for="typeBusiness">
+                                        <i class="bi bi-building-fill d-block fs-4 mb-1"></i>
+                                        <span class="fw-bold">Business</span>
+                                        <small class="d-block text-muted mt-1">Company account</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="/terms/" class="text-primary">Terms of Service</a> and <a href="/privacy/" class="text-primary">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="registerBtn">
+                            <i class="bi bi-person-plus-fill me-2"></i>Create Client Account
+                        </button>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">Already have an account? <a href="/login/" class="text-primary fw-bold">Login here</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-rocket-takeoff-fill me-2"></i>NodexPlatform</h5>
+                    <p class="text-muted small">The all-in-one platform for creators, businesses, and clients to collaborate and build amazing projects.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Platform</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-muted text-decoration-none small">Home</a></li>
+                        <li><a href="/quick-request/" class="text-muted text-decoration-none small">Quick Request</a></li>
+                        <li><a href="/client-register/" class="text-muted text-decoration-none small">Become a Client</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/terms/" class="text-muted text-decoration-none small">Terms</a></li>
+                        <li><a href="/privacy/" class="text-muted text-decoration-none small">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">Connect</h6>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <p class="text-center text-muted small mb-0">&copy; 2026 NodexPlatform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/nodex.js"></script><script src="/static/js/client-register.js"></script>
+</body>
+</html>

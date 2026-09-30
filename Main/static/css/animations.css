@@ -1,0 +1,577 @@
+/* ==========================================================================
+   NodexPlatform Animation Styles
+   Professional scroll-triggered animations with smooth transitions
+   ========================================================================== */
+
+/* Gradient Backgrounds */
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0061f2 0%, #0061f2 100%);
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+/* ==========================================================================
+   Scroll-Triggered Fade Animations
+   ========================================================================== */
+
+/* Fade In Up */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fade In Down */
+.fade-in-down {
+    opacity: 0;
+    transform: translateY(-50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-down.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fade In Left */
+.fade-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Fade In Right */
+.fade-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Fade In Scale */
+.fade-in-scale {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ==========================================================================
+   Staggered Animation Delays
+   ========================================================================== */
+
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+.delay-6 { transition-delay: 0.6s; }
+
+/* ==========================================================================
+   Hero Section Styles
+   ========================================================================== */
+
+.hero-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.code-window {
+    position: relative;
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.window-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.red { background: #ff5f56; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green { background: #27c93f; }
+
+/* ==========================================================================
+   Feature Cards
+   ========================================================================== */
+
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+/* ==========================================================================
+   Service Cards
+   ========================================================================== */
+
+.service-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.service-card:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.service-card:hover .service-icon i {
+    color: white !important;
+}
+
+.service-card:hover p {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ==========================================================================
+   Solution Cards
+   ========================================================================== */
+
+.solution-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.solution-card:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-5px);
+}
+
+/* ==========================================================================
+   Step Cards (How It Works)
+   ========================================================================== */
+
+.step-card {
+    position: relative;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   Stats Section
+   ========================================================================== */
+
+.stat-item {
+    padding: 2rem 1rem;
+}
+
+.stat-item h2 {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   Product Cards
+   ========================================================================== */
+
+.product-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid #0061f2;
+}
+
+.product-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   Pricing Cards
+   ========================================================================== */
+
+.pricing-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+}
+
+.pricing-card.border-primary {
+    border-width: 2px !important;
+}
+
+/* ==========================================================================
+   Testimonial Cards
+   ========================================================================== */
+
+.testimonial-card {
+    transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.stars {
+    font-size: 1.2rem;
+}
+
+/* ==========================================================================
+   Case Study Cards
+   ========================================================================== */
+
+.case-study-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid #28a745;
+}
+
+.case-study-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   Team Cards
+   ========================================================================== */
+
+.team-card {
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+}
+
+.team-avatar {
+    width: 100px;
+    height: 100px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   Technology Items
+   ========================================================================== */
+
+.tech-item {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+}
+
+.tech-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Integration Items
+   ========================================================================== */
+
+.integration-item {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.integration-item:hover {
+    background: #f8f9fa;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Blog Cards
+   ========================================================================== */
+
+.blog-card {
+    transition: all 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================================================
+   Award Cards
+   ========================================================================== */
+
+.award-card {
+    transition: all 0.3s ease;
+    background: white;
+    border-radius: 12px;
+}
+
+.award-card:hover {
+    transform: translateY(-10px) rotate(2deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   Gallery Items
+   ========================================================================== */
+
+.gallery-item {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   Video Placeholder
+   ========================================================================== */
+
+.video-placeholder {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-placeholder:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.02);
+}
+
+.video-placeholder i {
+    transition: transform 0.3s ease;
+}
+
+.video-placeholder:hover i {
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   Partner Logos
+   ========================================================================== */
+
+.partner-logo {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.partner-logo:hover {
+    background: #f8f9fa;
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Event Cards
+   ========================================================================== */
+
+.event-card {
+    transition: all 0.3s ease;
+}
+
+.event-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.event-date {
+    min-width: 80px;
+}
+
+/* ==========================================================================
+   Career Stats
+   ========================================================================== */
+
+.career-stat {
+    transition: all 0.3s ease;
+}
+
+.career-stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Contact Cards
+   ========================================================================== */
+
+.contact-card {
+    transition: all 0.3s ease;
+    background: white;
+    border-radius: 12px;
+}
+
+.contact-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   Company Logos (Trusted By Section)
+   ========================================================================== */
+
+.company-logo {
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.company-logo:hover {
+    color: #0061f2 !important;
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   Smooth Scrolling
+   ========================================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ==========================================================================
+   Navbar Styles
+   ========================================================================== */
+
+.navbar {
+    transition: all 0.3s ease;
+}
+
+.navbar.scrolled {
+    background: rgba(0, 97, 242, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+    }
+
+    .hero-section .display-2 {
+        font-size: 2.5rem;
+    }
+
+    .stat-item h2 {
+        font-size: 2.5rem;
+    }
+
+    .fade-in-up,
+    .fade-in-down,
+    .fade-in-left,
+    .fade-in-right {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   Loading Animation
+   ========================================================================== */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ==========================================================================
+   Button Hover Effects
+   ========================================================================== */
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}

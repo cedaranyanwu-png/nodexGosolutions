@@ -1,0 +1,37 @@
+<!-- Account Type Selection Modal (For new Google users) -->
+    <div class="modal fade" id="accountTypeModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: white;">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-stars me-2"></i>Welcome to NodexPlatform!</h5>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="mb-4 text-muted">To customize your experience, please let us know how you plan to use NodexPlatform.</p>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="modalAccountType" id="modalTypePersonal" value="personal" checked>
+                            <label class="btn btn-outline-primary w-100 py-4 h-100" for="modalTypePersonal">
+                                <i class="bi bi-person-fill d-block fs-1 mb-2"></i>
+                                <span class="fw-bold">Personal</span>
+                                <div class="small text-muted mt-1">For individual projects and learning</div>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="modalAccountType" id="modalTypeBusiness" value="business">
+                            <label class="btn btn-outline-primary w-100 py-4 h-100" for="modalTypeBusiness">
+                                <i class="bi bi-building-fill d-block fs-1 mb-2"></i>
+                                <span class="fw-bold">Business</span>
+                                <div class="small text-muted mt-1">For teams, companies, and clients</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center pb-4">
+                    <button type="button" id="saveAccountTypeBtn" class="btn btn-primary px-5 py-2 fw-bold">
+                        Continue to Dashboard <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
