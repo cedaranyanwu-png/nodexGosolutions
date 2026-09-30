@@ -1,0 +1,49 @@
+<!-- Left Sidebar: Avatar & Navigation -->
+            <div class="col-lg-4 fade-in-up">
+                <div class="card profile-card p-4 mb-4">
+                    <div class="profile-avatar-wrapper">
+                        <div id="profileAvatar" class="profile-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <label for="profileImageInput" class="avatar-upload-btn" title="Change profile picture">
+                            <i class="bi bi-camera-fill"></i>
+                        </label>
+                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <h4 id="profileName" class="fw-bold mb-1">Loading...</h4>
+                        <p id="profileEmail" class="text-muted small mb-0">user@example.com</p>
+                    </div>
+
+                    <!-- Image Preview Section -->
+                    <div id="imagePreviewContainer" class="image-preview-container">
+                        <hr>
+                        <p class="small text-muted mb-2">New image preview:</p>
+                        <img id="imagePreview" class="image-preview" alt="Preview">
+                        <div class="mt-2">
+                            <button id="uploadImageBtn" class="btn btn-primary btn-sm">
+                                <i class="bi bi-upload me-1"></i>Upload Image
+                            </button>
+                            <button id="cancelImageBtn" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-x-lg me-1"></i>Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Navigation -->
+                <div class="card profile-card p-3">
+                    <div class="nav flex-column nav-pills" role="tablist">
+                        <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#profile-tab">
+                            <i class="bi bi-person me-2"></i>Profile Information
+                        </button>
+                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#password-tab">
+                            <i class="bi bi-shield-lock me-2"></i>Change Password
+                        </button>
+                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#security-tab">
+                            <i class="bi bi-shield-check me-2"></i>Security
+                        </button>
+                    </div>
+                </div>
+            </div>

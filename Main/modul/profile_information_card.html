@@ -1,0 +1,60 @@
+<!-- Profile Information Tab -->
+                    <div class="tab-pane fade show active" id="profile-tab">
+                        <div class="card profile-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="bi bi-person-lines-fill me-2"></i>Profile Information
+                            </h4>
+
+                            <div id="profileAlert"></div>
+
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">First Name</label>
+                                        <input type="text" class="form-control" id="profileFirstName" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Last Name</label>
+                                        <input type="text" class="form-control" id="profileLastName" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Email Address</label>
+                                    <input type="email" class="form-control" id="profileEmailInput" required>
+                                    <small class="text-muted">This email is used for login and notifications</small>
+                                </div>
+
+                                <!-- Account Type Selector -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Account Type</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="profileAccountType" id="profileTypePersonal" value="personal" checked>
+                                            <label class="btn btn-outline-primary w-100 py-3" for="profileTypePersonal">
+                                                <i class="bi bi-person-fill d-block fs-4 mb-1"></i>
+                                                Personal
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="profileAccountType" id="profileTypeBusiness" value="business">
+                                            <label class="btn btn-outline-primary w-100 py-3" for="profileTypeBusiness">
+                                                <i class="bi bi-building-fill d-block fs-4 mb-1"></i>
+                                                Business
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">This helps us tailor your dashboard experience and available features.</small>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>

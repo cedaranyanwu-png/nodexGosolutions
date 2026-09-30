@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NodexPlatform</title>
+
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Custom Animations -->
+    <link href="/static/css/animations.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Perfect Vertical Centering */
+        .auth-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .auth-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            max-width: 950px;
+            width: 100%;
+        }
+
+        /* Left Branding Side */
+        .auth-branding {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 550px;
+        }
+
+        .auth-branding h2 {
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        /* Right Form Side */
+        .auth-form {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Divider Line */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #6c757d;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        /* Form Controls */
+        .form-control {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 991px) {
+            .auth-branding {
+                min-height: auto;
+                padding: 2rem;
+            }
+
+            .auth-form {
+                padding: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/nodex.css">
+</head>
+<body>
+
+    <!-- Include the Public Navigation Bar -->
+    {% include "modul/nav.html" %}
+
+    <div class="auth-wrapper fade-in-up">
+        <div class="auth-card row g-0">
+
+            <!-- Left Side: Branding (Hidden on mobile) -->
+            <div class="col-lg-5 d-none d-lg-flex auth-branding">
+                <div>
+                    <h2 class="mb-4">Welcome back to NodexPlatform</h2>
+                    <p class="lead opacity-75 mb-0">Manage your projects, deploy code, and scale your business all in one unified dashboard.</p>
+                </div>
+
+                <div class="mt-5 pt-4 border-top border-white border-opacity-25">
+                    <p class="opacity-75 mb-2 small fst-italic">"NodexPlatform cut our deployment time by 80%. It's an absolute game-changer for our dev team."</p>
+                    <p class="fw-bold mb-0 small">— Sarah Jenkins, CTO at TechCorp</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="col-lg-7 auth-form">
+                <h3 class="fw-bold mb-2">Sign in to your account</h3>
+                <p class="text-muted mb-4">Enter your credentials below to access your dashboard</p>
+
+                <!-- Google Sign-In Button -->
+                <div class="text-center my-4">
+                    <div class="position-relative">
+                        <hr class="text-muted">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">Or continue with</span>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <div id="g_id_onload"
+                             data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                             data-callback="handleGoogleCredentialResponse"
+                             data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-size="large"
+                             data-theme="outline"
+                             data-text="signin_with"
+                             data-shape="rectangular"
+                             data-logo_alignment="left"
+                             data-width="300">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider">
+                    <span>OR CONTINUE WITH EMAIL</span>
+                </div>
+
+                <!-- Standard Login Form -->
+                <form id="loginForm" method="POST" action="/login/">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="loginEmail" name="email" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="loginPassword" class="form-label mb-0">Password</label>
+                            <a href="/forgot-password/" class="text-decoration-none small text-primary">Forgot password?</a>
+                        </div>
+                        <input type="password" class="form-control" id="loginPassword" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label text-muted small" for="rememberMe">Remember me for 30 days</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sign in</button>
+                </form>
+
+                <p class="text-center text-muted mt-4 mb-0">
+                    Don't have an account? <a href="/register/" class="text-primary fw-bold text-decoration-none">Create free account</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/animations.js"></script>
+    <script src="/static/js/auth.js"></script>
+
+    <!-- Google Sign-In Handler -->
+    <script>
+    function handleGoogleCredentialResponse(response) {
+        const $btn = $('.g_id_signin');
+        $btn.css('opacity', '0.5').css('pointer-events', 'none'); // Show loading state
+
+        $.ajax({
+            url: '/python/api/auth/google-login/',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ token: response.credential }),
+            headers: { 'X-CSRFToken': getCSRFToken() },
+            success: function(res) {
+                if (res.success) {
+                    localStorage.setItem('nodex_auth_token', res.token);
+                    localStorage.setItem('nodex_user_data', JSON.stringify(res.user));
+                    window.location.href = res.redirect_url || '/user/dashboard/';
+                } else {
+                    alert(res.message || 'Google login failed');
+                    $btn.css('opacity', '1').css('pointer-events', 'auto');
+                }
+            },
+            error: function(xhr) {
+                alert('Google login failed. Please try again.');
+                $btn.css('opacity', '1').css('pointer-events', 'auto');
+            }
+        });
+    }
+
+    // Helper to get CSRF token
+    function getCSRFToken() {
+        const cookieValue = document.cookie.match(/csrftoken=([^;]+)/);
+        return cookieValue ? cookieValue[1] : '';
+    }
+    </script>
+</body>
+</html>

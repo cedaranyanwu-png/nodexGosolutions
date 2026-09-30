@@ -1,0 +1,240 @@
+<!-- Apps & Services Modal -->
+<div class="modal fade" id="appsModal" tabindex="-1" aria-labelledby="appsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: white; border-radius: 12px 12px 0 0;">
+                <div>
+                    <h4 class="modal-title fw-bold" id="appsModalLabel">
+                        <i class="bi bi-grid-3x3-gap-fill me-2"></i>Apps & Services
+                    </h4>
+                    <p class="small mb-0 opacity-75">Deploy and manage your applications across all technologies</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body pt-4">
+
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-light border-start-0" id="appsSearch" placeholder="Search apps and services...">
+                    </div>
+                </div>
+
+                <!-- Quick Deploy Section -->
+                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                    <i class="bi bi-lightning-charge-fill me-1"></i>Quick Deploy
+                </h6>
+
+                <div class="row g-3 mb-4">
+                    <!-- PHP App -->
+                    <div class="col-md-6 col-lg-3 app-card" data-name="php">
+                        <div class="card h-100 border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-filetype-php fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="fw-bold mb-1">PHP App</h6>
+                                <small class="text-muted">Deploy PHP websites</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Python App -->
+                    <div class="col-md-6 col-lg-3 app-card" data-name="python">
+                        <div class="card h-100 border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-filetype-py fs-2 text-success"></i>
+                                </div>
+                                <h6 class="fw-bold mb-1">Python App</h6>
+                                <small class="text-muted">Python projects</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Node.js App -->
+                    <div class="col-md-6 col-lg-3 app-card" data-name="nodejs">
+                        <div class="card h-100 border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-filetype-js fs-2 text-warning"></i>
+                                </div>
+                                <h6 class="fw-bold mb-1">Node.js App</h6>
+                                <small class="text-muted">JavaScript runtime</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Django App -->
+                    <div class="col-md-6 col-lg-3 app-card" data-name="django">
+                        <div class="card h-100 border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body text-center p-3">
+                                <div class="rounded-circle bg-dark bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-braces fs-2 text-dark"></i>
+                                </div>
+                                <h6 class="fw-bold mb-1">Django App</h6>
+                                <small class="text-muted">Full-stack Python</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Services Section -->
+                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                    <i class="bi bi-collection me-1"></i>All Services
+                </h6>
+
+                <div class="row g-3">
+                    <!-- Web Hosting -->
+                    <div class="col-md-6 app-card" data-name="web hosting">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-globe fs-4 text-info"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">Web Hosting</h6>
+                                    <small class="text-muted">Host websites with custom domains</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Database -->
+                    <div class="col-md-6 app-card" data-name="database">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-database fs-4 text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">Database</h6>
+                                    <small class="text-muted">MySQL, PostgreSQL, MongoDB</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage -->
+                    <div class="col-md-6 app-card" data-name="storage">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-hdd-stack fs-4 text-secondary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">Cloud Storage</h6>
+                                    <small class="text-muted">Store files and media securely</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Service -->
+                    <div class="col-md-6 app-card" data-name="email">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-envelope-fill fs-4 text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">Email Service</h6>
+                                    <small class="text-muted">Custom email for your domain</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SSL Certificates -->
+                    <div class="col-md-6 app-card" data-name="ssl security">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-shield-lock-fill fs-4 text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">SSL Certificates</h6>
+                                    <small class="text-muted">Secure your site with HTTPS</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Domains -->
+                    <div class="col-md-6 app-card" data-name="domain">
+                        <div class="card border-0 shadow-sm app-card-inner" style="cursor: pointer; transition: all 0.3s;">
+                            <div class="card-body d-flex align-items-center p-3">
+                                <div class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="bi bi-link-45deg fs-4 text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">Domains</h6>
+                                    <small class="text-muted">Register and manage domains</small>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 bg-light">
+                <small class="text-muted me-auto">
+                    <i class="bi bi-info-circle me-1"></i>Click any service to deploy or manage
+                </small>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="bi bi-question-circle me-1"></i>View Documentation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apps Modal Styles & Scripts -->
+<style>
+    .app-card-inner:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+    }
+    .app-card-inner:hover h6 {
+        color: #0d6efd;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    // Search functionality
+    $('#appsSearch').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
+
+        $('.app-card').each(function() {
+            const name = $(this).data('name').toString().toLowerCase();
+            const text = $(this).text().toLowerCase();
+
+            if (name.includes(searchTerm) || text.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    // App card click handler
+    $('.app-card-inner').on('click', function() {
+        const appName = $(this).closest('.app-card').find('h6').text();
+        alert(`Opening ${appName}... (This will connect to your deployment system)`);
+    });
+});
+</script>

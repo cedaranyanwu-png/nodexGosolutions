@@ -1,0 +1,167 @@
+<!-- Tools Modal - Include this anywhere with {% include "modul/tools_modal.html" %} -->
+<div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Header -->
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: white; border-radius: 15px 15px 0 0;">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1"><i class="bi bi-tools me-2"></i>Nodex Tools</h5>
+                    <p class="mb-0 small opacity-75">Powerful utilities to boost your productivity</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+
+                <!-- Search Tools -->
+                <div class="input-group mb-4">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0" id="searchTools" placeholder="Search tools...">
+                </div>
+
+                <!-- Tools Grid -->
+                <div class="row g-3" id="toolsGrid">
+
+                    <!-- Tool 1: Code Formatter -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="code-formatter" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-code-slash fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Code Formatter</h6>
+                            <small class="text-muted">Clean & format code</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2: Image Compressor -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="image-compressor" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-image fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Image Compressor</h6>
+                            <small class="text-muted">Reduce image size</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 3: QR Generator -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="qr-generator" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-qr-code fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">QR Generator</h6>
+                            <small class="text-muted">Create QR codes</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 4: Color Picker -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="color-picker" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-palette-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Color Picker</h6>
+                            <small class="text-muted">Pick & convert colors</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 5: JSON Formatter -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="json-formatter" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-braces fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">JSON Formatter</h6>
+                            <small class="text-muted">Beautify JSON data</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 6: Password Generator -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="password-generator" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Password Gen</h6>
+                            <small class="text-muted">Secure passwords</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 7: URL Shortener -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="url-shortener" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-link-45deg fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">URL Shortener</h6>
+                            <small class="text-muted">Shorten long links</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 8: Markdown Editor -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="markdown-editor" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-markdown fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Markdown Editor</h6>
+                            <small class="text-muted">Write & preview MD</small>
+                        </div>
+                    </div>
+
+                    <!-- Tool 9: Base64 Converter -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card tool-card p-3 text-center h-100" data-tool="base64-converter" style="cursor: pointer; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div class="mb-2">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-file-binary fs-4"></i>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-1">Base64 Converter</h6>
+                            <small class="text-muted">Encode & decode</small>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pro Tools Banner -->
+                <div class="alert alert-primary mt-4 mb-0 border-0" style="background: linear-gradient(135deg, rgba(13,110,253,0.1) 0%, rgba(102,16,242,0.1) 100%); border-radius: 15px;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-stars fs-2 text-primary me-3"></i>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">Unlock Premium Tools</h6>
+                            <small class="text-muted">Get access to 20+ advanced tools with a Business account.</small>
+                        </div>
+                        <button class="btn btn-primary btn-sm px-3">Upgrade</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tool-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+</style>
