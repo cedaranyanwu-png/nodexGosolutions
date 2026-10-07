@@ -1,0 +1,9 @@
+databases/
+php_server.log
+*.log
+*.zip
+flutterwave-keys.txt
+.env
+uploads/
+NGS_backups/
+tmp/

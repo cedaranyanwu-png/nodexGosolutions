@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Page Builder | nodexGo</title>
+    <!-- Load FontAwesome and Tailwind -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <a href="/user/dashboard" class="flex items-center text-xl font-bold text-blue-600 tracking-wide hover:opacity-90 transition duration-150">
+            <i class="fa-solid fa-server mr-2"></i>nodex<span class="text-slate-800 font-semibold">Go</span>
+        </a>
+        <a href="/user/dashboard" class="text-xs font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-200 hover:bg-blue-100 transition duration-150">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Return Dashboard
+        </a>
+    </header>
+
+    <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto w-full">
+        <!-- Configuration Controls (Left) -->
+        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-4">
+                    <i class="fa-solid fa-id-card text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800 mb-1">Bio Page Creator</h1>
+                <p class="text-xs text-gray-500 mb-6">Build beautiful link-in-bio pages with custom link grids.</p>
+
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">My Full Name</label>
+                        <input type="text" id="bioName" class="w-full text-sm rounded-md px-3.5 py-2.5 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="Cedar Anyanwu" value="Cedar Anyanwu" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Headline Tagline</label>
+                        <input type="text" id="bioTagline" class="w-full text-sm rounded-md px-3.5 py-2.5 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="Full-Stack PHP Developer & Designer" value="Software Architect" />
+                    </div>
+
+                    <!-- Custom Link 1 -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-2xs font-bold uppercase text-gray-400 mb-1">Custom Button Title</label>
+                            <input type="text" id="btnTitle1" class="w-full text-xs rounded-md px-2.5 py-2 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="My Website" value="My Website Portfolio" />
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold uppercase text-gray-400 mb-1">Button Link URL</label>
+                            <input type="url" id="btnLink1" class="w-full text-xs rounded-md px-2.5 py-2 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="https://..." value="https://nodexplatform.com.ng" />
+                        </div>
+                    </div>
+
+                    <!-- Custom Link 2 -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-2xs font-bold uppercase text-gray-400 mb-1">Custom Button Title 2</label>
+                            <input type="text" id="btnTitle2" class="w-full text-xs rounded-md px-2.5 py-2 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="My GitHub" value="View Github Repos" />
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold uppercase text-gray-400 mb-1">Button Link URL 2</label>
+                            <input type="url" id="btnLink2" class="w-full text-xs rounded-md px-2.5 py-2 border border-gray-200 focus:outline-none focus:border-blue-500" placeholder="https://..." value="https://github.com" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnGenerate" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg transition duration-150 flex items-center justify-center gap-2 mt-6">
+                <i class="fa-solid fa-play"></i> Apply Real-time Changes
+            </button>
+        </div>
+
+        <!-- Real-time Live Preview (Right) -->
+        <div class="bg-slate-900 rounded-3xl p-4 shadow-2xl flex flex-col border-4 border-slate-700 max-w-sm mx-auto w-full" style="height: 580px;">
+            <div class="bg-white rounded-2xl flex-grow overflow-y-auto p-6 flex flex-col justify-between" id="previewArea">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full mx-auto flex items-center justify-center font-bold text-2xl shadow-md border-2 border-blue-200 mb-3" id="prevInitial">
+                        C
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-800" id="prevName">Cedar Anyanwu</h2>
+                    <p class="text-xs text-gray-400 font-semibold" id="prevTagline">Software Architect</p>
+
+                    <div class="space-y-3 mt-6">
+                        <a id="prevBtn1" href="#" target="_blank" class="block w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 text-xs rounded-xl transition duration-150">My Website Portfolio</a>
+                        <a id="prevBtn2" href="#" target="_blank" class="block w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold border border-blue-200 text-xs rounded-xl transition duration-150">View Github Repos</a>
+                    </div>
+                </div>
+
+                <div class="text-center text-3xs text-gray-400 border-t pt-4">
+                    Created via nodexGo workspace bio engine
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-3 text-center text-2xs text-gray-400">
+        &copy; 2026 nodexGo. Personal Branding Suite.
+    </footer>
+
+    <script>
+        const btnGenerate = document.getElementById('btnGenerate');
+        const bioName = document.getElementById('bioName');
+        const bioTagline = document.getElementById('bioTagline');
+        const btnTitle1 = document.getElementById('btnTitle1');
+        const btnLink1 = document.getElementById('btnLink1');
+        const btnTitle2 = document.getElementById('btnTitle2');
+        const btnLink2 = document.getElementById('btnLink2');
+
+        const prevName = document.getElementById('prevName');
+        const prevTagline = document.getElementById('prevTagline');
+        const prevInitial = document.getElementById('prevInitial');
+        const prevBtn1 = document.getElementById('prevBtn1');
+        const prevBtn2 = document.getElementById('prevBtn2');
+
+        function updatePreview() {
+            prevName.textContent = bioName.value.trim() || 'Cedar Anyanwu';
+            prevTagline.textContent = bioTagline.value.trim() || 'Software Architect';
+
+            const initLetter = (bioName.value.trim() || 'C').charAt(0).toUpperCase();
+            prevInitial.textContent = initLetter;
+
+            prevBtn1.textContent = btnTitle1.value.trim() || 'Primary Button';
+            prevBtn1.href = btnLink1.value.trim() || '#';
+
+            prevBtn2.textContent = btnTitle2.value.trim() || 'Secondary Button';
+            prevBtn2.href = btnLink2.value.trim() || '#';
+        }
+
+        btnGenerate.addEventListener('click', updatePreview);
+        updatePreview();
+    </script>
+</body>
+</html>

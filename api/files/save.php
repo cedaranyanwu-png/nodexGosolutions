@@ -1,0 +1,27 @@
+<?php
+/**
+ * api/files/save.php
+ */
+declare(strict_types=1);
+
+require_once __DIR__ . '/../../backend/auth/AuthService.php';
+require_once __DIR__ . '/../../backend/services/FileManagerService.php';
+
+enforceAuth(true);
+
+$auth = new AuthService();
+$user = $auth->getCurrentUser();
+
+$subdomain = (string)($_POST['subdomain'] ?? '');
+$file = (string)($_POST['file'] ?? '');
+$content = (string)($_POST['content'] ?? '');
+
+$service = new FileManagerService();
+$rootDir = $service->getWebsiteRoot($user, $subdomain);
+
+if (!$rootDir) {
+    jsonResponse(['success' => false, 'message' => 'Website workspace not found or access denied.'], 403);
+}
+
+$res = $service->saveFile($rootDir, $file, $content);
+jsonResponse($res, $res['success'] ? 200 : 400);

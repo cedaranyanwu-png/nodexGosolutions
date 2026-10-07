@@ -1,0 +1,16 @@
+/* assets/css/subscriptions.css - Membership & Plan Upgrade Styling */
+.plan-card-featured {
+  border: 2px solid #2563eb;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+}
+
+.trial-badge-pulse {
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
