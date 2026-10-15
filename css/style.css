@@ -1,0 +1,205 @@
+/* Base styles for the layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header styling */
+header {
+    background-color: var(--theme-color, #2c3e50);
+    color: #fff;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+}
+
+header img {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 1rem;
+    border: 2px solid #fff;
+    border-radius: 8px;
+}
+
+/* Container for the main content */
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Interactive React Dashboard Styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1.25rem;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    border-bottom: 2px solid #e1e8ed;
+    padding-bottom: 0.5rem;
+}
+
+/* Tenant Switcher Buttons */
+.tenant-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tenant-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: #e2e8f0;
+    color: #2d3748;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.tenant-btn:hover {
+    background: #cbd5e0;
+}
+
+.tenant-btn.active {
+    color: #fff;
+    background: var(--theme-color, #2c3e50);
+}
+
+/* Status Indicator */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-connected {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.status-disconnected {
+    background-color: #fed7d7;
+    color: #742a2a;
+}
+
+.status-connecting {
+    background-color: #feebc8;
+    color: #744210;
+}
+
+/* Chat / Live Feed Window */
+.chat-window {
+    height: 220px;
+    overflow-y: auto;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    padding: 0.75rem;
+    background: #fff;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-msg {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    max-width: 85%;
+    word-break: break-word;
+}
+
+.chat-msg.system {
+    background: #edf2f7;
+    color: #4a5568;
+    align-self: center;
+    font-style: italic;
+    font-size: 0.82rem;
+}
+
+.chat-msg.user {
+    background: #ebf8ff;
+    color: #2b6cb0;
+    align-self: flex-end;
+}
+
+.chat-msg.tenant {
+    background: #f0fff4;
+    color: #276749;
+    align-self: flex-start;
+}
+
+.chat-input-box {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input-box input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+}
+
+.chat-input-box button {
+    padding: 0.5rem 1rem;
+    background: var(--theme-color, #2c3e50);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-input-box button:hover {
+    opacity: 0.9;
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Dynamic text color for links based on theme */
+a {
+    color: var(--theme-color, #2c3e50);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
