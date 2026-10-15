@@ -18,6 +18,21 @@ if (!isset($tenant)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Use the tenant's name as the page title -->
     <title><?php echo htmlspecialchars($tenant['name']); ?> | NodeX Multi-Tenant</title>
+
+    <?php
+    // Google Analytics Tracking Tag Injection
+    $gaId = $tenant['ga_id'] ?? 'G-NODEXGO123';
+    if (!empty($gaId)):
+    ?>
+    <!-- Google Analytics Tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($gaId); ?>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<?php echo htmlspecialchars($gaId); ?>');
+    </script>
+    <?php endif; ?>
     <style>
         /* Base styles for the layout */
         body {

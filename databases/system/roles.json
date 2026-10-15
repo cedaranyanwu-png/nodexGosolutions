@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "Super Admin",
+        "description": "Complete absolute administrative privileges",
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 2,
+        "name": "Admin",
+        "description": "General administration capabilities",
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 3,
+        "name": "Manager",
+        "description": "Manages users and website workspaces",
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 4,
+        "name": "Support",
+        "description": "Assists clients and processes tickets",
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    },
+    {
+        "id": 5,
+        "name": "Moderator",
+        "description": "Audits content and custom templates",
+        "created_at": "2026-08-11 12:13:32",
+        "updated_at": "2026-08-11 12:13:32"
+    }
+]
