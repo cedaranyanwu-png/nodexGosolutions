@@ -1,0 +1,103 @@
+[Wed Aug 12 19:39:19 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 Accepted
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 [200]: HEAD /main/public/cedar.php
+[Wed Aug 12 19:39:21 2026] 127.0.0.1:49442 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 [200]: GET /main/public/cedar.php
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56970 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 Accepted
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56978 Closing
+[Wed Aug 12 19:40:08 2026] 127.0.0.1:56982 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 [200]: GET /main/public/about.php
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:56998 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 [200]: GET /main/assets/images/about-banner-1.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 [200]: GET /main/assets/images/logo.png?v=2
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57002 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57010 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 Accepted
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 [200]: GET /main/assets/images/about-banner-2.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 [200]: GET /main/assets/images/about-team-1.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 [200]: GET /main/assets/images/about-team-2.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 [200]: GET /main/assets/images/about-team-3.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57016 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57020 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57022 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57034 Closing
+[Wed Aug 12 19:40:12 2026] 127.0.0.1:57042 Closing
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44448 Accepted
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44448 [200]: GET /main/public/cedar.php
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44448 Closing
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44454 Accepted
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44462 Accepted
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44454 [200]: GET /main/assets/images/logo.png?v=2
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44462 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44462 Closing
+[Thu Aug 13 08:24:04 2026] 127.0.0.1:44454 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44468 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44468 [200]: GET /main/public/about.php
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44468 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44476 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44490 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44476 [200]: GET /main/assets/images/logo.png?v=2
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44490 [200]: GET /main/assets/images/about-banner-1.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44490 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44476 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44506 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44514 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44520 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44534 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44548 Accepted
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44506 [200]: GET /main/assets/images/about-banner-2.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44514 [200]: GET /main/assets/images/about-team-1.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44520 [200]: GET /main/assets/images/about-team-2.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44534 [200]: GET /main/assets/images/about-team-3.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44548 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44506 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44514 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44520 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44534 Closing
+[Thu Aug 13 08:24:08 2026] 127.0.0.1:44548 Closing
+[Thu Aug 13 09:13:44 2026] 127.0.0.1:49036 Accepted
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49036 [200]: GET /main/public/cedar.php
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49036 Closing
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49038 Accepted
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49054 Accepted
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49038 [200]: GET /main/assets/images/logo.png?v=2
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49054 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49054 Closing
+[Thu Aug 13 09:13:45 2026] 127.0.0.1:49038 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44358 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44358 [200]: GET /main/public/about.php
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44358 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44364 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44378 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44364 [200]: GET /main/assets/images/about-banner-1.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44364 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44378 [200]: GET /main/assets/images/logo.png?v=2
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44378 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44386 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44390 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44406 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44410 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44424 Accepted
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44386 [200]: GET /main/assets/images/about-banner-2.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44390 [200]: GET /main/assets/images/about-team-1.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44406 [200]: GET /main/assets/images/about-team-2.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44410 [200]: GET /main/assets/images/about-team-3.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44424 [200]: GET /main/assets/images/cedar-profile.jpg?v=1786559146
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44386 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44390 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44406 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44410 Closing
+[Thu Aug 13 09:13:49 2026] 127.0.0.1:44424 Closing
