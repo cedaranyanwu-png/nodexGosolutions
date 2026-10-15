@@ -1,0 +1,31 @@
+[Sun Aug 16 00:59:12 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Sun Aug 16 00:59:13 2026] 127.0.0.1:33822 Accepted
+[Sun Aug 16 00:59:13 2026] 127.0.0.1:33822 [200]: HEAD /
+[Sun Aug 16 00:59:13 2026] 127.0.0.1:33822 Closing
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55144 Accepted
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55144 [200]: GET /login
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55144 Closing
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55148 Accepted
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55152 Accepted
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55148 [200]: GET /css/style.css?v=1786834957
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55152 [200]: GET /main/assets/images/logo.png?v=2
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55148 Closing
+[Sun Aug 16 01:00:36 2026] 127.0.0.1:55152 Closing
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39758 Accepted
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39758 [200]: GET /login
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39758 Closing
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39760 Accepted
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39774 Accepted
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39760 [200]: GET /css/style.css?v=1786834957
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39774 [200]: GET /main/assets/images/logo.png?v=2
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39760 Closing
+[Sun Aug 16 01:04:11 2026] 127.0.0.1:39774 Closing
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36196 Accepted
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36196 [200]: GET /login
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36196 Closing
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36210 Accepted
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36226 Accepted
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36210 [200]: GET /css/style.css?v=1786834957
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36210 Closing
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36226 [200]: GET /main/assets/images/logo.png?v=2
+[Sun Aug 16 01:05:41 2026] 127.0.0.1:36226 Closing
