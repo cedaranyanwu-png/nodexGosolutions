@@ -1,0 +1,1 @@
+"""Media Studio app initialization."""

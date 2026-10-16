@@ -1,0 +1,11 @@
+*.pyc
+__pycache__/
+*.sqlite3
+.env
+frontend/node_modules/
+frontend/dist/
+.pytest_cache/
+staticfiles/
+media/
+check_out.txt
+frontend/build_out.txt
