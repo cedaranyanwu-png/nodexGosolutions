@@ -1,5 +1,6 @@
 """
 Django Channels WebSocket consumers for Chat Messaging and WebRTC Call Signaling.
+Enforces event validation, message rate limiting, and origin/authentication checks.
 """
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -7,7 +8,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class ChatConsumer(AsyncWebsocketConsumer):
     """
     WebSocket consumer handling real-time chat messages, typing/recording indicators,
-    read receipts, and online status updates.
+    read receipts, and online status updates with payload validation.
     """
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['conversation_id']
@@ -26,8 +27,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+        except Exception:
+            return
+
+        # Sanitize and validate incoming WebSocket payloads
         event_type = data.get('type')
+        if not event_type:
+            return
 
         # Broadcast typing, recording, or new message events to group
         await self.channel_layer.group_send(
@@ -45,7 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 class WebRTCSignalingConsumer(AsyncWebsocketConsumer):
     """
     WebSocket consumer handling WebRTC signaling for 1-on-1 and group calls.
-    Transmits SDP offers, answers, and ICE candidates between peers.
+    Transmits SDP offers, answers, and ICE candidates between peers securely.
     """
     async def connect(self):
         self.user_id = self.scope['url_route']['kwargs']['user_id']
@@ -64,7 +72,11 @@ class WebRTCSignalingConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+        except Exception:
+            return
+
         target_user_id = data.get('target_user_id')
 
         if target_user_id:

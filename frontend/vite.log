@@ -76,3 +76,14 @@ Error: connect ECONNREFUSED 127.0.0.1:8000
 7:58:42 PM [vite] http proxy error: /api/v1/posts/posts/
 Error: connect ECONNREFUSED 127.0.0.1:8000
     at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+8:45:55 AM [vite] hmr update /src/layouts/MainLayout.jsx
+8:46:02 AM [vite] hmr update /src/pages/FeedPage.jsx
+8:47:30 AM [vite] hmr update /src/pages/MessagesPage.jsx
+8:47:37 AM [vite] hmr update /src/pages/GenericPage.jsx
+8:49:07 AM [vite] hmr update /src/pages/AdminPage.jsx
+9:00:35 AM [vite] http proxy error: /api/v1/posts/posts/
+Error: connect ECONNREFUSED 127.0.0.1:8000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+9:00:35 AM [vite] http proxy error: /api/v1/posts/posts/
+Error: connect ECONNREFUSED 127.0.0.1:8000
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)

@@ -1,0 +1,24 @@
+/* QuickChat Platform - Custom CSS Palette Extensions */
+:root {
+  --qc-blue-primary: #0d6efd;
+  --qc-blue-dark: #0a58ca;
+  --qc-bg-white: #ffffff;
+  --qc-bg-light: #f8f9fa;
+}
+
+body {
+  background-color: var(--qc-bg-light);
+  color: #212529;
+}
+
+.bg-qc-primary {
+  background-color: var(--qc-blue-primary) !important;
+}
+
+.text-qc-primary {
+  color: var(--qc-blue-primary) !important;
+}
+
+.rounded-4 {
+  border-radius: 1rem !important;
+}

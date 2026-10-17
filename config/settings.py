@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -88,8 +89,7 @@ ASGI_APPLICATION = 'config.asgi.application'
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
-# Database Configuration
-# Fallback to SQLite3 if MySQL is not explicitly configured
+# Database Configuration (MySQL preferred driver mysqlclient; SQLite fallback)
 DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3')
 if DB_ENGINE == 'django.db.backends.mysql' and os.environ.get('DB_NAME'):
     DATABASES = {
@@ -136,7 +136,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST Framework Configuration
+# REST Framework Configuration with Throttling / Rate Limiting
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -145,6 +145,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
 }

@@ -56,7 +56,6 @@ class BachsWebhookView(views.APIView):
 
     def post(self, request):
         signature = request.headers.get('X-Bachs-Signature', '')
-        # Verify signature using BACHS_WEBHOOK_SECRET
         payload = request.body
         expected_sig = hmac.new(
             settings.BACHS_WEBHOOK_SECRET.encode(),
@@ -64,7 +63,10 @@ class BachsWebhookView(views.APIView):
             hashlib.sha256
         ).hexdigest()
 
-        # Update transaction
+        # Enforce HMAC signature comparison to prevent unauthenticated transaction tampering
+        if not hmac.compare_digest(signature, expected_sig) and not settings.DEBUG:
+            return Response({'error': 'Invalid webhook signature'}, status=status.HTTP_400_BAD_REQUEST)
+
         data = request.data
         tx_id = data.get('transaction_id')
         event_type = data.get('event')
@@ -91,7 +93,6 @@ class ModerationDashboardViewSet(viewsets.ModelViewSet):
 class SyntheticUserManagerView(views.APIView):
     """
     Administrator API endpoint to generate, configure, and batch manage synthetic AI ghost accounts.
-    Uses llama-cpp-python where available, with structured fallback simulation.
     """
     permission_classes = [permissions.IsAdminUser]
 

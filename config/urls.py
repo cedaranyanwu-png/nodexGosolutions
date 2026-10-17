@@ -5,9 +5,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    # Server-rendered HTML page template views
+    path('', TemplateView.as_view(template_name='public/home.html'), name='home'),
+    path('login/', TemplateView.as_view(template_name='accounts/login.html'), name='login-page'),
+    path('register/', TemplateView.as_view(template_name='accounts/register.html'), name='register-page'),
+    path('feed/', TemplateView.as_view(template_name='social/feed.html'), name='feed-page'),
+    path('profile/', TemplateView.as_view(template_name='profiles/profile.html'), name='profile-page'),
+    path('messages/inbox/', TemplateView.as_view(template_name='messaging/inbox.html'), name='inbox-page'),
+    path('creators/dashboard/', TemplateView.as_view(template_name='creators/dashboard.html'), name='creator-dashboard-page'),
+    path('admin-panel/', TemplateView.as_view(template_name='admin/dashboard.html'), name='admin-dashboard-page'),
+
+    # Django Admin
     path('admin/', admin.site.urls),
+
+    # REST APIs
     path('api/v1/accounts/', include('apps.accounts.urls')),
     path('api/v1/profiles/', include('apps.profiles.urls')),
     path('api/v1/posts/', include('apps.posts.urls')),

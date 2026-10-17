@@ -24,7 +24,7 @@ class RegisterView(views.APIView):
             return Response({
                 'token': token.key,
                 'user': UserSerializer(user).data
-            }, status=status.HTTP_211_CREATED if hasattr(status, 'HTTP_211_CREATED') else status.HTTP_201_CREATED)
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -38,11 +38,8 @@ class LoginView(views.APIView):
         if not email or not password:
             return Response({'error': 'Email and password required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user_obj = User.objects.get(email=email)
-            user = authenticate(username=user_obj.username, password=password)
-        except User.DoesNotExist:
-            user = None
+        # Authenticate using email as USERNAME_FIELD
+        user = authenticate(request, username=email, password=password)
 
         if user:
             if user.is_suspended:
