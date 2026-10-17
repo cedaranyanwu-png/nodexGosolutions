@@ -2,6 +2,9 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import FeedPage from './pages/FeedPage';
+import ExplorePage from './pages/ExplorePage';
+import ReelsPage from './pages/ReelsPage';
+import ProfilePage from './pages/ProfilePage';
 import MessagesPage from './pages/MessagesPage';
 import AdminPage from './pages/AdminPage';
 import GenericPage from './pages/GenericPage';
@@ -11,8 +14,9 @@ export default function App() {
     <MainLayout>
       <Routes>
         <Route path="/" element={<FeedPage />} />
-        <Route path="/explore" element={<GenericPage title="Explore & Recommendations" description="Discover trending posts, creators, and personalized recommendations." />} />
-        <Route path="/reels" element={<GenericPage title="Vertical Short-Form Reels" description="Watch and interact with vertical short videos." />} />
+        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/reels" element={<ReelsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/calls" element={<GenericPage title="WebRTC Voice & Video Calls" description="Initiate direct or group audio and video calls." />} />
         <Route path="/communities" element={<GenericPage title="Communities" description="Join public and private communities." />} />

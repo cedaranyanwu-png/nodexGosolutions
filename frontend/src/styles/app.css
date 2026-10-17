@@ -1,53 +1,22 @@
-/* QuickChat Platform CSS - Refined Modern UI Theme */
+/* QuickChat Bootstrap 5 Blue & White Theme */
 :root {
-  --primary-blue: #2563eb;
-  --accent-violet: #7c3aed;
-  --bg-dark: #0f172a;
-  --card-bg: #1e293b;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
+  --qc-primary-blue: #0d6efd;
+  --qc-dark-blue: #0a58ca;
+  --qc-bg-white: #ffffff;
+  --qc-bg-light: #f8f9fa;
+  --qc-border-color: #dee2e6;
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
+  background-color: var(--qc-bg-light);
+  color: #212529;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  margin: 0;
-  padding: 0;
 }
 
-.qc-nav {
-  background: var(--card-bg);
-  border-right: 1px solid var(--border-color);
-  min-height: 100vh;
+.card {
+  border-radius: 1rem;
 }
 
-.qc-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.btn-qc-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--accent-violet));
-  border: none;
-  color: white;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-}
-
-.btn-qc-primary:hover {
-  opacity: 0.92;
-  color: white;
-}
-
-.qc-badge {
-  background: var(--accent-violet);
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+.hover-bg-light:hover {
+  background-color: #e9ecef;
 }
