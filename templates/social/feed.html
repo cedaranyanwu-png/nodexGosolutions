@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Social Feed — QuickChat{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+      <h5 class="fw-bold text-primary mb-3">Create Post</h5>
+      <form id="createPostForm">
+        <textarea class="form-control mb-3" rows="3" placeholder="What's happening?"></textarea>
+        <button class="btn btn-primary fw-bold px-4" type="submit">Publish</button>
+      </form>
+    </div>
+    <div id="feedList">
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-3 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <strong class="text-primary">@alice</strong>
+          <small class="text-muted">Just now</small>
+        </div>
+        <p class="mb-2">Welcome to QuickChat! Enjoying the real-time social feed.</p>
+        <div class="text-muted"><small>❤️ 5 Likes · 💬 2 Comments</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+      <h6 class="fw-bold text-primary mb-3">Recommended Creators</h6>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+          <div><strong>@tech_guru</strong><br><small class="text-muted">Tech & AI</small></div>
+          <button class="btn btn-sm btn-outline-primary">Follow</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

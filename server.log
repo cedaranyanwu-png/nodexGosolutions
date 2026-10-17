@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/app/main.py", line 45, in <module>
+    main()
+  File "/app/main.py", line 34, in main
+    bootstrap()
+  File "/app/main.py", line 16, in bootstrap
+    import django
+ModuleNotFoundError: No module named 'django'

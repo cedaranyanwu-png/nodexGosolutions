@@ -1,0 +1,1 @@
+"""Professional Rooms app initialization."""

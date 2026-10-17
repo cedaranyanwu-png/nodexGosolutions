@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Superadmin Dashboard — QuickChat{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold text-primary mb-4">Superadmin Control Center</h2>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+      <small class="text-muted">Total Users</small>
+      <h3 class="fw-bold text-primary my-1">1,240</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+      <small class="text-muted">Synthetic AI Accounts</small>
+      <h3 class="fw-bold text-warning my-1">42</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+      <small class="text-muted">Pending Moderation Reports</small>
+      <h3 class="fw-bold text-danger my-1">3</h3>
+    </div>
+  </div>
+</div>
+{% endblock %}

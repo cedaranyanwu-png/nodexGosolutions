@@ -1,0 +1,1 @@
+"""Synthetic Users app initialization."""

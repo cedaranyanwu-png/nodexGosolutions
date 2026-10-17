@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Log In — QuickChat{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <h3 class="fw-bold text-center text-primary mb-4">Log In to QuickChat</h3>
+      <form id="loginForm" method="POST" action="/api/v1/accounts/login/">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label font-weight-semibold">Email Address</label>
+          <input type="email" name="email" class="form-control form-control-lg" required placeholder="name@example.com">
+        </div>
+        <div class="mb-4">
+          <label class="form-label font-weight-semibold">Password</label>
+          <input type="password" name="password" class="form-control form-control-lg" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Sign In</button>
+      </form>
+      <div class="text-center mt-3">
+        <small class="text-muted">Don't have an account? <a href="/register/" class="text-primary fw-semibold">Sign Up</a></small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
